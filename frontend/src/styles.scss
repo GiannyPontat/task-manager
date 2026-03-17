@@ -1,0 +1,143 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$primary: mat.define-palette(mat.$indigo-palette);
+$accent:  mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$warn:    mat.define-palette(mat.$red-palette);
+
+$theme: mat.define-light-theme((
+  color: (primary: $primary, accent: $accent, warn: $warn),
+  typography: mat.define-typography-config(),
+  density: 0
+));
+
+@include mat.all-component-themes($theme);
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Inter', sans-serif;
+  background-color: #f8fafc;
+}
+
+// ─── mat-icon : baseline fix global ───────────────────────────────────────────
+// Empêche line-height et vertical-align de décaler les icônes Material
+.mat-icon {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1 !important;
+  flex-shrink: 0;
+}
+
+// ─── Boutons Material : centrage icône + texte ─────────────────────────────────
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-stroked-button,
+.mat-mdc-flat-button,
+.mat-mdc-icon-button {
+  .mdc-button__label,
+  .mat-mdc-button-touch-target {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  // Icône seule dans un icon-button : centrage parfait
+  &.mat-mdc-icon-button {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// ─── Icônes dans les liens et boutons nav (routerLink) ────────────────────────
+a[mat-button],
+a[mat-stroked-button],
+a[mat-flat-button] {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+}
+
+// ─── Icônes préfixe/suffixe dans les mat-form-field ──────────────────────────
+.mat-mdc-form-field {
+  .mat-mdc-form-field-icon-prefix,
+  .mat-mdc-form-field-icon-suffix {
+    display: flex;
+    align-items: center;
+  }
+}
+
+// ─── Icônes cliquables : transition + hover ───────────────────────────────────
+// Cible les mat-icon à l'intérieur de boutons icon-button
+.mat-mdc-icon-button .mat-icon {
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+.mat-mdc-icon-button:hover .mat-icon {
+  transform: scale(1.1);
+}
+
+// ─── Taille standard des icônes ───────────────────────────────────────────────
+// Taille cohérente 20px par défaut sauf indication contraire
+.mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+
+  // Dans les boutons raised/stroked/flat standards : 18px
+  .mat-mdc-raised-button &,
+  .mat-mdc-stroked-button &,
+  .mat-mdc-flat-button &,
+  .mat-mdc-button & {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  // Dans les icon-buttons : 22px
+  .mat-mdc-icon-button & {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// ─── Chips mat-chip : alignement icône interne ────────────────────────────────
+.mat-mdc-chip {
+  .mat-mdc-chip-action-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+// ─── mat-card-header : alignement titre + icône ───────────────────────────────
+mat-card-title,
+.mat-mdc-card-title {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+// ─── mat-option : alignement icône + texte ────────────────────────────────────
+.mat-mdc-option .mdc-list-item__primary-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+// ─── Icônes dans les dialog-title ─────────────────────────────────────────────
+[mat-dialog-title],
+h2[mat-dialog-title] {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
