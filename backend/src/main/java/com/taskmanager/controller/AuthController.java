@@ -5,10 +5,12 @@ import com.taskmanager.dto.ForgotPasswordRequest;
 import com.taskmanager.dto.LoginRequest;
 import com.taskmanager.dto.RegisterRequest;
 import com.taskmanager.dto.ResetPasswordRequest;
+import com.taskmanager.entity.User;
 import com.taskmanager.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,6 +28,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(authService.refresh(user));
     }
 
     @PostMapping("/forgot-password")

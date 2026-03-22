@@ -29,9 +29,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final ColumnService columnService;
     private final PasswordResetTokenRepository tokenRepository;
     private final EmailService emailService;
+    private final InvitationService invitationService;
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -49,7 +49,12 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
-        columnService.initDefaultColumns(user);
+        invitationService.acceptPendingInvitations(user);
+        String token = jwtService.generateToken(user);
+        return new AuthResponse(token, user.getDisplayName(), user.getEmail(), user.getRole().name());
+    }
+
+    public AuthResponse refresh(User user) {
         String token = jwtService.generateToken(user);
         return new AuthResponse(token, user.getDisplayName(), user.getEmail(), user.getRole().name());
     }
