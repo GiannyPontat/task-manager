@@ -1,6 +1,7 @@
-import { Component, inject, Output, EventEmitter, computed } from '@angular/core';
+import { Component, OnInit, inject, Output, EventEmitter, computed, signal } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
@@ -9,14 +10,17 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SidebarService } from '../../../core/services/sidebar.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { WorkspaceService } from '../../../core/services/workspace.service';
+import { ProjectService } from '../../../core/services/project.service';
+import { InvitationService } from '../../../core/services/invitation.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { InviteDialogComponent } from './invite-dialog.component';
+import { ProjectSettingsComponent } from '../../projects/project-settings/project-settings.component';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [
-    CommonModule, AsyncPipe, RouterModule,
+    CommonModule, AsyncPipe, RouterModule, FormsModule,
     MatIconModule, MatButtonModule, MatRippleModule,
     MatTooltipModule, MatDialogModule, MatSnackBarModule,
   ],
@@ -36,12 +40,12 @@ import { InviteDialogComponent } from './invite-dialog.component';
 
         <!-- Profile -->
         <div class="profile-row">
-          <div class="workspace-avatar">
-            <mat-icon>grid_view</mat-icon>
+          <div class="user-avatar">
+            {{ userInitials() }}
           </div>
           <div class="profile-info">
-            <span class="profile-name">Mon Espace</span>
-            <span class="profile-sub">Pro Plan</span>
+            <span class="profile-name">{{ authService.currentUser()?.username }}</span>
+            <span class="profile-sub">{{ authService.currentUser()?.email }}</span>
           </div>
         </div>
 
@@ -67,6 +71,63 @@ import { InviteDialogComponent } from './invite-dialog.component';
 
         <div class="divider"></div>
 
+        <!-- ── Projets ── -->
+        <div class="section projects-section">
+          <div class="section-header-row">
+            <p class="section-label">Projets</p>
+            <button
+              class="invite-btn"
+              (click)="openCreateProject()"
+              matTooltip="Nouveau projet"
+              matTooltipPosition="right"
+            >
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+
+          <div class="nav-list">
+            @for (project of projectService.projects(); track project.id) {
+              <div
+                class="nav-item project-item"
+                matRipple
+                [class.active]="projectService.selected()?.id === project.id"
+                (click)="projectService.selectProject(project)"
+              >
+                <mat-icon class="nav-icon">folder</mat-icon>
+                <span class="nav-label">{{ project.name }}</span>
+                <button class="project-action-btn" matTooltip="Paramètres" matTooltipPosition="right"
+                        (click)="openSettings($event, project)">
+                  <mat-icon>settings</mat-icon>
+                </button>
+              </div>
+            }
+
+            @if (creatingProject()) {
+              <div class="inline-form">
+                <input
+                  class="inline-input"
+                  type="text"
+                  [(ngModel)]="newProjectName"
+                  placeholder="Nom du projet…"
+                  (keyup.enter)="submitProject()"
+                  (keyup.escape)="creatingProject.set(false)"
+                  autofocus
+                />
+                <div class="inline-actions">
+                  <button class="action-btn check" (click)="submitProject()">
+                    <mat-icon>check</mat-icon>
+                  </button>
+                  <button class="action-btn close-btn" (click)="creatingProject.set(false)">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
         <!-- ── Membres du Projet ── -->
         <div class="section members-section">
           <div class="section-header-row">
@@ -82,14 +143,14 @@ import { InviteDialogComponent } from './invite-dialog.component';
           </div>
 
           <div class="member-list">
-            @for (m of (members$ | async) ?? []; track m.name) {
-              <div class="member-row" [matTooltip]="m.name + ' · ' + (m.role === 'admin' ? 'Admin' : 'Membre')">
-                <div class="member-avatar" [style.background]="m.color">
-                  {{ m.initials }}
+            @for (m of projectService.selected()?.members ?? []; track m.userId) {
+              <div class="member-row" [matTooltip]="m.username + ' · ' + m.role">
+                <div class="member-avatar">
+                  {{ m.username.substring(0, 1).toUpperCase() }}
                 </div>
                 <div class="member-info">
-                  <span class="member-name">{{ m.name }}</span>
-                  @if (m.role === 'admin') {
+                  <span class="member-name">{{ m.username }}</span>
+                  @if (m.role === 'ADMIN') {
                     <span class="member-role-badge">Admin</span>
                   }
                 </div>
@@ -125,8 +186,14 @@ import { InviteDialogComponent } from './invite-dialog.component';
 
         <div class="divider"></div>
 
-        <!-- ── Logout ── -->
+        <!-- ── Theme toggle + Logout ── -->
         <div class="logout-section">
+          <button class="theme-toggle-btn" matRipple (click)="themeService.toggle()"
+                  [matTooltip]="themeService.theme() === 'dark' ? 'Mode clair' : 'Mode sombre'"
+                  matTooltipPosition="right">
+            <mat-icon class="logout-icon">{{ themeService.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+            <span class="logout-label">{{ themeService.theme() === 'dark' ? 'Mode clair' : 'Mode sombre' }}</span>
+          </button>
           <button
             class="logout-btn"
             matRipple
@@ -157,12 +224,13 @@ import { InviteDialogComponent } from './invite-dialog.component';
     /* ── Glass panel ── */
     .glass-panel {
       height: 100%;
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--bg-panel);
       backdrop-filter: blur(18px) saturate(180%);
       -webkit-backdrop-filter: blur(18px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--border-panel);
+      border-right: 1px solid var(--border);
       border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+      box-shadow: var(--shadow);
       display: flex;
       flex-direction: column;
       padding: 20px 12px;
@@ -209,22 +277,26 @@ import { InviteDialogComponent } from './invite-dialog.component';
       padding: 4px 6px 12px;
     }
 
-    .workspace-avatar {
+    .user-avatar {
       width: 36px; height: 36px; min-width: 36px;
       border-radius: 12px;
-      background: rgba(255,255,255,0.08);
+      background: linear-gradient(135deg, #6366f1, #3b82f6);
       display: flex; align-items: center; justify-content: center;
-      mat-icon { font-size: 17px; width: 17px; height: 17px; color: #94a3b8; }
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.03em;
+      flex-shrink: 0;
     }
 
     .profile-info { display: flex; flex-direction: column; overflow: hidden; }
-    .profile-name { font-size: 0.8rem; font-weight: 600; color: #f8fafc; white-space: nowrap; }
-    .profile-sub  { font-size: 0.68rem; color: rgba(255,255,255,0.45); }
+    .profile-name { font-size: 0.8rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-sub  { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* ── Divider ── */
     .divider {
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
       margin: 8px 0;
       flex-shrink: 0;
     }
@@ -237,7 +309,7 @@ import { InviteDialogComponent } from './invite-dialog.component';
       text-transform: uppercase;
       letter-spacing: 0.1em;
       font-weight: 700;
-      color: rgba(255, 255, 255, 0.35);
+      color: var(--text-muted);
       margin: 4px 0 8px 8px;
     }
 
@@ -251,20 +323,19 @@ import { InviteDialogComponent } from './invite-dialog.component';
       padding: 9px 10px;
       border-radius: 10px;
       text-decoration: none;
-      color: #94a3b8;
+      color: var(--text-secondary);
       font-size: 0.82rem;
       font-weight: 500;
       border: 1px solid transparent;
       transition: background 0.18s, color 0.18s, border-color 0.18s;
       cursor: pointer;
-      &:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
+      &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
     }
 
     .nav-item.active {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      color: #f8fafc;
+      background: rgba(99,102,241,0.1);
+      border-color: rgba(99,102,241,0.2);
+      color: var(--primary);
     }
 
     .nav-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
@@ -287,19 +358,19 @@ import { InviteDialogComponent } from './invite-dialog.component';
 
     .invite-btn {
       width: 22px; height: 22px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
       border-radius: 6px;
-      color: #64748b;
+      color: var(--text-muted);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
       flex-shrink: 0;
       mat-icon { font-size: 13px; width: 13px; height: 13px; }
       &:hover {
-        background: rgba(99,102,241,0.2);
-        border-color: rgba(99,102,241,0.4);
-        color: #818cf8;
+        background: rgba(99,102,241,0.15);
+        border-color: var(--primary);
+        color: var(--primary);
       }
     }
 
@@ -317,7 +388,7 @@ import { InviteDialogComponent } from './invite-dialog.component';
       border-radius: 9px;
       transition: background 0.15s;
       cursor: default;
-      &:hover { background: rgba(255,255,255,0.04); }
+      &:hover { background: var(--bg-panel-hover); }
     }
 
     .member-avatar {
@@ -341,7 +412,7 @@ import { InviteDialogComponent } from './invite-dialog.component';
     .member-name {
       font-size: 0.8rem;
       font-weight: 500;
-      color: #cbd5e1;
+      color: var(--text-secondary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -360,6 +431,76 @@ import { InviteDialogComponent } from './invite-dialog.component';
       flex-shrink: 0;
     }
 
+    /* ── Project item with delete button ── */
+    .project-item {
+      position: relative;
+      cursor: pointer;
+      .delete-project-btn { display: none; }
+      &:hover .delete-project-btn { display: flex; }
+    }
+
+    .project-action-btn {
+      margin-left: auto;
+      width: 20px; height: 20px;
+      background: none;
+      border: none;
+      border-radius: 5px;
+      color: #64748b;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      &:hover { color: #818cf8; background: rgba(99,102,241,0.15); }
+    }
+
+    /* ── Inline project create form ── */
+    .inline-form {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 6px 8px;
+    }
+
+    .inline-input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: var(--text-main);
+      font-size: 0.82rem;
+      font-family: inherit;
+      outline: none;
+      box-sizing: border-box;
+      &::placeholder { color: var(--text-muted); }
+      &:focus { border-color: var(--primary); }
+    }
+
+    .inline-actions { display: flex; gap: 4px; justify-content: flex-end; }
+
+    .action-btn {
+      width: 24px; height: 24px;
+      border: none;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+    }
+
+    .action-btn.check {
+      background: rgba(99,102,241,0.3);
+      color: #a5b4fc;
+      &:hover { background: rgba(99,102,241,0.5); }
+    }
+
+    .action-btn.close-btn {
+      background: rgba(255,255,255,0.06);
+      color: #64748b;
+      &:hover { background: rgba(255,77,77,0.15); color: #ff4d4d; }
+    }
+
     /* ── Filters ── */
     .filter-list { display: flex; flex-direction: column; gap: 3px; }
 
@@ -371,20 +512,20 @@ import { InviteDialogComponent } from './invite-dialog.component';
       border-radius: 10px;
       background: transparent;
       border: 1px solid transparent;
-      color: #94a3b8;
+      color: var(--text-secondary);
       font-size: 0.82rem;
       font-weight: 500;
       cursor: pointer;
       text-align: left;
       width: 100%;
       transition: background 0.18s, color 0.18s, border-color 0.18s;
-      &:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
+      &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
     }
 
     .filter-item.active {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.18);
-      color: #f8fafc;
+      background: rgba(99,102,241,0.1);
+      border-color: rgba(99,102,241,0.2);
+      color: var(--primary);
     }
 
     .priority-dot {
@@ -402,6 +543,33 @@ import { InviteDialogComponent } from './invite-dialog.component';
     .logout-section {
       padding: 4px 0 2px;
       flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .theme-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: background 0.18s, color 0.18s;
+      &:hover {
+        background: rgba(99,102,241,0.08);
+        border-color: rgba(99,102,241,0.15);
+        color: var(--primary);
+      }
+      mat-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
     }
 
     .logout-btn {
@@ -413,16 +581,16 @@ import { InviteDialogComponent } from './invite-dialog.component';
       border-radius: 10px;
       background: transparent;
       border: 1px solid transparent;
-      color: #64748b;
+      color: var(--text-muted);
       font-size: 0.82rem;
       font-weight: 500;
       cursor: pointer;
       text-align: left;
       transition: background 0.18s, color 0.18s, border-color 0.18s;
       &:hover {
-        background: rgba(255, 77, 77, 0.1);
-        border-color: rgba(255, 77, 77, 0.2);
-        color: #ff4d4d;
+        background: rgba(255, 77, 77, 0.08);
+        border-color: rgba(255, 77, 77, 0.18);
+        color: #ef4444;
       }
     }
 
@@ -430,22 +598,30 @@ import { InviteDialogComponent } from './invite-dialog.component';
     .logout-label { white-space: nowrap; }
   `],
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   @Output() filterSelected = new EventEmitter<string | null>();
 
-  readonly authService      = inject(AuthService);
-  readonly sidebarService   = inject(SidebarService);
-  private readonly workspaceService = inject(WorkspaceService);
-  private readonly dialog  = inject(MatDialog);
-  private readonly snack   = inject(MatSnackBar);
+  readonly authService    = inject(AuthService);
+  readonly themeService   = inject(ThemeService);
+  readonly sidebarService = inject(SidebarService);
+  readonly projectService     = inject(ProjectService);
+  private readonly invitationService = inject(InvitationService);
+  private readonly dialog = inject(MatDialog);
+  private readonly snack  = inject(MatSnackBar);
+
+  creatingProject = signal(false);
+  newProjectName  = '';
+
+  readonly userInitials = computed(() => {
+    const name = this.authService.currentUser()?.username ?? '';
+    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+  });
 
   readonly activeFilter = computed(() => {
     const p = this.sidebarService.priorityFilter();
     if (!p) return null;
     return ({ HIGH: 'Urgent', MEDIUM: 'Moyen', LOW: 'Bas' } as Record<string, string>)[p] ?? null;
   });
-
-  readonly members$ = this.workspaceService.getMembers();
 
   readonly navItems = [
     { label: 'Tableau',    icon: 'grid_view',      route: '/tasks'    },
@@ -459,16 +635,71 @@ export class SidebarComponent {
     { label: 'Bas',    color: '#2ecc71' },
   ];
 
+  ngOnInit(): void {
+    this.projectService.loadProjects().subscribe();
+  }
+
+  openSettings(event: Event, project: { id: number }): void {
+    event.stopPropagation();
+    const full = this.projectService.projects().find(p => p.id === project.id)
+               ?? this.projectService.selected();
+    if (!full) return;
+    // Récupère le projet complet avec membres
+    this.projectService.getProject(full.id).subscribe(p => {
+      const ref = this.dialog.open(ProjectSettingsComponent, {
+        data: { project: p },
+        panelClass: 'dark-dialog',
+        backdropClass: 'dark-backdrop',
+        maxWidth: '620px',
+      });
+      ref.afterClosed().subscribe(result => {
+        if (result === 'DELETED') {
+          this.snack.open(`Projet supprimé`, 'OK', { duration: 3000 });
+        }
+      });
+    });
+  }
+
+  openCreateProject(): void {
+    this.newProjectName = '';
+    this.creatingProject.set(true);
+  }
+
+  submitProject(): void {
+    const name = this.newProjectName.trim();
+    if (!name) return;
+    this.projectService.createProject({ name }).subscribe({
+      next: () => {
+        this.creatingProject.set(false);
+        this.newProjectName = '';
+        this.snack.open(`Projet "${name}" créé`, 'OK', { duration: 3000 });
+      },
+      error: () => this.snack.open('Erreur lors de la création', 'OK', { duration: 3000 }),
+    });
+  }
+
   openInviteDialog(): void {
+    const project = this.projectService.selected();
+    if (!project) return;
     const ref = this.dialog.open(InviteDialogComponent, {
       panelClass: 'dark-dialog',
       backdropClass: 'dark-backdrop',
     });
     ref.afterClosed().subscribe((email: string | null) => {
       if (!email) return;
-      this.workspaceService.inviteMember(email).subscribe({
-        next: () => this.snack.open(`Invitation envoyée à ${email}`, 'OK', { duration: 3000 }),
-        error: () => this.snack.open('Erreur lors de l\'envoi de l\'invitation', 'OK', { duration: 3000 }),
+      this.projectService.addMember(project.id, { email, role: 'EDITOR' }).subscribe({
+        next: () => this.snack.open(`${email} ajouté au projet`, 'OK', { duration: 3000 }),
+        error: (err) => {
+          if (err.status === 404) {
+            // Utilisateur non inscrit → invitation par email
+            this.invitationService.invite(email, undefined, project.id).subscribe({
+              next: (result) => this.snack.open(result.message, 'OK', { duration: 4000 }),
+              error: () => this.snack.open('Erreur lors de l\'envoi de l\'invitation', 'OK', { duration: 3000 }),
+            });
+          } else {
+            this.snack.open(err.error?.message ?? 'Erreur lors de l\'invitation', 'OK', { duration: 3000 });
+          }
+        },
       });
     });
   }

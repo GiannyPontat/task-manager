@@ -10,6 +10,10 @@ export class UserService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
 
+  getAll() {
+    return this.http.get<{ id: number; username: string }[]>(`${environment.apiUrl}/users`);
+  }
+
   updateProfile(username: string) {
     return this.http
       .patch<AuthResponse>(`${environment.apiUrl}/users/me`, { username })

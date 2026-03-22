@@ -9,6 +9,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatRippleModule } from '@angular/material/core';
 import { AuthService } from '../../core/services/auth.service';
 import { TaskService } from '../../core/services/task.service';
+import { ProjectService } from '../../core/services/project.service';
 import { UserService } from '../../core/services/user.service';
 
 @Component({
@@ -493,7 +494,8 @@ import { UserService } from '../../core/services/user.service';
 export class ProfileComponent implements OnInit {
   readonly auth      = inject(AuthService);
   private readonly userSvc = inject(UserService);
-  private readonly taskSvc = inject(TaskService);
+  private readonly taskSvc        = inject(TaskService);
+  private readonly projectService = inject(ProjectService);
   private readonly snack   = inject(MatSnackBar);
   private readonly fb      = inject(FormBuilder);
 
@@ -533,7 +535,9 @@ export class ProfileComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.taskSvc.getTasks().subscribe({
+    const projectId = this.projectService.selected()?.id;
+    if (!projectId) return;
+    this.taskSvc.getTasks(projectId).subscribe({
       next: (page) => {
         const tasks = page.content ?? [];
         this.totalTasks.set(tasks.length);

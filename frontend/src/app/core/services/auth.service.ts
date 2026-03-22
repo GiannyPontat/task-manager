@@ -9,12 +9,20 @@ const API = `${environment.apiUrl}/auth`;
 const TOKEN_KEY = 'jwt_token';
 const USER_KEY = 'current_user';
 
+/** Délai avant expiration à partir duquel on rafraîchit (5 min) */
+const REFRESH_BEFORE_MS = 5 * 60 * 1000;
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
   readonly currentUser = signal<AuthResponse | null>(this.loadUser());
 
-  constructor(private http: HttpClient, private router: Router) {}
+  private refreshTimer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor(private http: HttpClient, private router: Router) {
+    // Replanifie le refresh si un token existe déjà au démarrage
+    if (this.getToken()) this.scheduleRefresh(this.getToken()!);
+  }
 
   register(payload: RegisterRequest) {
     return this.http.post<AuthResponse>(`${API}/register`, payload).pipe(
@@ -28,6 +36,38 @@ export class AuthService {
     );
   }
 
+  refresh(): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${API}/refresh`, {}).pipe(
+      tap(res => this.saveSession(res))
+    );
+  }
+
+  private scheduleRefresh(token: string): void {
+    if (this.refreshTimer) clearTimeout(this.refreshTimer);
+    const exp = this.getTokenExpiry(token);
+    if (!exp) return;
+    const delay = exp - Date.now() - REFRESH_BEFORE_MS;
+    if (delay <= 0) {
+      // Token déjà expiré ou sur le point d'expirer
+      this.logout();
+      return;
+    }
+    this.refreshTimer = setTimeout(() => {
+      this.refresh().subscribe({
+        error: () => this.logout(),
+      });
+    }, delay);
+  }
+
+  private getTokenExpiry(token: string): number | null {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp ? payload.exp * 1000 : null;
+    } catch {
+      return null;
+    }
+  }
+
   forgotPassword(email: string): Observable<void> {
     return this.http.post<void>(`${API}/forgot-password`, { email });
   }
@@ -37,6 +77,7 @@ export class AuthService {
   }
 
   logout(): void {
+    if (this.refreshTimer) clearTimeout(this.refreshTimer);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     this.currentUser.set(null);
@@ -59,6 +100,7 @@ export class AuthService {
     localStorage.setItem(TOKEN_KEY, res.token);
     localStorage.setItem(USER_KEY, JSON.stringify(res));
     this.currentUser.set(res);
+    this.scheduleRefresh(res.token);
   }
 
   private loadUser(): AuthResponse | null {

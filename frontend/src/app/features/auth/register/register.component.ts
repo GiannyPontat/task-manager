@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -56,8 +56,9 @@ import { AuthService } from '../../../core/services/auth.service';
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Adresse email</mat-label>
               <input matInput type="email" formControlName="email"
-                     placeholder="vous@exemple.com" autocomplete="email" />
-              <mat-icon matSuffix>email</mat-icon>
+                     placeholder="vous@exemple.com" autocomplete="email"
+                     [readonly]="emailFromInvite" />
+              <mat-icon matSuffix>{{ emailFromInvite ? 'lock' : 'email' }}</mat-icon>
               @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
                 <mat-error>L'email est requis.</mat-error>
               } @else if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
@@ -202,17 +203,28 @@ export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
 
   hidePassword = true;
   loading = false;
   errorMessage = '';
+  emailFromInvite = false;
 
   form = this.fb.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
+
+  constructor() {
+    const email = this.route.snapshot.queryParamMap.get('email');
+    if (email) {
+      this.form.get('email')!.setValue(email);
+      this.form.get('email')!.disable();
+      this.emailFromInvite = true;
+    }
+  }
 
   onSubmit(): void {
     if (this.form.invalid) {

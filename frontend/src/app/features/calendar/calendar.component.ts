@@ -13,6 +13,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import frLocale from '@fullcalendar/core/locales/fr';
 
 import { ColumnService } from '../../core/services/column.service';
+import { ProjectService } from '../../core/services/project.service';
 import { Task, Priority } from '../../core/models/task.model';
 import { TaskFormComponent } from '../tasks/task-form/task-form.component';
 
@@ -375,7 +376,8 @@ interface CalendarView { key: string; label: string; }
 export class CalendarComponent implements OnInit {
   @ViewChild('calendarRef') calendarRef!: FullCalendarComponent;
 
-  private readonly columnService = inject(ColumnService);
+  private readonly columnService  = inject(ColumnService);
+  private readonly projectService = inject(ProjectService);
   private readonly dialog         = inject(MatDialog);
 
   events   = signal<EventInput[]>([]);
@@ -409,7 +411,9 @@ export class CalendarComponent implements OnInit {
   }
 
   loadTasks(): void {
-    this.columnService.getColumns().subscribe({
+    const projectId = this.projectService.selected()?.id;
+    if (!projectId) return;
+    this.columnService.getColumns(projectId).subscribe({
       next: (cols) => {
         const mapped: EventInput[] = cols.flatMap(col =>
           col.tasks.map(task => ({
