@@ -6,6 +6,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { SidebarComponent } from './features/shared/sidebar/sidebar.component';
 import { SidebarService } from './core/services/sidebar.service';
 import { AuthService } from './core/services/auth.service';
+import { ThemeService } from './core/services/theme.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -19,8 +20,8 @@ import { Subscription } from 'rxjs';
   ],
   template: `
     <div class="app-bg">
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
+      <div class="blob blob-1" [style.opacity]="themeService.theme() === 'dark' ? 0.18 : 0.07"></div>
+      <div class="blob blob-2" [style.opacity]="themeService.theme() === 'dark' ? 0.14 : 0.05"></div>
 
       <mat-sidenav-container class="sidenav-container" autosize>
 
@@ -56,8 +57,9 @@ import { Subscription } from 'rxjs';
     .app-bg {
       position: fixed;
       inset: 0;
-      background: #0f172a;
+      background: var(--bg-app);
       overflow: hidden;
+      transition: background-color 0.3s ease;
     }
 
     .blob {
@@ -73,7 +75,7 @@ import { Subscription } from 'rxjs';
       left: -80px;
       background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
       filter: blur(130px);
-      opacity: 0.18;
+      transition: opacity 0.3s ease;
     }
 
     .blob-2 {
@@ -83,7 +85,7 @@ import { Subscription } from 'rxjs';
       left: 40px;
       background: linear-gradient(135deg, #0ea5e9 0%, #22d3ee 100%);
       filter: blur(120px);
-      opacity: 0.14;
+      transition: opacity 0.3s ease;
     }
 
     /* ── Sidenav container ── */
@@ -121,6 +123,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private breakpointObserver = inject(BreakpointObserver);
   readonly sidebarService = inject(SidebarService);
   readonly authService = inject(AuthService);
+  readonly themeService = inject(ThemeService);
 
   ngOnInit() {
     this.sub = this.breakpointObserver

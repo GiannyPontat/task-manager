@@ -14,6 +14,64 @@ $theme: mat.define-light-theme((
 
 @include mat.all-component-themes($theme);
 
+// ─── CSS Design Tokens ────────────────────────────────────────────────────────
+:root {
+  // Light (default) — fond doux, reposant pour les yeux
+  --bg-app:         #E8EDF5;
+  --bg-card:        #F0F4FA;
+  --text-main:      #1E293B;
+  --text-muted:     #64748B;
+  --primary:        #6366F1;
+  --border:         #CBD5E1;
+  --shadow:         0 2px 8px rgb(15 23 42 / 0.08);
+
+  // Extended tokens (composants)
+  --bg-panel:       rgba(240,244,250,0.92);
+  --bg-panel-hover: rgba(255,255,255,0.85);
+  --border-panel:   rgba(0,0,0,0.09);
+  --text-primary:   #1E293B;
+  --text-secondary: #475569;
+  --navbar-bg:      #F0F4FA;
+  --card-bg:        rgba(240,244,250,0.95);
+  --card-border:    #CBD5E1;
+  --input-bg:       #F8FAFC;
+  --divider:        #CBD5E1;
+  --bg-deep:        #E8EDF5;
+}
+
+[data-theme="dark"] {
+  --bg-app:         #0B0E14;
+  --bg-card:        #161B22;
+  --text-main:      #F8FAFC;
+  --text-muted:     #94A3B8;
+  --primary:        #818CF8;
+  --border:         #30363D;
+  --shadow:         0 4px 6px -1px rgb(0 0 0 / 0.5);
+
+  // Extended tokens (composants)
+  --bg-panel:       rgba(255,255,255,0.05);
+  --bg-panel-hover: rgba(255,255,255,0.09);
+  --border-panel:   rgba(255,255,255,0.12);
+  --text-primary:   #f8fafc;
+  --text-secondary: #cbd5e1;
+  --navbar-bg:      #1e293b;
+  --card-bg:        rgba(255,255,255,0.04);
+  --card-border:    rgba(255,255,255,0.08);
+  --input-bg:       rgba(255,255,255,0.04);
+  --divider:        rgba(255,255,255,0.1);
+  --bg-deep:        #0B0E14;
+}
+
+// ─── Transition globale ───────────────────────────────────────────────────────
+*, *::before, *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+// Sauf les animations qui ne doivent pas être ralenties
+.mat-mdc-progress-spinner, [cdkDrag], .cdk-drag-preview {
+  transition: none !important;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -21,7 +79,86 @@ $theme: mat.define-light-theme((
 body {
   margin: 0;
   font-family: Roboto, 'Inter', sans-serif;
-  background-color: #0f172a;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+// ─── Global overrides (Angular Material + encapsulation pierce) ───────────────
+// Les composants utilisent désormais des CSS variables ; ces overrides !important
+// ciblent uniquement les éléments Angular Material qui ignorent les variables.
+
+// Navbar background (Angular Material toolbar)
+app-navbar .navbar-bar {
+  background: var(--navbar-bg) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+// mat-card : override les couleurs Angular Material internes
+app-kanban-board mat-card.kanban-column {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+app-kanban-board mat-card.task-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+// Dialogs
+.dark-dialog .mat-mdc-dialog-container {
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15) !important;
+}
+.dark-backdrop { background: rgba(0,0,0,0.3) !important; }
+
+// Notifications panel (mat-menu portal)
+.notif-panel {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+// Material select dropdown
+.mat-mdc-select-panel { background: var(--bg-card) !important; }
+.mat-mdc-option { color: var(--text-main) !important; }
+.mat-mdc-option:hover { background: var(--bg-panel-hover) !important; }
+
+// ─── Dark theme overrides ──────────────────────────────────────────────────────
+// Les composants utilisent maintenant des CSS variables — seuls les éléments
+// Angular Material (mat-card, mat-select, dialogs) nécessitent des overrides.
+
+[data-theme="dark"] {
+
+  // mat-card : Angular Material surcharge le bg avec sa propre variable interne
+  app-kanban-board mat-card.kanban-column {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: none !important;
+  }
+  app-kanban-board mat-card.task-card {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: none !important;
+  }
+
+  // Dialogs
+  .dark-dialog .mat-mdc-dialog-container {
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6) !important;
+  }
+  .dark-backdrop { background: rgba(0,0,0,0.65) !important; }
+
+  // Notifications panel
+  .notif-panel {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+  }
+
+  // Material select dropdown
+  .mat-mdc-select-panel { background: var(--bg-card) !important; }
+  .mat-mdc-option { color: var(--text-main) !important; }
+  .mat-mdc-option:hover { background: var(--bg-panel-hover) !important; }
 }
 
 // ─── mat-icon : baseline fix global ───────────────────────────────────────────
@@ -160,4 +297,16 @@ h2[mat-dialog-title] {
 
 .dark-backdrop {
   background: rgba(0, 0, 0, 0.65) !important;
+}
+
+// ─── Notification dropdown (mat-menu portal) ──────────────────────────────────
+.notif-panel {
+  background: #0f172a !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+  min-width: 320px !important;
+  padding: 0 !important;
+
+  .mat-mdc-menu-content { padding: 0 !important; }
 }
