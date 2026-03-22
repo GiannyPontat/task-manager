@@ -4,40 +4,42 @@ import { Observable } from 'rxjs';
 import { Activity, Page, Task, TaskRequest, TaskStatus } from '../models/task.model';
 import { environment } from '../../../environments/environment';
 
-const API = `${environment.apiUrl}/tasks`;
-
 @Injectable({ providedIn: 'root' })
 export class TaskService {
 
   constructor(private http: HttpClient) {}
 
-  getTasks(status?: TaskStatus, page = 0, size = 10): Observable<Page<Task>> {
+  private base(projectId: number) {
+    return `${environment.apiUrl}/projects/${projectId}/tasks`;
+  }
+
+  getTasks(projectId: number, status?: TaskStatus, page = 0, size = 50): Observable<Page<Task>> {
     let params = new HttpParams().set('page', page).set('size', size).set('sort', 'createdAt,desc');
     if (status) params = params.set('status', status);
-    return this.http.get<Page<Task>>(API, { params });
+    return this.http.get<Page<Task>>(this.base(projectId), { params });
   }
 
-  createTask(payload: TaskRequest): Observable<Task> {
-    return this.http.post<Task>(API, payload);
+  createTask(projectId: number, payload: TaskRequest): Observable<Task> {
+    return this.http.post<Task>(this.base(projectId), payload);
   }
 
-  updateTask(id: number, payload: TaskRequest): Observable<Task> {
-    return this.http.put<Task>(`${API}/${id}`, payload);
+  updateTask(projectId: number, id: number, payload: TaskRequest): Observable<Task> {
+    return this.http.put<Task>(`${this.base(projectId)}/${id}`, payload);
   }
 
-  moveTask(id: number, columnId: number, position: number, status?: TaskStatus): Observable<Task> {
-    return this.http.patch<Task>(`${API}/${id}/move`, { columnId, position, status });
+  moveTask(projectId: number, id: number, columnId: number, position: number, status?: TaskStatus): Observable<Task> {
+    return this.http.patch<Task>(`${this.base(projectId)}/${id}/move`, { columnId, position, status });
   }
 
-  deleteTask(id: number): Observable<void> {
-    return this.http.delete<void>(`${API}/${id}`);
+  deleteTask(projectId: number, id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base(projectId)}/${id}`);
   }
 
-  getActivities(taskId: number): Observable<Activity[]> {
-    return this.http.get<Activity[]>(`${API}/${taskId}/activities`);
+  getActivities(projectId: number, taskId: number): Observable<Activity[]> {
+    return this.http.get<Activity[]>(`${this.base(projectId)}/${taskId}/activities`);
   }
 
-  addComment(taskId: number, text: string): Observable<Activity> {
-    return this.http.post<Activity>(`${API}/${taskId}/activities`, { text });
+  addComment(projectId: number, taskId: number, text: string): Observable<Activity> {
+    return this.http.post<Activity>(`${this.base(projectId)}/${taskId}/activities`, { text });
   }
 }

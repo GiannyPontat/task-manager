@@ -1,4 +1,6 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, distinctUntilChanged } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -20,6 +22,7 @@ import {
 
 import { ColumnService } from '../../../core/services/column.service';
 import { TaskService } from '../../../core/services/task.service';
+import { ProjectService } from '../../../core/services/project.service';
 import { SidebarService } from '../../../core/services/sidebar.service';
 import { KanbanColumn, Task, TaskRequest, Priority, TaskStatus } from '../../../core/models/task.model';
 import { TaskFormComponent } from '../../tasks/task-form/task-form.component';
@@ -55,7 +58,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       <div class="kanban-toolbar">
         <h1 class="board-title">
           <mat-icon>view_kanban</mat-icon>
-          Tableau Kanban
+          {{ projectService.selected()?.name ?? 'Tableau Kanban' }}
         </h1>
         <div class="toolbar-spacer"></div>
         @if (columns().length > 0) {
@@ -66,8 +69,15 @@ const PRIORITY_COLORS: Record<Priority, string> = {
         }
       </div>
 
+      <!-- ── No project selected ── -->
+      @if (!projectService.selected()) {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">folder_open</mat-icon>
+          <p class="empty-text">Sélectionnez ou créez un projet dans la barre latérale.</p>
+        </div>
+
       <!-- ── Loading ── -->
-      @if (loading()) {
+      } @else if (loading()) {
         <div class="loading-center">
           <mat-spinner diameter="48"></mat-spinner>
         </div>
@@ -175,10 +185,10 @@ const PRIORITY_COLORS: Record<Priority, string> = {
                           <span class="chip" [ngClass]="'status-' + task.status.toLowerCase()">
                             {{ statusLabel(task.status) }}
                           </span>
-                          @if (task.assignedMember) {
-                            <span class="chip chip-member" [matTooltip]="task.assignedMember">
-                              <span class="member-dot">{{ memberInitials(task.assignedMember) }}</span>
-                              {{ task.assignedMember }}
+                          @for (member of (task.assignedMembers ?? []); track member) {
+                            <span class="chip chip-member" [matTooltip]="member">
+                              <span class="member-dot">{{ memberInitials(member) }}</span>
+                              {{ member }}
                             </span>
                           }
                         </div>
@@ -238,7 +248,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
   `,
   styles: [`
     /* ══════════════════════════════════════════
-       Page — fond transparent (hérite du dark)
+       Page — fond hérite du thème
     ══════════════════════════════════════════ */
     .kanban-page {
       padding: 32px 32px 40px;
@@ -263,10 +273,10 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       margin: 0;
       font-size: 1.8rem;
       font-weight: 800;
-      color: #f8fafc;
+      color: var(--text-main);
       white-space: nowrap;
       letter-spacing: -0.6px;
-      mat-icon { font-size: 30px; width: 30px; height: 30px; color: #6366f1; }
+      mat-icon { font-size: 30px; width: 30px; height: 30px; color: var(--primary); }
     }
 
     .toolbar-spacer { flex: 1; }
@@ -314,8 +324,8 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       text-align: center;
     }
 
-    .empty-icon { font-size: 72px; width: 72px; height: 72px; color: rgba(255,255,255,0.2); }
-    .empty-text { font-size: 1.05rem; color: #94a3b8; margin: 0; }
+    .empty-icon { font-size: 72px; width: 72px; height: 72px; color: var(--text-muted); }
+    .empty-text { font-size: 1.05rem; color: var(--text-muted); margin: 0; }
     .empty-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
     /* ══════════════════════════════════════════
@@ -331,7 +341,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .board-scroll-wrapper::-webkit-scrollbar { height: 4px; }
     .board-scroll-wrapper::-webkit-scrollbar-track { background: transparent; }
     .board-scroll-wrapper::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.15);
+      background: var(--border);
       border-radius: 10px;
     }
 
@@ -346,18 +356,16 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     }
 
     /* ══════════════════════════════════════════
-       Column — Glassmorphism
+       Column
     ══════════════════════════════════════════ */
     .kanban-column {
       width: 300px;
       min-width: 300px;
       flex-shrink: 0;
       border-radius: 16px !important;
-      border: 1px solid rgba(255,255,255,0.1) !important;
-      background: rgba(255,255,255,0.05) !important;
-      backdrop-filter: blur(10px) !important;
-      -webkit-backdrop-filter: blur(10px) !important;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.2) !important;
+      border: 1px solid var(--border) !important;
+      background: var(--bg-card) !important;
+      box-shadow: var(--shadow) !important;
       display: flex;
       flex-direction: column;
     }
@@ -383,11 +391,11 @@ const PRIORITY_COLORS: Record<Priority, string> = {
 
     .col-drag-handle {
       font-size: 16px; width: 16px; height: 16px;
-      color: rgba(255,255,255,0.2);
+      color: var(--text-muted);
       cursor: grab;
       flex-shrink: 0;
       transition: color 0.2s;
-      &:hover { color: rgba(255,255,255,0.5); }
+      &:hover { color: var(--text-secondary); }
     }
 
     .column-header {
@@ -395,7 +403,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       align-items: center !important;
       gap: 8px;
       padding: 14px 14px 10px !important;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid var(--border);
       flex-direction: row !important;
     }
 
@@ -403,7 +411,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       flex: 1;
       font-size: 0.875rem !important;
       font-weight: 600 !important;
-      color: #f8fafc !important;
+      color: var(--text-main) !important;
       letter-spacing: 0.1px;
       margin: 0 !important;
       line-height: 1.2 !important;
@@ -427,7 +435,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .delete-col-btn {
       width: 28px; height: 28px; line-height: 1;
       display: inline-flex; align-items: center; justify-content: center;
-      color: rgba(255,255,255,0.25);
+      color: var(--text-muted);
       transition: color 0.2s, transform 0.15s;
       mat-icon { font-size: 16px; width: 16px; height: 16px; }
       &:hover { color: #ef4444; transform: scale(1.15); }
@@ -449,9 +457,9 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       align-items: center;
       gap: 5px;
       padding: 22px 0;
-      color: rgba(255,255,255,0.2);
+      color: var(--text-muted);
       font-size: 0.78rem;
-      border: 1.5px dashed rgba(255,255,255,0.1);
+      border: 1.5px dashed var(--border);
       border-radius: 14px;
       transition: padding 0.2s;
       mat-icon { font-size: 24px; width: 24px; height: 24px; }
@@ -464,7 +472,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     }
 
     /* ══════════════════════════════════════════
-       Task card — dark glass
+       Task card
     ══════════════════════════════════════════ */
     .task-card {
       border-radius: 10px !important;
@@ -472,13 +480,13 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       cursor: grab;
       transition: box-shadow 0.2s, transform 0.15s, background 0.2s;
       position: relative;
-      background: rgba(255,255,255,0.07) !important;
-      border: 1px solid rgba(255,255,255,0.1) !important;
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border) !important;
       border-left: 3px solid transparent !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+      box-shadow: var(--shadow) !important;
       &:hover {
-        background: rgba(255,255,255,0.1) !important;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
+        background: var(--bg-panel-hover) !important;
+        box-shadow: var(--shadow) !important;
         transform: translateY(-2px);
       }
       &:active { cursor: grabbing; transform: scale(0.99); }
@@ -489,12 +497,12 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .drag-handle {
       position: absolute;
       top: 7px; left: 6px;
-      color: rgba(255,255,255,0.15);
+      color: var(--text-muted);
       cursor: grab;
       display: flex; align-items: center; justify-content: center;
       transition: color 0.2s;
       mat-icon { font-size: 15px; width: 15px; height: 15px; }
-      &:hover { color: rgba(255,255,255,0.45); }
+      &:hover { color: var(--text-secondary); }
     }
 
     .drag-placeholder {
@@ -532,7 +540,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .task-title {
       font-weight: 500;
       font-size: 0.875rem;
-      color: #f1f5f9;
+      color: var(--text-main);
       flex: 1;
       line-height: 1.5;
       padding-top: 2px;
@@ -550,15 +558,15 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .task-btn {
       width: 26px; height: 26px; line-height: 1;
       display: inline-flex; align-items: center; justify-content: center;
-      color: rgba(255,255,255,0.3);
+      color: var(--text-muted);
       transition: color 0.2s, transform 0.15s;
       mat-icon { font-size: 15px; width: 15px; height: 15px; }
-      &:hover { color: #f8fafc; transform: scale(1.15); }
+      &:hover { color: var(--text-main); transform: scale(1.15); }
     }
 
     .task-description {
       font-size: 0.78rem;
-      color: #94a3b8;
+      color: var(--text-muted);
       margin: 4px 0 8px;
       line-height: 1.5;
       padding-left: 18px;
@@ -591,13 +599,13 @@ const PRIORITY_COLORS: Record<Priority, string> = {
 
     .chip-icon { font-size: 11px; width: 11px; height: 11px; }
 
-    .priority-low    { background: rgba(16,185,129,0.15); color: #6ee7b7; }
-    .priority-medium { background: rgba(245,158,11,0.15); color: #fcd34d; }
-    .priority-high   { background: rgba(239,68,68,0.15);  color: #fca5a5; }
+    .priority-low    { background: rgba(16,185,129,0.15); color: #059669; }
+    .priority-medium { background: rgba(245,158,11,0.15); color: #d97706; }
+    .priority-high   { background: rgba(239,68,68,0.15);  color: #dc2626; }
 
     .chip-member {
       background: rgba(99,102,241,0.12);
-      color: #a5b4fc;
+      color: var(--primary);
       gap: 5px;
       max-width: 120px;
       overflow: hidden;
@@ -611,34 +619,33 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       justify-content: center;
       width: 16px; height: 16px;
       border-radius: 50%;
-      background: #6366f1;
+      background: var(--primary);
       color: #fff;
       font-size: 0.55rem;
       font-weight: 700;
       flex-shrink: 0;
     }
-    .status-todo        { background: rgba(255,255,255,0.07); color: #94a3b8; }
-    .status-in_progress { background: rgba(245,158,11,0.15); color: #fcd34d; }
-    .status-done        { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+    .status-todo        { background: var(--bg-panel); color: var(--text-muted); }
+    .status-in_progress { background: rgba(245,158,11,0.15); color: #d97706; }
+    .status-done        { background: rgba(16,185,129,0.15); color: #059669; }
 
     /* ── Column footer ── */
     .column-footer {
       padding: 6px 10px 10px !important;
-      border-top: 1px solid rgba(255,255,255,0.07);
+      border-top: 1px solid var(--border);
     }
 
     .add-task-btn {
       width: 100%;
       font-size: 0.82rem;
-      color: rgba(165,180,252,0.8) !important;
+      color: var(--primary) !important;
       border-radius: 8px !important;
-      border: 1px dashed rgba(99,102,241,0.3) !important;
-      background: rgba(99,102,241,0.05) !important;
+      border: 1px dashed var(--primary) !important;
+      background: transparent !important;
       transition: background 0.18s, border-color 0.18s !important;
       &:hover {
-        background: rgba(99,102,241,0.12) !important;
-        border-color: rgba(99,102,241,0.5) !important;
-        color: #a5b4fc !important;
+        background: rgba(99,102,241,0.08) !important;
+        color: var(--primary) !important;
       }
     }
 
@@ -647,23 +654,23 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       width: 200px; min-width: 200px; height: 50px;
       flex-shrink: 0;
       align-self: flex-start;
-      border-color: rgba(99,102,241,0.3) !important;
-      color: rgba(165,180,252,0.7) !important;
+      border-color: var(--primary) !important;
+      color: var(--primary) !important;
       border-style: dashed !important;
       border-radius: 14px !important;
-      background: rgba(99,102,241,0.05) !important;
+      background: transparent !important;
       transition: all 0.2s;
+      opacity: 0.7;
       &:hover {
-        border-color: rgba(99,102,241,0.6) !important;
-        background: rgba(99,102,241,0.1) !important;
-        color: #a5b4fc !important;
+        background: rgba(99,102,241,0.08) !important;
+        opacity: 1;
       }
     }
 
     /* ── Add column form card ── */
     .new-column-form {
-      background: rgba(255,255,255,0.06) !important;
-      border-color: rgba(99,102,241,0.4) !important;
+      background: var(--bg-panel) !important;
+      border-color: var(--primary) !important;
     }
 
     .column-form { display: flex; flex-direction: column; gap: 8px; padding: 8px 0; }
@@ -687,9 +694,10 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     }
   `],
 })
-export class TaskBoardComponent implements OnInit {
+export class TaskBoardComponent {
   private readonly columnService  = inject(ColumnService);
   private readonly taskService    = inject(TaskService);
+  readonly projectService         = inject(ProjectService);
   private readonly sidebarService = inject(SidebarService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -715,13 +723,21 @@ export class TaskBoardComponent implements OnInit {
     title: ['', [Validators.required, Validators.maxLength(100)]],
   });
 
-  ngOnInit(): void {
-    this.loadColumns();
+  constructor() {
+    toObservable(this.projectService.selected).pipe(
+      filter(p => p !== null),
+      distinctUntilChanged((a, b) => a?.id === b?.id),
+      takeUntilDestroyed(),
+    ).subscribe(() => this.loadColumns());
+  }
+
+  private get projectId(): number {
+    return this.projectService.selected()!.id;
   }
 
   loadColumns(): void {
     this.loading.set(true);
-    this.columnService.getColumns().subscribe({
+    this.columnService.getColumns(this.projectId).subscribe({
       next: (cols) => { this.columns.set(cols); this.loading.set(false); },
       error: () => { this.loading.set(false); this.notify('Erreur lors du chargement'); },
     });
@@ -730,11 +746,7 @@ export class TaskBoardComponent implements OnInit {
   /* ── Init ── */
 
   initBoard(): void {
-    this.loading.set(true);
-    this.columnService.initDefaultColumns().subscribe({
-      next: (cols) => { this.columns.set(cols); this.loading.set(false); },
-      error: () => { this.loading.set(false); this.notify('Erreur lors de l\'initialisation'); },
-    });
+    this.notify('Créez un projet pour initialiser un tableau.');
   }
 
   /* ── Search ── */
@@ -769,7 +781,7 @@ export class TaskBoardComponent implements OnInit {
     if (this.columnForm.invalid) return;
     const title = this.columnForm.value.title!;
     const position = this.columns().length;
-    this.columnService.createColumn({ title, position }).subscribe({
+    this.columnService.createColumn(this.projectId, { title, position }).subscribe({
       next: (col) => {
         this.columns.update(cols => [...cols, col]);
         this.addingColumn.set(false);
@@ -781,7 +793,7 @@ export class TaskBoardComponent implements OnInit {
 
   deleteColumn(col: KanbanColumn): void {
     if (!confirm(`Supprimer la colonne "${col.title}" et toutes ses tâches ?`)) return;
-    this.columnService.deleteColumn(col.id).subscribe({
+    this.columnService.deleteColumn(this.projectId, col.id).subscribe({
       next: () => {
         this.columns.update(cols => cols.filter(c => c.id !== col.id));
         this.notify(`Colonne "${col.title}" supprimée`);
@@ -800,7 +812,7 @@ export class TaskBoardComponent implements OnInit {
       return updated;
     });
     const positions = this.columns().map((c, i) => ({ id: c.id, position: i }));
-    this.columnService.reorderColumns(positions).subscribe({
+    this.columnService.reorderColumns(this.projectId, positions).subscribe({
       error: () => { this.notify('Erreur lors du réordonnancement'); this.loadColumns(); },
     });
   }
@@ -841,7 +853,7 @@ export class TaskBoardComponent implements OnInit {
       }));
     }
 
-    this.taskService.moveTask(movedTask.id, targetCol.id, event.currentIndex, newStatus).subscribe({
+    this.taskService.moveTask(this.projectId, movedTask.id, targetCol.id, event.currentIndex, newStatus).subscribe({
       error: () => { this.notify('Erreur lors du déplacement, rechargement…'); this.loadColumns(); },
     });
   }
@@ -849,10 +861,10 @@ export class TaskBoardComponent implements OnInit {
   /* ── Task actions ── */
 
   openAddTask(col: KanbanColumn): void {
-    const ref = this.dialog.open(TaskFormComponent, { data: {}, maxWidth: '760px', minWidth: '620px', panelClass: 'dark-dialog', backdropClass: 'dark-backdrop' });
+    const ref = this.dialog.open(TaskFormComponent, { data: { projectId: this.projectId }, maxWidth: '760px', minWidth: '620px', panelClass: 'dark-dialog', backdropClass: 'dark-backdrop' });
     ref.afterClosed().subscribe((payload: TaskRequest | undefined) => {
       if (!payload) return;
-      this.taskService.createTask({ ...payload, columnId: col.id }).subscribe({
+      this.taskService.createTask(this.projectId, { ...payload, columnId: col.id }).subscribe({
         next: (task) => {
           this.columns.update(cols =>
             cols.map(c => c.id === col.id ? { ...c, tasks: [...c.tasks, task] } : c)
@@ -865,10 +877,10 @@ export class TaskBoardComponent implements OnInit {
   }
 
   editTask(col: KanbanColumn, task: Task): void {
-    const ref = this.dialog.open(TaskFormComponent, { data: { task }, maxWidth: '760px', minWidth: '620px' });
+    const ref = this.dialog.open(TaskFormComponent, { data: { task, projectId: this.projectId }, maxWidth: '760px', minWidth: '620px' });
     ref.afterClosed().subscribe((payload: TaskRequest | undefined) => {
       if (!payload) return;
-      this.taskService.updateTask(task.id, { ...payload, columnId: col.id }).subscribe({
+      this.taskService.updateTask(this.projectId, task.id, { ...payload, columnId: col.id }).subscribe({
         next: (updated) => {
           this.columns.update(cols =>
             cols.map(c => c.id === col.id
@@ -883,7 +895,7 @@ export class TaskBoardComponent implements OnInit {
   }
 
   deleteTask(col: KanbanColumn, task: Task): void {
-    this.taskService.deleteTask(task.id).subscribe({
+    this.taskService.deleteTask(this.projectId, task.id).subscribe({
       next: () => {
         this.columns.update(cols =>
           cols.map(c => c.id === col.id

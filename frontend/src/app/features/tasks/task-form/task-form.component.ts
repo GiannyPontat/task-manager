@@ -11,8 +11,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Activity, Task, TaskRequest, TaskStatus, Priority } from '../../../core/models/task.model';
 import { TaskService } from '../../../core/services/task.service';
+import { ProjectService } from '../../../core/services/project.service';
+import { InvitationService } from '../../../core/services/invitation.service';
 
-export interface TaskDialogData { task?: Task; }
+export interface TaskDialogData { task?: Task; projectId?: number; }
 
 interface ChecklistItem { label: string; done: boolean; }
 interface Member { name: string; initials: string; color: string; }
@@ -52,18 +54,22 @@ interface Member { name: string; initials: string; color: string; }
         <!-- ════ LEFT COLUMN ════ -->
         <div class="main-col">
 
-          <!-- Assigned member badge -->
-          @if (assignedMember()) {
+          <!-- Assigned members badges -->
+          @if (assignedMembers().length > 0) {
             <div class="assigned-row">
               <span class="meta-label">Assigné à</span>
-              <div class="member-badge">
-                <div class="avatar sm" [style.background]="assignedMemberData()?.color">
-                  {{ assignedMemberData()?.initials }}
-                </div>
-                <span>{{ assignedMember() }}</span>
-                <button mat-icon-button class="unassign-btn" (click)="assignedMember.set(null)" matTooltip="Retirer">
-                  <mat-icon>close</mat-icon>
-                </button>
+              <div class="assigned-badges">
+                @for (name of assignedMembers(); track name) {
+                  <div class="member-badge">
+                    <div class="avatar sm" [style.background]="memberData(name)?.color">
+                      {{ memberData(name)?.initials }}
+                    </div>
+                    <span>{{ name }}</span>
+                    <button mat-icon-button class="unassign-btn" (click)="removeMember(name)" matTooltip="Retirer">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+                }
               </div>
             </div>
           }
@@ -175,15 +181,37 @@ interface Member { name: string; initials: string; color: string; }
             </button>
             @if (showPicker()) {
               <div class="member-picker">
-                @for (m of members; track m.name) {
-                  <button class="picker-option" (click)="assignMember(m)">
+                @for (m of members(); track m.name) {
+                  <button class="picker-option" (click)="toggleMember(m)">
                     <div class="avatar sm" [style.background]="m.color">{{ m.initials }}</div>
                     <span>{{ m.name }}</span>
-                    @if (assignedMember() === m.name) {
+                    @if (assignedMembers().includes(m.name)) {
                       <mat-icon class="check-icon">check</mat-icon>
                     }
                   </button>
                 }
+
+                <div class="picker-divider"></div>
+
+                <div class="invite-section">
+                  <div class="invite-row">
+                    <input
+                      #inviteInput
+                      type="email"
+                      class="invite-input"
+                      placeholder="Inviter par email…"
+                      (keyup.enter)="sendInvite(inviteInput.value); inviteInput.value = ''"
+                    />
+                    <button class="invite-btn" (click)="sendInvite(inviteInput.value); inviteInput.value = ''">
+                      <mat-icon>send</mat-icon>
+                    </button>
+                  </div>
+                  @if (inviteFeedback()) {
+                    <span class="invite-feedback" [class.invite-error]="inviteFeedback()!.type === 'error'">
+                      {{ inviteFeedback()!.message }}
+                    </span>
+                  }
+                </div>
               </div>
             }
           </div>
@@ -237,10 +265,7 @@ interface Member { name: string; initials: string; color: string; }
                 <button class="quick-confirm" (click)="addItem()">+</button>
               </div>
             }
-            <button class="sb-btn">
-              <mat-icon>calendar_today</mat-icon>
-              Dates
-            </button>
+
           </div>
 
           <!-- Actions -->
@@ -344,8 +369,14 @@ interface Member { name: string; initials: string; color: string; }
     /* Assigned row */
     .assigned-row {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
+    }
+
+    .assigned-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .meta-label {
@@ -641,6 +672,61 @@ interface Member { name: string; initials: string; color: string; }
       color: #6366f1;
     }
 
+    /* Invite section */
+    .picker-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+      margin: 4px 0;
+    }
+
+    .invite-section {
+      padding: 4px 6px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .invite-row {
+      display: flex;
+      gap: 4px;
+    }
+
+    .invite-input {
+      flex: 1;
+      min-width: 0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 5px 8px;
+      color: #e2e8f0;
+      font-size: 0.75rem;
+      font-family: inherit;
+      outline: none;
+      &::placeholder { color: #475569; }
+      &:focus { border-color: rgba(99,102,241,0.5); }
+    }
+
+    .invite-btn {
+      width: 28px; height: 28px; flex-shrink: 0;
+      background: rgba(99,102,241,0.2);
+      border: none;
+      border-radius: 6px;
+      color: #818cf8;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      &:hover { background: rgba(99,102,241,0.4); }
+    }
+
+    .invite-feedback {
+      font-size: 0.7rem;
+      color: #10b981;
+      padding-left: 2px;
+    }
+
+    .invite-feedback.invite-error { color: #f87171; }
+
     /* Sidebar selects */
     .sb-select {
       width: 100%;
@@ -747,20 +833,23 @@ interface Member { name: string; initials: string; color: string; }
 })
 export class TaskFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
-  private readonly taskService = inject(TaskService);
+  private readonly taskService     = inject(TaskService);
+  private readonly projectService  = inject(ProjectService);
+  private readonly invitationService = inject(InvitationService);
   readonly dialogRef = inject(MatDialogRef<TaskFormComponent>);
   readonly data: TaskDialogData = inject(MAT_DIALOG_DATA);
 
   readonly isEdit = !!this.data?.task;
 
   /* ── Signals ── */
-  assignedMember = signal<string | null>(this.data?.task?.assignedMember ?? null);
-  showPicker     = signal(false);
+  assignedMembers = signal<string[]>(this.data?.task?.assignedMembers ?? []);
+  showPicker      = signal(false);
   showChecklist  = signal(false);
   checklistItems = signal<ChecklistItem[]>([]);
   activities     = signal<Activity[]>([]);
   commentText    = signal('');
   newItemText    = '';
+  inviteFeedback = signal<{ message: string; type: 'success' | 'error' } | null>(null);
 
   /* ── Computed ── */
   checklistProgress = computed(() => {
@@ -769,17 +858,10 @@ export class TaskFormComponent implements OnInit {
     return Math.round((items.filter(i => i.done).length / items.length) * 100);
   });
 
-  assignedMemberData = computed(() =>
-    this.members.find(m => m.name === this.assignedMember()) ?? null
-  );
+  memberData = (name: string) => this.members().find(m => m.name === name) ?? null;
 
-  /* ── Static data ── */
-  readonly members: Member[] = [
-    { name: 'Alice Martin',  initials: 'AM', color: '#6366f1' },
-    { name: 'Bob Dupont',    initials: 'BD', color: '#0ea5e9' },
-    { name: 'Clara Leroy',   initials: 'CL', color: '#a855f7' },
-    { name: 'David Moreau',  initials: 'DM', color: '#f59e0b' },
-  ];
+  /* ── Members (chargés depuis l'API) ── */
+  members = signal<Member[]>([]);
 
   private readonly AVATAR_COLORS = [
     '#6366f1', '#0ea5e9', '#a855f7', '#f59e0b',
@@ -807,8 +889,23 @@ export class TaskFormComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    const pid = this.data.projectId ?? this.data.task?.projectId;
+    const loadMembers = (projectMembers: { userId: number; username: string }[]) => {
+      this.members.set(projectMembers.map(m => ({
+        name: m.username,
+        initials: m.username.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+        color: this.AVATAR_COLORS[m.userId % this.AVATAR_COLORS.length],
+      })));
+    };
+    const existing = this.projectService.selected()?.members;
+    if (existing?.length) {
+      loadMembers(existing);
+    } else if (pid) {
+      this.projectService.getProject(pid).subscribe(p => loadMembers(p.members ?? []));
+    }
     if (this.isEdit && this.data.task?.id) {
-      this.taskService.getActivities(this.data.task.id).subscribe(list => this.activities.set(list));
+      const pid = this.data.projectId ?? this.data.task?.projectId;
+      if (pid) this.taskService.getActivities(pid, this.data.task.id).subscribe(list => this.activities.set(list));
     }
   }
 
@@ -842,12 +939,38 @@ export class TaskFormComponent implements OnInit {
   submitComment(): void {
     const text = this.commentText().trim();
     if (!text || !this.data.task?.id) return;
-    this.taskService.addComment(this.data.task.id, text).subscribe({
+    const pid = this.data.projectId ?? this.data.task?.projectId;
+    if (!pid) return;
+    this.taskService.addComment(pid, this.data.task.id, text).subscribe({
       next: (activity) => {
         this.activities.update(list => [...list, activity]);
         this.commentText.set('');
       },
       error: (err) => console.error('Erreur ajout commentaire', err),
+    });
+  }
+
+  /* ── Invite ── */
+  sendInvite(email: string): void {
+    email = email.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.inviteFeedback.set({ message: 'Email invalide.', type: 'error' });
+      setTimeout(() => this.inviteFeedback.set(null), 3000);
+      return;
+    }
+    const taskId = this.data?.task?.id;
+    this.invitationService.invite(email, taskId).subscribe({
+      next: (res) => {
+        const msg = res.status === 'already_registered'
+          ? 'Utilisateur déjà inscrit.'
+          : `Invitation envoyée à ${email}`;
+        this.inviteFeedback.set({ message: msg, type: 'success' });
+        setTimeout(() => this.inviteFeedback.set(null), 3000);
+      },
+      error: () => {
+        this.inviteFeedback.set({ message: 'Erreur lors de l\'invitation.', type: 'error' });
+        setTimeout(() => this.inviteFeedback.set(null), 3000);
+      },
     });
   }
 
@@ -875,9 +998,14 @@ export class TaskFormComponent implements OnInit {
   }
 
   /* ── Member actions ── */
-  assignMember(m: Member): void {
-    this.assignedMember.set(m.name);
-    this.showPicker.set(false);
+  toggleMember(m: Member): void {
+    this.assignedMembers.update(list =>
+      list.includes(m.name) ? list.filter(n => n !== m.name) : [...list, m.name]
+    );
+  }
+
+  removeMember(name: string): void {
+    this.assignedMembers.update(list => list.filter(n => n !== name));
   }
 
   /* ── Dialog actions ── */
@@ -892,7 +1020,7 @@ export class TaskFormComponent implements OnInit {
       status:         status as TaskStatus,
       priority:       priority as Priority,
       dueDate:        dueDate ?? undefined,
-      assignedMember: this.assignedMember() ?? undefined,
+      assignedMembers: this.assignedMembers(),
     } satisfies TaskRequest);
   }
 }

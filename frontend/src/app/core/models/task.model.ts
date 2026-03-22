@@ -19,8 +19,10 @@ export interface Task {
   priority: Priority;
   createdAt: string;
   dueDate?: string;
+  projectId?: number;
   columnId?: number;
-  assignedMember?: string;
+  assignedMembers?: string[];
+  createdByName?: string;
 }
 
 export interface TaskRequest {
@@ -30,7 +32,7 @@ export interface TaskRequest {
   priority?: Priority;
   dueDate?: string;
   columnId?: number;
-  assignedMember?: string;
+  assignedMembers?: string[];
 }
 
 export interface KanbanColumn {

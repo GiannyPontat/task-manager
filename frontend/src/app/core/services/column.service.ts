@@ -4,30 +4,28 @@ import { Observable } from 'rxjs';
 import { ColumnRequest, KanbanColumn } from '../models/task.model';
 import { environment } from '../../../environments/environment';
 
-const API = `${environment.apiUrl}/columns`;
-
 @Injectable({ providedIn: 'root' })
 export class ColumnService {
 
   constructor(private http: HttpClient) {}
 
-  getColumns(): Observable<KanbanColumn[]> {
-    return this.http.get<KanbanColumn[]>(API);
+  private base(projectId: number) {
+    return `${environment.apiUrl}/projects/${projectId}/columns`;
   }
 
-  createColumn(payload: ColumnRequest): Observable<KanbanColumn> {
-    return this.http.post<KanbanColumn>(API, payload);
+  getColumns(projectId: number): Observable<KanbanColumn[]> {
+    return this.http.get<KanbanColumn[]>(this.base(projectId));
   }
 
-  initDefaultColumns(): Observable<KanbanColumn[]> {
-    return this.http.post<KanbanColumn[]>(`${API}/init`, {});
+  createColumn(projectId: number, payload: ColumnRequest): Observable<KanbanColumn> {
+    return this.http.post<KanbanColumn>(this.base(projectId), payload);
   }
 
-  reorderColumns(updates: { id: number; position: number }[]): Observable<void> {
-    return this.http.patch<void>(`${API}/reorder`, updates);
+  reorderColumns(projectId: number, updates: { id: number; position: number }[]): Observable<void> {
+    return this.http.patch<void>(`${this.base(projectId)}/reorder`, updates);
   }
 
-  deleteColumn(id: number): Observable<void> {
-    return this.http.delete<void>(`${API}/${id}`);
+  deleteColumn(projectId: number, id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base(projectId)}/${id}`);
   }
 }
