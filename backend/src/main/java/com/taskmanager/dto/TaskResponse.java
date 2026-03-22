@@ -4,6 +4,7 @@ import com.taskmanager.entity.Priority;
 import com.taskmanager.entity.TaskStatus;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,4 +16,6 @@ public class TaskResponse {
     private Priority priority;
     private LocalDateTime createdAt;
     private Long columnId;
+    private LocalDate dueDate;
+    private String assignedMember;
 }

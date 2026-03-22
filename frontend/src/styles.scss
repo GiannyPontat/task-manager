@@ -21,7 +21,7 @@ $theme: mat.define-light-theme((
 body {
   margin: 0;
   font-family: Roboto, 'Inter', sans-serif;
-  background-color: #f8fafc;
+  background-color: #0f172a;
 }
 
 // ─── mat-icon : baseline fix global ───────────────────────────────────────────
@@ -140,4 +140,24 @@ h2[mat-dialog-title] {
   display: flex !important;
   align-items: center;
   gap: 10px;
+}
+
+// ─── MatDialog dark theme (invite, task-form) ─────────────────────────────────
+.dark-dialog {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: transparent;
+    padding: 0 !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6) !important;
+  }
+  .mdc-dialog__surface {
+    border-radius: 16px !important;
+    background: transparent !important;
+    overflow: hidden;
+  }
+}
+
+.dark-backdrop {
+  background: rgba(0, 0, 0, 0.65) !important;
 }

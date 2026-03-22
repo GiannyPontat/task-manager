@@ -20,6 +20,7 @@ import {
 
 import { ColumnService } from '../../../core/services/column.service';
 import { TaskService } from '../../../core/services/task.service';
+import { SidebarService } from '../../../core/services/sidebar.service';
 import { KanbanColumn, Task, TaskRequest, Priority, TaskStatus } from '../../../core/models/task.model';
 import { TaskFormComponent } from '../../tasks/task-form/task-form.component';
 
@@ -56,30 +57,14 @@ const PRIORITY_COLORS: Record<Priority, string> = {
           <mat-icon>view_kanban</mat-icon>
           Tableau Kanban
         </h1>
-
-        <!-- Search bar -->
-        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
-          <mat-label>Rechercher une tâche…</mat-label>
-          <mat-icon matPrefix>search</mat-icon>
-          <input matInput
-                 [value]="searchQuery()"
-                 (input)="searchQuery.set($any($event.target).value)" />
-          @if (searchQuery()) {
-            <button matSuffix mat-icon-button aria-label="Effacer" (click)="searchQuery.set('')">
-              <mat-icon>close</mat-icon>
-            </button>
-          }
-        </mat-form-field>
+        <div class="toolbar-spacer"></div>
+        @if (columns().length > 0) {
+          <button class="new-task-btn" (click)="openAddTask(columns()[0])">
+            <mat-icon>add</mat-icon>
+            Nouvelle Tâche
+          </button>
+        }
       </div>
-
-      <!-- Search hint -->
-      @if (searchQuery()) {
-        <p class="search-hint">
-          <mat-icon>filter_list</mat-icon>
-          {{ totalMatchingTasks() }} tâche(s) correspondent à
-          <strong>"{{ searchQuery() }}"</strong>
-        </p>
-      }
 
       <!-- ── Loading ── -->
       @if (loading()) {
@@ -107,13 +92,23 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       <!-- ── Board ── -->
       } @else {
         <div class="board-scroll-wrapper">
-          <div class="kanban-board" cdkDropListGroup>
+          <div class="kanban-board"
+               cdkDropList
+               cdkDropListOrientation="horizontal"
+               [cdkDropListData]="columns()"
+               (cdkDropListDropped)="onColumnDrop($event)">
 
             @for (col of columns(); track col.id) {
-              <mat-card class="kanban-column" appearance="outlined">
+              <mat-card class="kanban-column" appearance="outlined"
+                        cdkDrag [cdkDragData]="col">
+
+                <!-- Column drag preview -->
+                <div *cdkDragPlaceholder class="column-drag-placeholder"></div>
 
                 <!-- Column header -->
                 <mat-card-header class="column-header">
+                  <mat-icon class="col-drag-handle" cdkDragHandle
+                            matTooltip="Déplacer la colonne">drag_indicator</mat-icon>
                   <mat-card-title class="column-title">{{ col.title }}</mat-card-title>
                   <span class="task-count">
                     {{ filteredTasksFor(col).length }}
@@ -132,7 +127,9 @@ const PRIORITY_COLORS: Record<Priority, string> = {
                 <mat-card-content class="column-body">
                   <div class="task-list"
                        cdkDropList
+                       [id]="'task-list-' + col.id"
                        [cdkDropListData]="col.tasks"
+                       [cdkDropListConnectedTo]="taskListIds()"
                        [cdkDropListDisabled]="!!searchQuery()"
                        (cdkDropListDropped)="onDrop($event, col)">
 
@@ -178,6 +175,12 @@ const PRIORITY_COLORS: Record<Priority, string> = {
                           <span class="chip" [ngClass]="'status-' + task.status.toLowerCase()">
                             {{ statusLabel(task.status) }}
                           </span>
+                          @if (task.assignedMember) {
+                            <span class="chip chip-member" [matTooltip]="task.assignedMember">
+                              <span class="member-dot">{{ memberInitials(task.assignedMember) }}</span>
+                              {{ task.assignedMember }}
+                            </span>
+                          }
                         </div>
 
                         <div *cdkDragPlaceholder class="drag-placeholder"></div>
@@ -185,7 +188,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
                     }
 
                     @if (filteredTasksFor(col).length === 0) {
-                      <div class="empty-column">
+                      <div class="empty-column" [class.empty-column--compact]="col.tasks.length > 0">
                         <mat-icon>{{ searchQuery() ? 'search_off' : 'inbox' }}</mat-icon>
                         <span>{{ searchQuery() ? 'Aucun résultat' : 'Déposez une tâche ici' }}</span>
                       </div>
@@ -235,13 +238,14 @@ const PRIORITY_COLORS: Record<Priority, string> = {
   `,
   styles: [`
     /* ══════════════════════════════════════════
-       Page — light SaaS background
+       Page — fond transparent (hérite du dark)
     ══════════════════════════════════════════ */
     .kanban-page {
-      padding: 28px 28px 40px;
-      min-height: calc(100vh - 58px);
-      background: #f8fafc;
+      padding: 32px 32px 40px;
+      min-height: 100vh;
+      background: transparent;
       box-sizing: border-box;
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
     }
 
     /* ── Toolbar ── */
@@ -249,39 +253,47 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       display: flex;
       align-items: center;
       gap: 16px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
+      margin-bottom: 28px;
     }
 
     .board-title {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
       margin: 0;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #0f172a;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #f8fafc;
       white-space: nowrap;
-      flex-shrink: 0;
-      letter-spacing: -0.4px;
-      mat-icon { font-size: 26px; width: 26px; height: 26px; color: #6366f1; }
+      letter-spacing: -0.6px;
+      mat-icon { font-size: 30px; width: 30px; height: 30px; color: #6366f1; }
     }
 
-    .search-field {
-      flex: 1;
-      min-width: 200px;
-      max-width: 420px;
-    }
+    .toolbar-spacer { flex: 1; }
 
-    /* Search hint */
-    .search-hint {
-      display: flex;
+    .new-task-btn {
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 0.82rem;
-      color: #6366f1;
-      margin: 0 0 12px;
-      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+      gap: 8px;
+      height: 38px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #3b82f6);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+      &:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+      }
+      &:active { transform: scale(0.97); }
     }
 
     /* ── Loading ── */
@@ -302,7 +314,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       text-align: center;
     }
 
-    .empty-icon { font-size: 72px; width: 72px; height: 72px; color: #cbd5e1; }
+    .empty-icon { font-size: 72px; width: 72px; height: 72px; color: rgba(255,255,255,0.2); }
     .empty-text { font-size: 1.05rem; color: #94a3b8; margin: 0; }
     .empty-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
@@ -314,66 +326,100 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       overflow-y: visible;
       -webkit-overflow-scrolling: touch;
       padding-bottom: 24px;
-      margin: 0 -28px;
-      padding-left: 28px;
-      padding-right: 28px;
     }
 
-    .board-scroll-wrapper::-webkit-scrollbar { height: 5px; }
-    .board-scroll-wrapper::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
-    .board-scroll-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .board-scroll-wrapper::-webkit-scrollbar { height: 4px; }
+    .board-scroll-wrapper::-webkit-scrollbar-track { background: transparent; }
+    .board-scroll-wrapper::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+    }
 
     .kanban-board {
       display: flex;
       flex-direction: row;
       align-items: flex-start;
-      gap: 18px;
+      gap: 24px;
       min-height: 400px;
       width: max-content;
       min-width: 100%;
     }
 
     /* ══════════════════════════════════════════
-       Column
+       Column — Glassmorphism
     ══════════════════════════════════════════ */
     .kanban-column {
       width: 300px;
       min-width: 300px;
       flex-shrink: 0;
-      border-radius: 14px !important;
-      border: 1px solid #e2e8f0 !important;
-      border-top: 3px solid #6366f1 !important;
-      background: #f1f5f9 !important;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      background: rgba(255,255,255,0.05) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2) !important;
       display: flex;
       flex-direction: column;
     }
 
+    .column-drag-placeholder {
+      width: 300px;
+      min-height: 200px;
+      background: rgba(99,102,241,0.08);
+      border: 2px dashed rgba(99,102,241,0.35);
+      border-radius: 16px;
+      flex-shrink: 0;
+    }
+
+    :host ::ng-deep .cdk-drag-preview.kanban-column {
+      box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      border-radius: 16px;
+      opacity: 0.92;
+    }
+
+    :host ::ng-deep .kanban-board.cdk-drop-list-dragging .kanban-column:not(.cdk-drag-placeholder) {
+      transition: transform 250ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .col-drag-handle {
+      font-size: 16px; width: 16px; height: 16px;
+      color: rgba(255,255,255,0.2);
+      cursor: grab;
+      flex-shrink: 0;
+      transition: color 0.2s;
+      &:hover { color: rgba(255,255,255,0.5); }
+    }
+
     .column-header {
       display: flex !important;
-      align-items: center;
-      padding: 13px 14px 9px !important;
-      border-bottom: 1px solid #e2e8f0;
+      align-items: center !important;
+      gap: 8px;
+      padding: 14px 14px 10px !important;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-direction: row !important;
     }
 
     .column-title {
       flex: 1;
       font-size: 0.875rem !important;
       font-weight: 600 !important;
-      color: #1e293b !important;
+      color: #f8fafc !important;
       letter-spacing: 0.1px;
       margin: 0 !important;
+      line-height: 1.2 !important;
     }
 
     .task-count {
-      background: #e0e7ff;
-      color: #4f46e5;
+      background: rgba(99,102,241,0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99,102,241,0.3);
       border-radius: 20px;
       padding: 2px 9px;
       font-size: 0.7rem;
       font-weight: 700;
-      margin-right: 4px;
       white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1.6;
     }
 
     .task-count-total { opacity: 0.5; }
@@ -381,7 +427,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .delete-col-btn {
       width: 28px; height: 28px; line-height: 1;
       display: inline-flex; align-items: center; justify-content: center;
-      color: #cbd5e1;
+      color: rgba(255,255,255,0.25);
       transition: color 0.2s, transform 0.15s;
       mat-icon { font-size: 16px; width: 16px; height: 16px; }
       &:hover { color: #ef4444; transform: scale(1.15); }
@@ -403,28 +449,36 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       align-items: center;
       gap: 5px;
       padding: 22px 0;
-      color: #cbd5e1;
-      font-size: 0.8rem;
-      border: 2px dashed #e2e8f0;
-      border-radius: 10px;
-      mat-icon { font-size: 26px; width: 26px; height: 26px; }
+      color: rgba(255,255,255,0.2);
+      font-size: 0.78rem;
+      border: 1.5px dashed rgba(255,255,255,0.1);
+      border-radius: 14px;
+      transition: padding 0.2s;
+      mat-icon { font-size: 24px; width: 24px; height: 24px; }
+    }
+
+    .empty-column--compact {
+      padding: 10px 0;
+      font-size: 0.72rem;
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
     }
 
     /* ══════════════════════════════════════════
-       Task card
+       Task card — dark glass
     ══════════════════════════════════════════ */
     .task-card {
       border-radius: 10px !important;
-      padding: 10px 12px 12px !important;
+      padding: 12px 14px 14px !important;
       cursor: grab;
-      transition: box-shadow 0.2s, transform 0.15s;
+      transition: box-shadow 0.2s, transform 0.15s, background 0.2s;
       position: relative;
-      background: #ffffff !important;
-      border: 1px solid #e2e8f0 !important;
+      background: rgba(255,255,255,0.07) !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
       border-left: 3px solid transparent !important;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 6px -1px rgba(0,0,0,0.05) !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
       &:hover {
-        box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 10px 15px -3px rgba(0,0,0,0.08) !important;
+        background: rgba(255,255,255,0.1) !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
         transform: translateY(-2px);
       }
       &:active { cursor: grabbing; transform: scale(0.99); }
@@ -435,26 +489,26 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .drag-handle {
       position: absolute;
       top: 7px; left: 6px;
-      color: #e2e8f0;
+      color: rgba(255,255,255,0.15);
       cursor: grab;
       display: flex; align-items: center; justify-content: center;
       transition: color 0.2s;
       mat-icon { font-size: 15px; width: 15px; height: 15px; }
-      &:hover { color: #94a3b8; }
+      &:hover { color: rgba(255,255,255,0.45); }
     }
 
     .drag-placeholder {
-      background: #ede9fe;
-      border: 2px dashed #a5b4fc;
+      background: rgba(99,102,241,0.1);
+      border: 2px dashed rgba(99,102,241,0.4);
       border-radius: 10px;
       min-height: 60px;
       transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
     }
 
     :host ::ng-deep .cdk-drag-preview {
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
       border-radius: 10px;
-      background: #fff;
+      background: rgba(30,41,59,0.95);
       padding: 10px 12px 12px;
       border-left: 3px solid #6366f1;
     }
@@ -478,17 +532,10 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .task-title {
       font-weight: 500;
       font-size: 0.875rem;
-      color: #1e293b;
+      color: #f1f5f9;
       flex: 1;
       line-height: 1.5;
       padding-top: 2px;
-    }
-
-    :host ::ng-deep .task-title mark {
-      background: #fef9c3;
-      color: #713f12;
-      border-radius: 3px;
-      padding: 0 2px;
     }
 
     .task-actions {
@@ -503,15 +550,15 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .task-btn {
       width: 26px; height: 26px; line-height: 1;
       display: inline-flex; align-items: center; justify-content: center;
-      color: #94a3b8;
+      color: rgba(255,255,255,0.3);
       transition: color 0.2s, transform 0.15s;
       mat-icon { font-size: 15px; width: 15px; height: 15px; }
-      &:hover { color: #334155; transform: scale(1.15); }
+      &:hover { color: #f8fafc; transform: scale(1.15); }
     }
 
     .task-description {
       font-size: 0.78rem;
-      color: #64748b;
+      color: #94a3b8;
       margin: 4px 0 8px;
       line-height: 1.5;
       padding-left: 18px;
@@ -526,7 +573,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       display: flex;
       gap: 5px;
       flex-wrap: wrap;
-      margin-top: 8px;
+      margin-top: 12px;
       padding-left: 18px;
     }
 
@@ -544,25 +591,55 @@ const PRIORITY_COLORS: Record<Priority, string> = {
 
     .chip-icon { font-size: 11px; width: 11px; height: 11px; }
 
-    .priority-low    { background: #d1fae5; color: #065f46; }
-    .priority-medium { background: #fef3c7; color: #92400e; }
-    .priority-high   { background: #fee2e2; color: #991b1b; }
-    .status-todo        { background: #f1f5f9; color: #475569; }
-    .status-in_progress { background: #fef9c3; color: #713f12; }
-    .status-done        { background: #d1fae5; color: #065f46; }
+    .priority-low    { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+    .priority-medium { background: rgba(245,158,11,0.15); color: #fcd34d; }
+    .priority-high   { background: rgba(239,68,68,0.15);  color: #fca5a5; }
+
+    .chip-member {
+      background: rgba(99,102,241,0.12);
+      color: #a5b4fc;
+      gap: 5px;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .member-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #6366f1;
+      color: #fff;
+      font-size: 0.55rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .status-todo        { background: rgba(255,255,255,0.07); color: #94a3b8; }
+    .status-in_progress { background: rgba(245,158,11,0.15); color: #fcd34d; }
+    .status-done        { background: rgba(16,185,129,0.15); color: #6ee7b7; }
 
     /* ── Column footer ── */
     .column-footer {
       padding: 6px 10px 10px !important;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid rgba(255,255,255,0.07);
     }
 
     .add-task-btn {
       width: 100%;
       font-size: 0.82rem;
-      color: #6366f1 !important;
+      color: rgba(165,180,252,0.8) !important;
       border-radius: 8px !important;
-      &:hover { background: #ede9fe !important; }
+      border: 1px dashed rgba(99,102,241,0.3) !important;
+      background: rgba(99,102,241,0.05) !important;
+      transition: background 0.18s, border-color 0.18s !important;
+      &:hover {
+        background: rgba(99,102,241,0.12) !important;
+        border-color: rgba(99,102,241,0.5) !important;
+        color: #a5b4fc !important;
+      }
     }
 
     /* ── Add column inline button ── */
@@ -570,20 +647,24 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       width: 200px; min-width: 200px; height: 50px;
       flex-shrink: 0;
       align-self: flex-start;
-      border-color: #c7d2fe !important;
-      color: #6366f1 !important;
+      border-color: rgba(99,102,241,0.3) !important;
+      color: rgba(165,180,252,0.7) !important;
       border-style: dashed !important;
       border-radius: 14px !important;
-      background: #f8fafc !important;
+      background: rgba(99,102,241,0.05) !important;
       transition: all 0.2s;
       &:hover {
-        border-color: #818cf8 !important;
-        background: #ede9fe !important;
+        border-color: rgba(99,102,241,0.6) !important;
+        background: rgba(99,102,241,0.1) !important;
+        color: #a5b4fc !important;
       }
     }
 
     /* ── Add column form card ── */
-    .new-column-form { border-top-color: #818cf8 !important; }
+    .new-column-form {
+      background: rgba(255,255,255,0.06) !important;
+      border-color: rgba(99,102,241,0.4) !important;
+    }
 
     .column-form { display: flex; flex-direction: column; gap: 8px; padding: 8px 0; }
     .full-width { width: 100%; }
@@ -593,25 +674,13 @@ const PRIORITY_COLORS: Record<Priority, string> = {
        Responsive — mobile ≤ 600px
     ══════════════════════════════════════════ */
     @media (max-width: 600px) {
-      .kanban-page { padding: 14px; }
+      .kanban-page { padding: 16px; }
 
-      .kanban-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
+      .kanban-toolbar { margin-bottom: 20px; }
 
       .board-title {
-        font-size: 1.2rem;
-        mat-icon { font-size: 22px; width: 22px; height: 22px; }
-      }
-
-      .search-field { max-width: 100%; }
-
-      .board-scroll-wrapper {
-        margin: 0 -14px;
-        padding-left: 14px;
-        padding-right: 14px;
+        font-size: 1.35rem;
+        mat-icon { font-size: 24px; width: 24px; height: 24px; }
       }
 
       .kanban-column { width: 265px; min-width: 265px; }
@@ -619,8 +688,9 @@ const PRIORITY_COLORS: Record<Priority, string> = {
   `],
 })
 export class TaskBoardComponent implements OnInit {
-  private readonly columnService = inject(ColumnService);
-  private readonly taskService = inject(TaskService);
+  private readonly columnService  = inject(ColumnService);
+  private readonly taskService    = inject(TaskService);
+  private readonly sidebarService = inject(SidebarService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly fb = inject(FormBuilder);
@@ -629,6 +699,8 @@ export class TaskBoardComponent implements OnInit {
   loading = signal(true);
   addingColumn = signal(false);
   searchQuery = signal('');
+
+  taskListIds = computed(() => this.columns().map(c => 'task-list-' + c.id));
 
   totalMatchingTasks = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
@@ -668,9 +740,12 @@ export class TaskBoardComponent implements OnInit {
   /* ── Search ── */
 
   filteredTasksFor(col: KanbanColumn): Task[] {
+    let tasks = col.tasks;
+    const priority = this.sidebarService.priorityFilter();
+    if (priority) tasks = tasks.filter(t => t.priority === priority);
     const q = this.searchQuery().trim().toLowerCase();
-    if (!q) return col.tasks;
-    return col.tasks.filter(t => t.title.toLowerCase().includes(q));
+    if (q) tasks = tasks.filter(t => t.title.toLowerCase().includes(q));
+    return tasks;
   }
 
   highlightMatch(title: string, query: string): string {
@@ -717,7 +792,25 @@ export class TaskBoardComponent implements OnInit {
 
   /* ── Drag & Drop ── */
 
+  onColumnDrop(event: CdkDragDrop<KanbanColumn[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    this.columns.update(cols => {
+      const updated = [...cols];
+      moveItemInArray(updated, event.previousIndex, event.currentIndex);
+      return updated.map((c, i) => ({ ...c, position: i }));
+    });
+    const positions = this.columns().map((c, i) => ({ id: c.id, position: i }));
+    this.columnService.reorderColumns(positions).subscribe({
+      error: () => { this.notify('Erreur lors du réordonnancement'); this.loadColumns(); },
+    });
+  }
+
   onDrop(event: CdkDragDrop<Task[]>, targetCol: KanbanColumn): void {
+    // Capture the task before any mutation
+    const movedTask: Task = { ...event.previousContainer.data[event.previousIndex] };
+    const newStatus = targetCol.linkedStatus;
+    if (newStatus) movedTask.status = newStatus;
+
     if (event.previousContainer === event.container) {
       this.columns.update(cols => cols.map(c => {
         if (c.id !== targetCol.id) return c;
@@ -737,6 +830,9 @@ export class TaskBoardComponent implements OnInit {
       }));
 
       transferArrayItem(sourceTasks, targetTasks, event.previousIndex, event.currentIndex);
+      // Apply optimistic status update on the moved task in targetTasks
+      const idx = targetTasks.findIndex(t => t.id === movedTask.id);
+      if (idx !== -1) targetTasks[idx] = movedTask;
 
       this.columns.update(cols => cols.map(c => {
         if (c.id === sourceCol.id) return { ...c, tasks: sourceTasks };
@@ -745,8 +841,7 @@ export class TaskBoardComponent implements OnInit {
       }));
     }
 
-    const movedTask = event.container.data[event.currentIndex];
-    this.taskService.moveTask(movedTask.id, targetCol.id, event.currentIndex).subscribe({
+    this.taskService.moveTask(movedTask.id, targetCol.id, event.currentIndex, newStatus).subscribe({
       error: () => { this.notify('Erreur lors du déplacement, rechargement…'); this.loadColumns(); },
     });
   }
@@ -754,7 +849,7 @@ export class TaskBoardComponent implements OnInit {
   /* ── Task actions ── */
 
   openAddTask(col: KanbanColumn): void {
-    const ref = this.dialog.open(TaskFormComponent, { data: {} });
+    const ref = this.dialog.open(TaskFormComponent, { data: {}, maxWidth: '760px', minWidth: '620px', panelClass: 'dark-dialog', backdropClass: 'dark-backdrop' });
     ref.afterClosed().subscribe((payload: TaskRequest | undefined) => {
       if (!payload) return;
       this.taskService.createTask({ ...payload, columnId: col.id }).subscribe({
@@ -770,7 +865,7 @@ export class TaskBoardComponent implements OnInit {
   }
 
   editTask(col: KanbanColumn, task: Task): void {
-    const ref = this.dialog.open(TaskFormComponent, { data: { task } });
+    const ref = this.dialog.open(TaskFormComponent, { data: { task }, maxWidth: '760px', minWidth: '620px' });
     ref.afterClosed().subscribe((payload: TaskRequest | undefined) => {
       if (!payload) return;
       this.taskService.updateTask(task.id, { ...payload, columnId: col.id }).subscribe({
@@ -817,6 +912,13 @@ export class TaskBoardComponent implements OnInit {
 
   statusLabel(s: TaskStatus): string {
     return ({ TODO: 'À faire', IN_PROGRESS: 'En cours', DONE: 'Terminée' } as Record<string, string>)[s];
+  }
+
+  memberInitials(name: string): string {
+    const parts = name.trim().split(/\s+/);
+    return parts.length >= 2
+      ? (parts[0][0] + parts[1][0]).toUpperCase()
+      : name.substring(0, 2).toUpperCase();
   }
 
   private notify(msg: string): void {

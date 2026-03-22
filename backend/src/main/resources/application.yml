@@ -20,7 +20,17 @@ logging:
   level:
     com.taskmanager.security: DEBUG
 
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:your@gmail.com}
+    password: ${MAIL_PASSWORD:your-app-password}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
 application:
+  frontend-url: ${FRONTEND_URL:http://localhost:4200}
   security:
     jwt:
       secret-key: "5a6f4b3c8d2e1f9a7b0c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a"

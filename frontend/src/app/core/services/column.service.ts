@@ -23,6 +23,10 @@ export class ColumnService {
     return this.http.post<KanbanColumn[]>(`${API}/init`, {});
   }
 
+  reorderColumns(updates: { id: number; position: number }[]): Observable<void> {
+    return this.http.patch<void>(`${API}/reorder`, updates);
+  }
+
   deleteColumn(id: number): Observable<void> {
     return this.http.delete<void>(`${API}/${id}`);
   }

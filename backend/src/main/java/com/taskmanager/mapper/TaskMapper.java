@@ -18,6 +18,8 @@ public class TaskMapper {
         response.setStatus(task.getStatus());
         response.setPriority(task.getPriority());
         response.setCreatedAt(task.getCreatedAt());
+        response.setDueDate(task.getDueDate());
+        response.setAssignedMember(task.getAssignedMember());
         if (task.getColumn() != null) response.setColumnId(task.getColumn().getId());
         return response;
     }
@@ -28,6 +30,8 @@ public class TaskMapper {
                 .description(request.getDescription())
                 .status(request.getStatus() != null ? request.getStatus() : TaskStatus.TODO)
                 .priority(request.getPriority() != null ? request.getPriority() : Priority.LOW)
+                .dueDate(request.getDueDate())
+                .assignedMember(request.getAssignedMember())
                 .build();
     }
 }

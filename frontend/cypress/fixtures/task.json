@@ -1,0 +1,9 @@
+{
+  "id": 99,
+  "title": "Ma nouvelle tâche E2E",
+  "description": "",
+  "status": "TODO",
+  "priority": "LOW",
+  "createdAt": "2026-03-21T10:00:00",
+  "columnId": 1
+}

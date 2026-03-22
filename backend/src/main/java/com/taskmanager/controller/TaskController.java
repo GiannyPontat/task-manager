@@ -1,5 +1,7 @@
 package com.taskmanager.controller;
 
+import com.taskmanager.dto.ActivityResponse;
+import com.taskmanager.dto.CommentRequest;
 import com.taskmanager.dto.MoveTaskRequest;
 import com.taskmanager.dto.TaskRequest;
 import com.taskmanager.dto.TaskResponse;
@@ -16,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -66,6 +69,23 @@ public class TaskController {
             @RequestBody MoveTaskRequest request
     ) {
         return ResponseEntity.ok(taskService.moveTask(user, id, request));
+    }
+
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityResponse>> getActivities(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(taskService.getActivities(user, id));
+    }
+
+    @PostMapping("/{id}/activities")
+    public ResponseEntity<ActivityResponse> addComment(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id,
+            @Valid @RequestBody CommentRequest request
+    ) {
+        return ResponseEntity.ok(taskService.addComment(user, id, request));
     }
 
     @DeleteMapping("/{id}")

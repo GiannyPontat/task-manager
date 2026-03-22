@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "title": "À faire",
+    "position": 0,
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Tâche existante",
+        "description": "Une tâche déjà présente",
+        "status": "TODO",
+        "priority": "LOW",
+        "createdAt": "2026-01-01T10:00:00",
+        "columnId": 1
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "En cours",
+    "position": 1,
+    "tasks": []
+  },
+  {
+    "id": 3,
+    "title": "Terminé",
+    "position": 2,
+    "tasks": []
+  }
+]

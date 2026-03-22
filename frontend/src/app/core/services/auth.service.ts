@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
 import { environment } from '../../../environments/environment';
 
@@ -28,6 +28,14 @@ export class AuthService {
     );
   }
 
+  forgotPassword(email: string): Observable<void> {
+    return this.http.post<void>(`${API}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${API}/reset-password`, { token, newPassword });
+  }
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
@@ -43,6 +51,10 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  refreshSession(res: AuthResponse): void {
+    this.saveSession(res);
+  }
+
   private saveSession(res: AuthResponse): void {
     localStorage.setItem(TOKEN_KEY, res.token);
     localStorage.setItem(USER_KEY, JSON.stringify(res));
@@ -51,6 +63,14 @@ export class AuthService {
 
   private loadUser(): AuthResponse | null {
     const raw = localStorage.getItem(USER_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const user = JSON.parse(raw) as AuthResponse;
+    // Session obsolète : username contient un email (avant le fix backend)
+    if (user.username?.includes('@')) {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      return null;
+    }
+    return user;
   }
 }

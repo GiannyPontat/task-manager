@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Page, Task, TaskRequest, TaskStatus } from '../models/task.model';
+import { Activity, Page, Task, TaskRequest, TaskStatus } from '../models/task.model';
 import { environment } from '../../../environments/environment';
 
 const API = `${environment.apiUrl}/tasks`;
@@ -25,11 +25,19 @@ export class TaskService {
     return this.http.put<Task>(`${API}/${id}`, payload);
   }
 
-  moveTask(id: number, columnId: number, position: number): Observable<Task> {
-    return this.http.patch<Task>(`${API}/${id}/move`, { columnId, position });
+  moveTask(id: number, columnId: number, position: number, status?: TaskStatus): Observable<Task> {
+    return this.http.patch<Task>(`${API}/${id}/move`, { columnId, position, status });
   }
 
   deleteTask(id: number): Observable<void> {
     return this.http.delete<void>(`${API}/${id}`);
+  }
+
+  getActivities(taskId: number): Observable<Activity[]> {
+    return this.http.get<Activity[]>(`${API}/${taskId}/activities`);
+  }
+
+  addComment(taskId: number, text: string): Observable<Activity> {
+    return this.http.post<Activity>(`${API}/${taskId}/activities`, { text });
   }
 }

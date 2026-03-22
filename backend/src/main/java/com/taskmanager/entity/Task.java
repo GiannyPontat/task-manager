@@ -3,6 +3,7 @@ package com.taskmanager.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,6 +35,12 @@ public class Task {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
+    @Column(name = "assigned_member", length = 100)
+    private String assignedMember;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

@@ -1,5 +1,15 @@
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
 export type Priority = 'LOW' | 'MEDIUM' | 'HIGH';
+export type ActivityType = 'TASK_CREATED' | 'TASK_UPDATED' | 'COMMENT_ADDED';
+
+export interface Activity {
+  id: number;
+  authorName: string;
+  authorInitials: string;
+  type: ActivityType;
+  detail?: string;
+  createdAt: string;
+}
 
 export interface Task {
   id: number;
@@ -8,7 +18,9 @@ export interface Task {
   status: TaskStatus;
   priority: Priority;
   createdAt: string;
+  dueDate?: string;
   columnId?: number;
+  assignedMember?: string;
 }
 
 export interface TaskRequest {
@@ -16,13 +28,16 @@ export interface TaskRequest {
   description?: string;
   status?: TaskStatus;
   priority?: Priority;
+  dueDate?: string;
   columnId?: number;
+  assignedMember?: string;
 }
 
 export interface KanbanColumn {
   id: number;
   title: string;
   position: number;
+  linkedStatus?: TaskStatus;
   tasks: Task[];
 }
 

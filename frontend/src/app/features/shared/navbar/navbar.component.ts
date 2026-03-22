@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -20,6 +20,10 @@ import { AuthService } from '../../../core/services/auth.service';
   ],
   template: `
     <mat-toolbar class="navbar">
+
+      <button mat-icon-button class="hamburger-btn" (click)="menuToggle.emit()" aria-label="Toggle menu">
+        <mat-icon>menu</mat-icon>
+      </button>
 
       <span class="brand">
         <div class="brand-mark">✓</div>
@@ -64,6 +68,14 @@ import { AuthService } from '../../../core/services/auth.service';
       top: 0;
       z-index: 100;
     }
+
+    /* ── Hamburger ── */
+    .hamburger-btn {
+      color: #94a3b8 !important;
+      margin-right: 8px;
+      transition: color 0.15s;
+    }
+    .hamburger-btn:hover { color: #f1f5f9 !important; }
 
     /* ── Brand ── */
     .brand {
@@ -183,6 +195,7 @@ import { AuthService } from '../../../core/services/auth.service';
   `],
 })
 export class NavbarComponent {
+  @Output() menuToggle = new EventEmitter<void>();
   readonly authService = inject(AuthService);
 
   userInitial = computed(() => this.authService.currentUser()?.username?.[0] ?? '?');

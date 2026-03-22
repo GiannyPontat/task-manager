@@ -90,9 +90,12 @@ import { AuthService } from '../../../core/services/auth.service';
           </form>
         </mat-card-content>
 
-        <mat-card-actions align="end">
-          <span class="redirect-hint">Pas encore de compte ?</span>
-          <a mat-button color="accent" routerLink="/register">S'inscrire</a>
+        <mat-card-actions class="card-actions">
+          <a mat-button class="forgot-link" routerLink="/forgot-password">Mot de passe oublié ?</a>
+          <div class="register-row">
+            <span class="redirect-hint">Pas encore de compte ?</span>
+            <a mat-button color="accent" routerLink="/register">S'inscrire</a>
+          </div>
         </mat-card-actions>
       </mat-card>
     </div>
@@ -176,10 +179,20 @@ import { AuthService } from '../../../core/services/auth.service';
       margin: 4px 0 8px;
     }
 
-    mat-card-actions {
-      padding: 8px 32px 24px;
+    .card-actions {
+      padding: 4px 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+    }
+
+    .forgot-link { color: #6366f1 !important; font-size: 0.82rem !important; align-self: flex-end; }
+
+    .register-row {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 4px;
     }
 

@@ -44,10 +44,15 @@ public class User implements UserDetails {
         this.createdAt = LocalDateTime.now();
     }
 
+    /** Retourne le vrai pseudo pour l'affichage (différent du login Spring Security). */
+    public String getDisplayName() {
+        return username;
+    }
+
     // UserDetails methods
     @Override
     public String getUsername() {
-        return email; // l'email est l'identifiant d'authentification
+        return email; // l'email est l'identifiant d'authentification Spring Security
     }
 
     @Override

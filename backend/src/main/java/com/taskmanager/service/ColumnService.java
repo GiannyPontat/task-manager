@@ -1,5 +1,6 @@
 package com.taskmanager.service;
 
+import com.taskmanager.dto.ColumnPositionUpdate;
 import com.taskmanager.dto.ColumnRequest;
 import com.taskmanager.dto.ColumnResponse;
 import com.taskmanager.entity.KanbanColumn;
@@ -10,8 +11,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,14 +46,29 @@ public class ColumnService {
 
     public void initDefaultColumns(User user) {
         if (!columnRepository.findByUserIdOrderByPositionAsc(user.getId()).isEmpty()) return;
-        List.of("À faire", "En cours", "Terminé").forEach((title) -> {
+        var defaults = List.of(
+            Map.entry("À faire",  com.taskmanager.entity.TaskStatus.TODO),
+            Map.entry("En cours", com.taskmanager.entity.TaskStatus.IN_PROGRESS),
+            Map.entry("Terminé",  com.taskmanager.entity.TaskStatus.DONE)
+        );
+        defaults.forEach(entry -> {
             int pos = (int) columnRepository.countByUserId(user.getId());
             KanbanColumn col = KanbanColumn.builder()
-                    .title(title)
+                    .title(entry.getKey())
                     .position(pos)
+                    .linkedStatus(entry.getValue())
                     .user(user)
                     .build();
             columnRepository.save(col);
+        });
+    }
+
+    @Transactional
+    public void reorderColumns(User user, List<ColumnPositionUpdate> updates) {
+        updates.forEach(update -> {
+            KanbanColumn column = findColumnOwnedBy(user, update.getId());
+            column.setPosition(update.getPosition());
+            columnRepository.save(column);
         });
     }
 

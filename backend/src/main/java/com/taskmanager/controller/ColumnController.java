@@ -1,9 +1,9 @@
 package com.taskmanager.controller;
 
+import com.taskmanager.dto.ColumnPositionUpdate;
 import com.taskmanager.dto.ColumnRequest;
 import com.taskmanager.dto.ColumnResponse;
 import com.taskmanager.entity.User;
-import java.util.List;
 import com.taskmanager.service.ColumnService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +48,15 @@ public class ColumnController {
             @Valid @RequestBody ColumnRequest request
     ) {
         return ResponseEntity.ok(columnService.updateColumn(user, id, request));
+    }
+
+    @PatchMapping("/reorder")
+    public ResponseEntity<Void> reorderColumns(
+            @AuthenticationPrincipal User user,
+            @RequestBody List<ColumnPositionUpdate> updates
+    ) {
+        columnService.reorderColumns(user, updates);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

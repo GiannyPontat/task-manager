@@ -16,5 +16,23 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/kanban/kanban-board/kanban-board.component').then(m => m.TaskBoardComponent)
   },
+  {
+    path: 'calendar',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/calendar/calendar.component').then(m => m.CalendarComponent)
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('./features/auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./features/auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+  },
   { path: '**', redirectTo: 'tasks' }
 ];

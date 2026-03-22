@@ -25,6 +25,10 @@ public class KanbanColumn {
     @Column(nullable = false)
     private int position;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "linked_status")
+    private TaskStatus linkedStatus;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

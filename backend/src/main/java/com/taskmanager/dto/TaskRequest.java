@@ -5,6 +5,7 @@ import com.taskmanager.entity.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import java.time.LocalDate;
 
 @Data
 public class TaskRequest {
@@ -20,4 +21,8 @@ public class TaskRequest {
     private Priority priority;
 
     private Long columnId;
+
+    private LocalDate dueDate;
+
+    private String assignedMember;
 }

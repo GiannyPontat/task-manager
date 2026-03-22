@@ -19,12 +19,22 @@ public class ColumnMapper {
         response.setId(column.getId());
         response.setTitle(column.getTitle());
         response.setPosition(column.getPosition());
+        response.setLinkedStatus(inferStatus(column));
         response.setTasks(
                 column.getTasks().stream()
                         .map(taskMapper::toResponse)
                         .collect(Collectors.toList())
         );
         return response;
+    }
+
+    private com.taskmanager.entity.TaskStatus inferStatus(KanbanColumn column) {
+        if (column.getLinkedStatus() != null) return column.getLinkedStatus();
+        return switch (column.getPosition()) {
+            case 0 -> com.taskmanager.entity.TaskStatus.TODO;
+            case 1 -> com.taskmanager.entity.TaskStatus.IN_PROGRESS;
+            default -> com.taskmanager.entity.TaskStatus.DONE;
+        };
     }
 
     public KanbanColumn toEntity(ColumnRequest request) {
