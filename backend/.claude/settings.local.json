@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "mcp__gemini-design-mcp__modify_frontend"
-    ]
-  }
-}
