@@ -4,9 +4,13 @@ import com.taskmanager.dto.ColumnPositionUpdate;
 import com.taskmanager.dto.ColumnRequest;
 import com.taskmanager.dto.ColumnResponse;
 import com.taskmanager.entity.KanbanColumn;
+import com.taskmanager.entity.Project;
+import com.taskmanager.entity.ProjectRole;
+import com.taskmanager.entity.TaskStatus;
 import com.taskmanager.entity.User;
 import com.taskmanager.mapper.ColumnMapper;
 import com.taskmanager.repository.ColumnRepository;
+import com.taskmanager.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,67 +26,77 @@ import java.util.stream.Collectors;
 public class ColumnService {
 
     private final ColumnRepository columnRepository;
+    private final ProjectRepository projectRepository;
     private final ColumnMapper columnMapper;
+    private final ProjectSecurityService security;
 
-    public List<ColumnResponse> getColumns(User user) {
-        return columnRepository.findByUserIdOrderByPositionAsc(user.getId())
+    public List<ColumnResponse> getColumns(User user, Long projectId) {
+        security.getRole(user, projectId);
+        return columnRepository.findByProjectIdOrderByPositionAsc(projectId)
                 .stream()
                 .map(columnMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-    public ColumnResponse createColumn(User user, ColumnRequest request) {
+    public ColumnResponse createColumn(User user, Long projectId, ColumnRequest request) {
+        security.requireRole(user, projectId, ProjectRole.ADMIN, ProjectRole.EDITOR);
+        Project project = findProject(projectId);
         KanbanColumn column = columnMapper.toEntity(request);
-        column.setUser(user);
+        column.setProject(project);
         return columnMapper.toResponse(columnRepository.save(column));
     }
 
-    public ColumnResponse updateColumn(User user, Long id, ColumnRequest request) {
-        KanbanColumn column = findColumnOwnedBy(user, id);
+    public ColumnResponse updateColumn(User user, Long projectId, Long id, ColumnRequest request) {
+        security.requireRole(user, projectId, ProjectRole.ADMIN, ProjectRole.EDITOR);
+        KanbanColumn column = findColumnInProject(projectId, id);
         column.setTitle(request.getTitle());
         column.setPosition(request.getPosition());
         return columnMapper.toResponse(columnRepository.save(column));
     }
 
-    public void initDefaultColumns(User user) {
-        if (!columnRepository.findByUserIdOrderByPositionAsc(user.getId()).isEmpty()) return;
+    public void initDefaultColumns(Project project) {
         var defaults = List.of(
-            Map.entry("À faire",  com.taskmanager.entity.TaskStatus.TODO),
-            Map.entry("En cours", com.taskmanager.entity.TaskStatus.IN_PROGRESS),
-            Map.entry("Terminé",  com.taskmanager.entity.TaskStatus.DONE)
+            Map.entry("À faire",  TaskStatus.TODO),
+            Map.entry("En cours", TaskStatus.IN_PROGRESS),
+            Map.entry("Terminé",  TaskStatus.DONE)
         );
         defaults.forEach(entry -> {
-            int pos = (int) columnRepository.countByUserId(user.getId());
-            KanbanColumn col = KanbanColumn.builder()
+            int pos = (int) columnRepository.countByProjectId(project.getId());
+            columnRepository.save(KanbanColumn.builder()
                     .title(entry.getKey())
                     .position(pos)
                     .linkedStatus(entry.getValue())
-                    .user(user)
-                    .build();
-            columnRepository.save(col);
+                    .project(project)
+                    .build());
         });
     }
 
     @Transactional
-    public void reorderColumns(User user, List<ColumnPositionUpdate> updates) {
+    public void reorderColumns(User user, Long projectId, List<ColumnPositionUpdate> updates) {
+        security.requireRole(user, projectId, ProjectRole.ADMIN, ProjectRole.EDITOR);
         updates.forEach(update -> {
-            KanbanColumn column = findColumnOwnedBy(user, update.getId());
+            KanbanColumn column = findColumnInProject(projectId, update.getId());
             column.setPosition(update.getPosition());
             columnRepository.save(column);
         });
     }
 
-    public void deleteColumn(User user, Long id) {
-        KanbanColumn column = findColumnOwnedBy(user, id);
-        columnRepository.delete(column);
+    public void deleteColumn(User user, Long projectId, Long id) {
+        security.requireRole(user, projectId, ProjectRole.ADMIN);
+        columnRepository.delete(findColumnInProject(projectId, id));
     }
 
-    private KanbanColumn findColumnOwnedBy(User user, Long id) {
+    private KanbanColumn findColumnInProject(Long projectId, Long id) {
         KanbanColumn column = columnRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Column not found: " + id));
-        if (!column.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("Access denied");
+        if (!column.getProject().getId().equals(projectId)) {
+            throw new AccessDeniedException("Column does not belong to this project");
         }
         return column;
+    }
+
+    private Project findProject(Long id) {
+        return projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found: " + id));
     }
 }

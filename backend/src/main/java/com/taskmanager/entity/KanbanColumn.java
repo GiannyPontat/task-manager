@@ -30,8 +30,8 @@ public class KanbanColumn {
     private TaskStatus linkedStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
 
     @OneToMany(mappedBy = "column", fetch = FetchType.LAZY)
     @OrderBy("createdAt ASC")

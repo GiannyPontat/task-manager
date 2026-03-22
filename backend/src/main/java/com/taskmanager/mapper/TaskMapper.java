@@ -19,8 +19,10 @@ public class TaskMapper {
         response.setPriority(task.getPriority());
         response.setCreatedAt(task.getCreatedAt());
         response.setDueDate(task.getDueDate());
-        response.setAssignedMember(task.getAssignedMember());
+        response.setProjectId(task.getProject().getId());
+        response.setAssignedMembers(task.getAssignedMembers());
         if (task.getColumn() != null) response.setColumnId(task.getColumn().getId());
+        if (task.getCreatedBy() != null) response.setCreatedByName(task.getCreatedBy().getDisplayName());
         return response;
     }
 
@@ -31,7 +33,9 @@ public class TaskMapper {
                 .status(request.getStatus() != null ? request.getStatus() : TaskStatus.TODO)
                 .priority(request.getPriority() != null ? request.getPriority() : Priority.LOW)
                 .dueDate(request.getDueDate())
-                .assignedMember(request.getAssignedMember())
+                .assignedMembers(request.getAssignedMembers() != null
+                        ? new java.util.ArrayList<>(request.getAssignedMembers())
+                        : new java.util.ArrayList<>())
                 .build();
     }
 }

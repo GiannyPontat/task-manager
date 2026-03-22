@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ColumnRepository extends JpaRepository<KanbanColumn, Long> {
-    List<KanbanColumn> findByUserIdOrderByPositionAsc(Long userId);
-    long countByUserId(Long userId);
+    List<KanbanColumn> findByProjectIdOrderByPositionAsc(Long projectId);
+    long countByProjectId(Long projectId);
+    void deleteByProjectId(Long projectId);
 }
