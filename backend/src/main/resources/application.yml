@@ -12,14 +12,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-
-server:
-  port: 8080
-
-logging:
-  level:
-    com.taskmanager.security: DEBUG
-
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -28,6 +20,13 @@ logging:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.taskmanager.security: DEBUG
 
 application:
   frontend-url: ${FRONTEND_URL:http://localhost:4200}

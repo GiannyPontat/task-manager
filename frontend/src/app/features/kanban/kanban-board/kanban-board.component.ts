@@ -797,7 +797,7 @@ export class TaskBoardComponent implements OnInit {
     this.columns.update(cols => {
       const updated = [...cols];
       moveItemInArray(updated, event.previousIndex, event.currentIndex);
-      return updated.map((c, i) => ({ ...c, position: i }));
+      return updated;
     });
     const positions = this.columns().map((c, i) => ({ id: c.id, position: i }));
     this.columnService.reorderColumns(positions).subscribe({
