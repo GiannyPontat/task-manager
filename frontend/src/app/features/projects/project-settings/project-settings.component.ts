@@ -196,6 +196,16 @@ import { InvitationService } from '../../../core/services/invitation.service';
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      /* MDC tokens — cascade to all nested Material components in this dialog */
+      --mdc-outlined-text-field-input-text-color: var(--text-main);
+      --mdc-outlined-text-field-label-text-color: var(--text-muted);
+      --mdc-outlined-text-field-outline-color: var(--border);
+      --mdc-outlined-text-field-hover-outline-color: var(--border);
+      --mdc-outlined-text-field-focus-outline-color: var(--primary);
+      --mdc-outlined-text-field-focus-label-text-color: var(--primary);
+      --mat-select-enabled-trigger-text-color: var(--text-main);
+      --mat-select-trigger-text-color: var(--text-main);
+      --mat-option-label-text-color: var(--text-main);
     }
 
     /* ── Header ── */
@@ -315,8 +325,8 @@ import { InvitationService } from '../../../core/services/invitation.service';
       ::ng-deep .mdc-notched-outline__leading,
       ::ng-deep .mdc-notched-outline__notch,
       ::ng-deep .mdc-notched-outline__trailing { border-color: var(--border) !important; }
-      ::ng-deep .mat-mdc-select-value { font-size: 0.78rem !important; font-weight: 600 !important; color: var(--primary) !important; }
-      ::ng-deep .mat-mdc-select-arrow { color: var(--primary) !important; }
+      ::ng-deep .mat-mdc-select-value { font-size: 0.78rem !important; font-weight: 600 !important; color: var(--text-main) !important; }
+      ::ng-deep .mat-mdc-select-arrow { color: var(--text-muted) !important; }
     }
 
     .role-chip {
@@ -332,13 +342,6 @@ import { InvitationService } from '../../../core/services/invitation.service';
     /* ── General form ── */
     .full-field {
       width: 100%; margin-bottom: 16px;
-      /* MDC token overrides — needed because Angular Material light theme injects its own values */
-      --mdc-outlined-text-field-input-text-color: var(--text-main);
-      --mdc-outlined-text-field-label-text-color: var(--text-muted);
-      --mdc-outlined-text-field-outline-color: var(--border);
-      --mdc-outlined-text-field-hover-outline-color: var(--border);
-      --mdc-outlined-text-field-focus-outline-color: var(--primary);
-      --mdc-outlined-text-field-focus-label-text-color: var(--primary);
       ::ng-deep .mdc-text-field { background: var(--input-bg) !important; border-radius: 12px !important; }
       ::ng-deep .mdc-notched-outline__leading,
       ::ng-deep .mdc-notched-outline__notch,
