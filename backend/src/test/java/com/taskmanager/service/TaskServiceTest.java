@@ -4,9 +4,9 @@ import com.taskmanager.dto.MoveTaskRequest;
 import com.taskmanager.dto.TaskRequest;
 import com.taskmanager.dto.TaskResponse;
 import com.taskmanager.entity.*;
+import com.taskmanager.mapper.ActivityMapper;
 import com.taskmanager.mapper.TaskMapper;
-import com.taskmanager.repository.ColumnRepository;
-import com.taskmanager.repository.TaskRepository;
+import com.taskmanager.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
@@ -25,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,29 +30,38 @@ class TaskServiceTest {
 
     @Mock private TaskRepository taskRepository;
     @Mock private ColumnRepository columnRepository;
+    @Mock private ActivityRepository activityRepository;
+    @Mock private ProjectRepository projectRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private NotificationService notificationService;
+    @Mock private ProjectSecurityService security;
     @Mock private TaskMapper taskMapper;
+    @Mock private ActivityMapper activityMapper;
 
     @InjectMocks private TaskService taskService;
 
-    private User owner;
-    private User otherUser;
+    private User alice;
+    private Project project;
     private Task task;
     private TaskResponse taskResponse;
 
+    private static final Long PROJECT_ID = 1L;
+    private static final Long TASK_ID    = 10L;
+
     @BeforeEach
     void setUp() {
-        owner = User.builder().id(1L).username("alice").email("alice@test.com")
-                .role(Role.USER).build();
-        otherUser = User.builder().id(2L).username("bob").email("bob@test.com")
-                .role(Role.USER).build();
+        alice = User.builder().id(1L).username("alice").email("alice@test.com").role(Role.USER).build();
+
+        project = Project.builder().id(PROJECT_ID).name("My Project").owner(alice).build();
 
         task = Task.builder()
-                .id(10L).title("My Task").status(TaskStatus.TODO)
-                .priority(Priority.LOW).user(owner).createdAt(LocalDateTime.now())
+                .id(TASK_ID).title("My Task").status(TaskStatus.TODO)
+                .priority(Priority.LOW).project(project).createdAt(LocalDateTime.now())
+                .assignedMembers(new java.util.ArrayList<>())
                 .build();
 
         taskResponse = new TaskResponse();
-        taskResponse.setId(10L);
+        taskResponse.setId(TASK_ID);
         taskResponse.setTitle("My Task");
         taskResponse.setStatus(TaskStatus.TODO);
     }
@@ -63,115 +69,115 @@ class TaskServiceTest {
     // ── getTasks ──────────────────────────────────────────────────────────────
 
     @Test
-    void getTasks_noFilter_returnsAllUserTasks() {
+    void getTasks_noFilter_returnsPageOfTasks() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Task> page = new PageImpl<>(List.of(task));
-        when(taskRepository.findByUserId(owner.getId(), pageable)).thenReturn(page);
+        when(security.getRole(alice, PROJECT_ID)).thenReturn(ProjectRole.VIEWER);
+        when(taskRepository.findByProjectId(PROJECT_ID, pageable)).thenReturn(new PageImpl<>(List.of(task)));
         when(taskMapper.toResponse(task)).thenReturn(taskResponse);
 
-        Page<TaskResponse> result = taskService.getTasks(owner, null, pageable);
+        Page<TaskResponse> result = taskService.getTasks(alice, PROJECT_ID, null, pageable);
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getTitle()).isEqualTo("My Task");
     }
 
     @Test
-    void getTasks_withStatusFilter_returnsFilteredTasks() {
+    void getTasks_withStatusFilter_queriesFilteredRepository() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Task> page = new PageImpl<>(List.of(task));
-        when(taskRepository.findByUserIdAndStatus(owner.getId(), TaskStatus.TODO, pageable)).thenReturn(page);
+        when(security.getRole(alice, PROJECT_ID)).thenReturn(ProjectRole.VIEWER);
+        when(taskRepository.findByProjectIdAndStatus(PROJECT_ID, TaskStatus.TODO, pageable))
+                .thenReturn(new PageImpl<>(List.of(task)));
         when(taskMapper.toResponse(task)).thenReturn(taskResponse);
 
-        Page<TaskResponse> result = taskService.getTasks(owner, TaskStatus.TODO, pageable);
+        taskService.getTasks(alice, PROJECT_ID, TaskStatus.TODO, pageable);
 
-        assertThat(result.getContent()).hasSize(1);
-        verify(taskRepository).findByUserIdAndStatus(owner.getId(), TaskStatus.TODO, pageable);
-        verify(taskRepository, never()).findByUserId(any(), any());
+        verify(taskRepository).findByProjectIdAndStatus(PROJECT_ID, TaskStatus.TODO, pageable);
+        verify(taskRepository, never()).findByProjectId(any(), any());
+    }
+
+    @Test
+    void getTasks_nonMember_throwsAccessDeniedException() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(security.getRole(alice, PROJECT_ID)).thenThrow(new AccessDeniedException("not a member"));
+
+        assertThatThrownBy(() -> taskService.getTasks(alice, PROJECT_ID, null, pageable))
+                .isInstanceOf(AccessDeniedException.class);
     }
 
     // ── getTask ───────────────────────────────────────────────────────────────
 
     @Test
-    void getTask_ownerAccess_returnsTask() {
-        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+    void getTask_memberAccess_returnsTask() {
+        when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
+        when(security.getRole(alice, PROJECT_ID)).thenReturn(ProjectRole.VIEWER);
         when(taskMapper.toResponse(task)).thenReturn(taskResponse);
 
-        TaskResponse result = taskService.getTask(owner, 10L);
+        TaskResponse result = taskService.getTask(alice, PROJECT_ID, TASK_ID);
 
-        assertThat(result.getId()).isEqualTo(10L);
+        assertThat(result.getId()).isEqualTo(TASK_ID);
     }
 
     @Test
     void getTask_notFound_throwsEntityNotFoundException() {
         when(taskRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> taskService.getTask(owner, 99L))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("Task not found");
+        assertThatThrownBy(() -> taskService.getTask(alice, PROJECT_ID, 99L))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void getTask_otherUserAccess_throwsAccessDeniedException() {
-        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+    void getTask_taskBelongsToOtherProject_throwsAccessDeniedException() {
+        Project otherProject = Project.builder().id(99L).name("Other").owner(alice).build();
+        Task foreignTask = Task.builder().id(TASK_ID).project(otherProject).build();
+        when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(foreignTask));
 
-        assertThatThrownBy(() -> taskService.getTask(otherUser, 10L))
+        assertThatThrownBy(() -> taskService.getTask(alice, PROJECT_ID, TASK_ID))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
     // ── createTask ────────────────────────────────────────────────────────────
 
     @Test
-    void createTask_noColumn_savesAndReturnsTask() {
+    void createTask_adminRole_savesAndReturnsTask() {
         TaskRequest request = new TaskRequest();
         request.setTitle("New Task");
 
-        Task entity = Task.builder().title("New Task").status(TaskStatus.TODO).priority(Priority.LOW).build();
-        Task saved  = Task.builder().id(11L).title("New Task").status(TaskStatus.TODO)
-                .priority(Priority.LOW).user(owner).createdAt(LocalDateTime.now()).build();
-        TaskResponse response = new TaskResponse();
-        response.setId(11L);
+        Task entity = Task.builder().title("New Task").build();
+        Task saved  = Task.builder().id(11L).title("New Task").project(project).createdAt(LocalDateTime.now()).build();
+        TaskResponse response = new TaskResponse(); response.setId(11L);
 
+        when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
         when(taskMapper.toEntity(request)).thenReturn(entity);
         when(taskRepository.save(any(Task.class))).thenReturn(saved);
         when(taskMapper.toResponse(saved)).thenReturn(response);
+        when(activityRepository.save(any())).thenReturn(null);
 
-        TaskResponse result = taskService.createTask(owner, request);
+        TaskResponse result = taskService.createTask(alice, PROJECT_ID, request);
 
         assertThat(result.getId()).isEqualTo(11L);
         verify(taskRepository).save(any(Task.class));
     }
 
     @Test
-    void createTask_columnNotFound_throwsEntityNotFoundException() {
+    void createTask_nonMember_throwsAccessDeniedException() {
         TaskRequest request = new TaskRequest();
-        request.setTitle("Task with column");
-        request.setColumnId(99L);
+        request.setTitle("Hack");
+        doThrow(new AccessDeniedException("no permission"))
+                .when(security).requireRole(alice, PROJECT_ID, ProjectRole.ADMIN, ProjectRole.EDITOR);
 
-        Task entity = Task.builder().title("Task with column").build();
-        when(taskMapper.toEntity(request)).thenReturn(entity);
-        when(columnRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> taskService.createTask(owner, request))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("Column not found");
+        assertThatThrownBy(() -> taskService.createTask(alice, PROJECT_ID, request))
+                .isInstanceOf(AccessDeniedException.class);
+        verify(taskRepository, never()).save(any());
     }
 
     @Test
-    void createTask_columnBelongsToOtherUser_throwsAccessDeniedException() {
+    void createTask_projectNotFound_throwsEntityNotFoundException() {
         TaskRequest request = new TaskRequest();
         request.setTitle("Task");
-        request.setColumnId(5L);
+        when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.empty());
 
-        KanbanColumn column = new KanbanColumn();
-        column.setId(5L);
-        column.setUser(otherUser);
-
-        Task entity = Task.builder().title("Task").build();
-        when(taskMapper.toEntity(request)).thenReturn(entity);
-        when(columnRepository.findById(5L)).thenReturn(Optional.of(column));
-
-        assertThatThrownBy(() -> taskService.createTask(owner, request))
-                .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> taskService.createTask(alice, PROJECT_ID, request))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     // ── updateTask ────────────────────────────────────────────────────────────
@@ -184,11 +190,12 @@ class TaskServiceTest {
         request.setStatus(TaskStatus.IN_PROGRESS);
         request.setPriority(Priority.HIGH);
 
-        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+        when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
         when(taskRepository.save(task)).thenReturn(task);
         when(taskMapper.toResponse(task)).thenReturn(taskResponse);
+        when(activityRepository.save(any())).thenReturn(null);
 
-        taskService.updateTask(owner, 10L, request);
+        taskService.updateTask(alice, PROJECT_ID, TASK_ID, request);
 
         assertThat(task.getTitle()).isEqualTo("Updated");
         assertThat(task.getDescription()).isEqualTo("New desc");
@@ -197,22 +204,23 @@ class TaskServiceTest {
     }
 
     @Test
-    void updateTask_otherUser_throwsAccessDeniedException() {
+    void updateTask_insufficientRole_throwsAccessDeniedException() {
         TaskRequest request = new TaskRequest();
-        request.setTitle("Hacked");
-        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+        request.setTitle("Attempt");
+        doThrow(new AccessDeniedException("no permission"))
+                .when(security).requireRole(alice, PROJECT_ID, ProjectRole.ADMIN, ProjectRole.EDITOR);
 
-        assertThatThrownBy(() -> taskService.updateTask(otherUser, 10L, request))
+        assertThatThrownBy(() -> taskService.updateTask(alice, PROJECT_ID, TASK_ID, request))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
     // ── deleteTask ────────────────────────────────────────────────────────────
 
     @Test
-    void deleteTask_owner_deletesSuccessfully() {
-        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+    void deleteTask_adminRole_deletesSuccessfully() {
+        when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
 
-        taskService.deleteTask(owner, 10L);
+        taskService.deleteTask(alice, PROJECT_ID, TASK_ID);
 
         verify(taskRepository).delete(task);
     }
@@ -221,15 +229,16 @@ class TaskServiceTest {
     void deleteTask_notFound_throwsEntityNotFoundException() {
         when(taskRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> taskService.deleteTask(owner, 99L))
+        assertThatThrownBy(() -> taskService.deleteTask(alice, PROJECT_ID, 99L))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void deleteTask_otherUser_throwsAccessDeniedException() {
-        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+    void deleteTask_insufficientRole_throwsAccessDeniedException() {
+        doThrow(new AccessDeniedException("no permission"))
+                .when(security).requireRole(alice, PROJECT_ID, ProjectRole.ADMIN, ProjectRole.EDITOR);
 
-        assertThatThrownBy(() -> taskService.deleteTask(otherUser, 10L))
+        assertThatThrownBy(() -> taskService.deleteTask(alice, PROJECT_ID, TASK_ID))
                 .isInstanceOf(AccessDeniedException.class);
         verify(taskRepository, never()).delete(any());
     }
@@ -237,22 +246,39 @@ class TaskServiceTest {
     // ── moveTask ──────────────────────────────────────────────────────────────
 
     @Test
-    void moveTask_validColumn_updatesColumn() {
-        KanbanColumn targetColumn = new KanbanColumn();
-        targetColumn.setId(3L);
-        targetColumn.setUser(owner);
+    void moveTask_validColumn_updatesTaskColumn() {
+        KanbanColumn target = new KanbanColumn();
+        target.setId(3L);
+        target.setProject(project);
 
         MoveTaskRequest request = new MoveTaskRequest();
         request.setColumnId(3L);
 
-        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
-        when(columnRepository.findById(3L)).thenReturn(Optional.of(targetColumn));
+        when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
+        when(columnRepository.findById(3L)).thenReturn(Optional.of(target));
         when(taskRepository.save(task)).thenReturn(task);
         when(taskMapper.toResponse(task)).thenReturn(taskResponse);
 
-        taskService.moveTask(owner, 10L, request);
+        taskService.moveTask(alice, PROJECT_ID, TASK_ID, request);
 
-        assertThat(task.getColumn()).isEqualTo(targetColumn);
+        assertThat(task.getColumn()).isEqualTo(target);
         verify(taskRepository).save(task);
+    }
+
+    @Test
+    void moveTask_columnFromOtherProject_throwsAccessDeniedException() {
+        Project otherProject = Project.builder().id(99L).name("Other").owner(alice).build();
+        KanbanColumn foreignColumn = new KanbanColumn();
+        foreignColumn.setId(3L);
+        foreignColumn.setProject(otherProject);
+
+        MoveTaskRequest request = new MoveTaskRequest();
+        request.setColumnId(3L);
+
+        when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
+        when(columnRepository.findById(3L)).thenReturn(Optional.of(foreignColumn));
+
+        assertThatThrownBy(() -> taskService.moveTask(alice, PROJECT_ID, TASK_ID, request))
+                .isInstanceOf(AccessDeniedException.class);
     }
 }

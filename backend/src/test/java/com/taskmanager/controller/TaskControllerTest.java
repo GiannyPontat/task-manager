@@ -70,19 +70,19 @@ class TaskControllerTest {
 
     @Test
     void getTasks_noToken_returns401() throws Exception {
-        mockMvc.perform(get("/api/tasks"))
+        mockMvc.perform(get("/api/projects/1/tasks"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void getTask_noToken_returns401() throws Exception {
-        mockMvc.perform(get("/api/tasks/1"))
+        mockMvc.perform(get("/api/projects/1/tasks/1"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void createTask_noToken_returns401() throws Exception {
-        mockMvc.perform(post("/api/tasks")
+        mockMvc.perform(post("/api/projects/1/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"hack\"}"))
                 .andExpect(status().isUnauthorized());
@@ -90,7 +90,7 @@ class TaskControllerTest {
 
     @Test
     void updateTask_noToken_returns401() throws Exception {
-        mockMvc.perform(put("/api/tasks/1")
+        mockMvc.perform(put("/api/projects/1/tasks/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"hack\"}"))
                 .andExpect(status().isUnauthorized());
@@ -98,55 +98,55 @@ class TaskControllerTest {
 
     @Test
     void deleteTask_noToken_returns401() throws Exception {
-        mockMvc.perform(delete("/api/tasks/1"))
+        mockMvc.perform(delete("/api/projects/1/tasks/1"))
                 .andExpect(status().isUnauthorized());
     }
 
-    // ── GET /api/tasks ────────────────────────────────────────────────────────
+    // ── GET /api/projects/{projectId}/tasks ───────────────────────────────────
 
     @Test
     void getTasks_withValidToken_returns200() throws Exception {
-        when(taskService.getTasks(any(User.class), isNull(), any(Pageable.class)))
+        when(taskService.getTasks(any(User.class), eq(1L), isNull(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(sampleResponse)));
 
-        mockMvc.perform(get("/api/tasks").header("Authorization", validToken))
+        mockMvc.perform(get("/api/projects/1/tasks").header("Authorization", validToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].title").value("Test Task"));
     }
 
     @Test
     void getTasks_withStatusFilter_returns200() throws Exception {
-        when(taskService.getTasks(any(User.class), eq(TaskStatus.TODO), any(Pageable.class)))
+        when(taskService.getTasks(any(User.class), eq(1L), eq(TaskStatus.TODO), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(sampleResponse)));
 
-        mockMvc.perform(get("/api/tasks?status=TODO").header("Authorization", validToken))
+        mockMvc.perform(get("/api/projects/1/tasks?status=TODO").header("Authorization", validToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
     }
 
-    // ── GET /api/tasks/{id} ───────────────────────────────────────────────────
+    // ── GET /api/projects/{projectId}/tasks/{id} ──────────────────────────────
 
     @Test
     void getTask_withValidToken_returns200() throws Exception {
-        when(taskService.getTask(any(User.class), eq(1L))).thenReturn(sampleResponse);
+        when(taskService.getTask(any(User.class), eq(1L), eq(1L))).thenReturn(sampleResponse);
 
-        mockMvc.perform(get("/api/tasks/1").header("Authorization", validToken))
+        mockMvc.perform(get("/api/projects/1/tasks/1").header("Authorization", validToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("Test Task"));
     }
 
-    // ── POST /api/tasks ───────────────────────────────────────────────────────
+    // ── POST /api/projects/{projectId}/tasks ──────────────────────────────────
 
     @Test
     void createTask_withValidToken_returns201() throws Exception {
         TaskRequest request = new TaskRequest();
         request.setTitle("New Task");
 
-        when(taskService.createTask(any(User.class), any(TaskRequest.class)))
+        when(taskService.createTask(any(User.class), eq(1L), any(TaskRequest.class)))
                 .thenReturn(sampleResponse);
 
-        mockMvc.perform(post("/api/tasks")
+        mockMvc.perform(post("/api/projects/1/tasks")
                         .header("Authorization", validToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -156,38 +156,37 @@ class TaskControllerTest {
 
     @Test
     void createTask_missingTitle_returns400() throws Exception {
-        TaskRequest request = new TaskRequest();
-        // title is blank — @NotBlank should trigger 400
+        TaskRequest request = new TaskRequest(); // title blank → @NotBlank
 
-        mockMvc.perform(post("/api/tasks")
+        mockMvc.perform(post("/api/projects/1/tasks")
                         .header("Authorization", validToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
-    // ── PUT /api/tasks/{id} ───────────────────────────────────────────────────
+    // ── PUT /api/projects/{projectId}/tasks/{id} ──────────────────────────────
 
     @Test
     void updateTask_withValidToken_returns200() throws Exception {
         TaskRequest request = new TaskRequest();
         request.setTitle("Updated Task");
 
-        when(taskService.updateTask(any(User.class), eq(1L), any(TaskRequest.class)))
+        when(taskService.updateTask(any(User.class), eq(1L), eq(1L), any(TaskRequest.class)))
                 .thenReturn(sampleResponse);
 
-        mockMvc.perform(put("/api/tasks/1")
+        mockMvc.perform(put("/api/projects/1/tasks/1")
                         .header("Authorization", validToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
 
-    // ── DELETE /api/tasks/{id} ────────────────────────────────────────────────
+    // ── DELETE /api/projects/{projectId}/tasks/{id} ───────────────────────────
 
     @Test
     void deleteTask_withValidToken_returns204() throws Exception {
-        mockMvc.perform(delete("/api/tasks/1").header("Authorization", validToken))
+        mockMvc.perform(delete("/api/projects/1/tasks/1").header("Authorization", validToken))
                 .andExpect(status().isNoContent());
     }
 }
