@@ -108,6 +108,12 @@ public class ProjectService {
         security.requireRole(user, projectId, ProjectRole.ADMIN);
         ProjectMember member = memberRepository.findByProjectIdAndUserId(projectId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Membre introuvable"));
+        if (member.getRole() == ProjectRole.ADMIN && role != ProjectRole.ADMIN) {
+            long adminCount = memberRepository.countByProjectIdAndRole(projectId, ProjectRole.ADMIN);
+            if (adminCount <= 1) {
+                throw new IllegalArgumentException("Impossible de retirer le dernier administrateur du projet");
+            }
+        }
         member.setRole(role);
         return toMemberResponse(memberRepository.save(member));
     }

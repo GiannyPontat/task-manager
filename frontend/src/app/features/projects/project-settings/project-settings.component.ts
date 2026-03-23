@@ -100,6 +100,8 @@ import { InvitationService } from '../../../core/services/invitation.service';
                 <td mat-cell *matCellDef="let m">
                   @if (isAdmin) {
                     <mat-select class="role-select" [value]="m.role"
+                                [disabled]="isLastAdmin(m)"
+                                [matTooltip]="isLastAdmin(m) ? 'Dernier admin — impossible de changer' : ''"
                                 (selectionChange)="onChangeRole(m.userId, $event.value)">
                       <mat-option value="ADMIN">Admin</mat-option>
                       <mat-option value="EDITOR">Éditeur</mat-option>
@@ -236,6 +238,8 @@ import { InvitationService } from '../../../core/services/invitation.service';
     ::ng-deep .settings-tabs .mdc-tab--active .mdc-tab__text-label { color: var(--text-main) !important; }
     ::ng-deep .settings-tabs .mdc-tab-indicator__content--underline { background-color: var(--primary) !important; }
     ::ng-deep .settings-tabs .mat-mdc-tab-body-wrapper { flex: 1; }
+    ::ng-deep .settings-tabs .mat-mdc-tab-body,
+    ::ng-deep .settings-tabs .mat-mdc-tab-body-content { background: transparent !important; }
 
     /* ── Tab body ── */
     .tab-body {
@@ -328,13 +332,20 @@ import { InvitationService } from '../../../core/services/invitation.service';
     /* ── General form ── */
     .full-field {
       width: 100%; margin-bottom: 16px;
+      /* MDC token overrides — needed because Angular Material light theme injects its own values */
+      --mdc-outlined-text-field-input-text-color: var(--text-main);
+      --mdc-outlined-text-field-label-text-color: var(--text-muted);
+      --mdc-outlined-text-field-outline-color: var(--border);
+      --mdc-outlined-text-field-hover-outline-color: var(--border);
+      --mdc-outlined-text-field-focus-outline-color: var(--primary);
+      --mdc-outlined-text-field-focus-label-text-color: var(--primary);
       ::ng-deep .mdc-text-field { background: var(--input-bg) !important; border-radius: 12px !important; }
       ::ng-deep .mdc-notched-outline__leading,
       ::ng-deep .mdc-notched-outline__notch,
       ::ng-deep .mdc-notched-outline__trailing { border-color: var(--border) !important; }
       ::ng-deep .mdc-text-field--focused .mdc-notched-outline__leading,
       ::ng-deep .mdc-text-field--focused .mdc-notched-outline__notch,
-      ::ng-deep .mdc-text-field--focused .mdc-notched-outline__trailing { border-color: rgba(99,102,241,0.6) !important; }
+      ::ng-deep .mdc-text-field--focused .mdc-notched-outline__trailing { border-color: var(--primary) !important; }
       ::ng-deep input, ::ng-deep textarea { color: var(--text-main) !important; }
       ::ng-deep .mdc-floating-label { color: var(--text-muted) !important; }
     }
@@ -395,6 +406,10 @@ export class ProjectSettingsComponent implements OnInit {
 
   roleLabel(role: ProjectRole): string {
     return ({ ADMIN: 'Admin', EDITOR: 'Éditeur', VIEWER: 'Lecteur' } as Record<string, string>)[role] ?? role;
+  }
+
+  isLastAdmin(member: ProjectMember): boolean {
+    return member.role === 'ADMIN' && this.members.filter(m => m.role === 'ADMIN').length <= 1;
   }
 
   onSave(): void {
