@@ -147,8 +147,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
 
               <mat-form-field appearance="outline" class="full-field">
                 <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" rows="3"
-                          placeholder="Décrivez l'objectif du projet…"></textarea>
+                <textarea matInput formControlName="description" rows="3"></textarea>
               </mat-form-field>
 
               @if (isAdmin) {
