@@ -206,7 +206,15 @@ import { InvitationService } from '../../../core/services/invitation.service';
       --mat-select-enabled-trigger-text-color: var(--text-main);
       --mat-select-trigger-text-color: var(--text-main);
       --mat-option-label-text-color: var(--text-main);
+      --mdc-outlined-text-field-input-text-placeholder-color: var(--text-muted);
     }
+
+    /* Placeholder color — not covered by MDC input-text-color token */
+    ::ng-deep .full-field input::placeholder,
+    ::ng-deep .full-field textarea::placeholder { color: var(--text-muted) !important; opacity: 1; }
+
+    /* Select trigger value text (belt-and-suspenders over MDC token) */
+    ::ng-deep .role-select .mat-mdc-select-value-text { color: var(--text-main) !important; }
 
     /* ── Header ── */
     .dlg-header {
