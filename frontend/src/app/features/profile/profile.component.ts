@@ -225,17 +225,17 @@ import { UserService } from '../../core/services/user.service';
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
       border-radius: 8px;
-      color: #94a3b8;
+      color: var(--text-muted);
       font-size: 0.72rem;
       font-family: inherit;
       padding: 5px 10px;
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
       mat-icon { font-size: 13px; width: 13px; height: 13px; }
-      &:hover { background: rgba(255,255,255,0.12); color: #cbd5e1; }
+      &:hover { background: var(--bg-panel-hover); color: var(--text-secondary); }
     }
 
     .user-identity {
@@ -248,7 +248,7 @@ import { UserService } from '../../core/services/user.service';
       margin: 0;
       font-size: 1.9rem;
       font-weight: 800;
-      color: #f8fafc;
+      color: var(--text-main);
       letter-spacing: -0.6px;
     }
 
@@ -275,10 +275,8 @@ import { UserService } from '../../core/services/user.service';
     }
 
     .stat-card {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 14px;
       padding: 18px 20px;
       display: flex;
@@ -289,14 +287,14 @@ import { UserService } from '../../core/services/user.service';
     .stat-value {
       font-size: 1.7rem;
       font-weight: 800;
-      color: #f8fafc;
+      color: var(--text-main);
       letter-spacing: -0.5px;
       line-height: 1;
     }
 
     .stat-label {
       font-size: 0.72rem;
-      color: #64748b;
+      color: var(--text-muted);
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.06em;
@@ -304,7 +302,7 @@ import { UserService } from '../../core/services/user.service';
 
     .stat-bar {
       height: 3px;
-      background: rgba(255,255,255,0.07);
+      background: var(--border);
       border-radius: 2px;
       margin-top: 6px;
       overflow: hidden;
@@ -322,10 +320,8 @@ import { UserService } from '../../core/services/user.service';
 
     /* ── Glass Cards ── */
     .glass-card {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 20px;
       padding: 28px;
     }
@@ -354,13 +350,13 @@ import { UserService } from '../../core/services/user.service';
     .card-title {
       font-size: 1.05rem;
       font-weight: 700;
-      color: #f8fafc;
+      color: var(--text-main);
       margin: 0 0 3px;
     }
 
     .card-subtitle {
       font-size: 0.78rem;
-      color: #64748b;
+      color: var(--text-muted);
       margin: 0;
     }
 
@@ -375,14 +371,14 @@ import { UserService } from '../../core/services/user.service';
 
     .field { width: 100%; }
 
-    /* Dark override for Material form fields */
+    /* Theme-aware Material form fields */
     :host ::ng-deep .field .mat-mdc-text-field-wrapper {
-      background: rgba(255,255,255,0.04) !important;
+      background: var(--input-bg) !important;
     }
     :host ::ng-deep .field .mdc-notched-outline__leading,
     :host ::ng-deep .field .mdc-notched-outline__notch,
     :host ::ng-deep .field .mdc-notched-outline__trailing {
-      border-color: rgba(255,255,255,0.12) !important;
+      border-color: var(--border) !important;
     }
     :host ::ng-deep .field.mat-focused .mdc-notched-outline__leading,
     :host ::ng-deep .field.mat-focused .mdc-notched-outline__notch,
@@ -390,15 +386,15 @@ import { UserService } from '../../core/services/user.service';
       border-color: rgba(99,102,241,0.7) !important;
     }
     :host ::ng-deep .field .mdc-floating-label,
-    :host ::ng-deep .field .mat-mdc-form-field-label { color: #64748b !important; }
-    :host ::ng-deep .field input { color: #f1f5f9 !important; caret-color: #6366f1; }
-    :host ::ng-deep .field .mat-mdc-form-field-icon-prefix mat-icon { color: #475569; }
-    :host ::ng-deep .field button mat-icon { color: #475569; }
+    :host ::ng-deep .field .mat-mdc-form-field-label { color: var(--text-muted) !important; }
+    :host ::ng-deep .field input { color: var(--text-main) !important; caret-color: #6366f1; }
+    :host ::ng-deep .field .mat-mdc-form-field-icon-prefix mat-icon { color: var(--text-muted); }
+    :host ::ng-deep .field button mat-icon { color: var(--text-muted); }
 
     /* Champ en lecture seule */
-    :host ::ng-deep .field-readonly input { color: #4b5563 !important; cursor: default; }
+    :host ::ng-deep .field-readonly input { color: var(--text-muted) !important; cursor: default; }
     :host ::ng-deep .field-readonly .mat-mdc-text-field-wrapper {
-      background: rgba(255,255,255,0.02) !important;
+      background: var(--bg-panel) !important;
     }
 
     .form-footer {
@@ -454,7 +450,7 @@ import { UserService } from '../../core/services/user.service';
       align-items: center;
       gap: 10px;
       font-size: 0.82rem;
-      color: #94a3b8;
+      color: var(--text-muted);
       mat-icon { color: #ef4444; font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
     }
 

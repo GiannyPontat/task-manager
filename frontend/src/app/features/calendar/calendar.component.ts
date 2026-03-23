@@ -127,26 +127,24 @@ interface CalendarView { key: string; label: string; }
       margin: 0;
       font-size: 1.5rem;
       font-weight: 700;
-      color: #f8fafc;
+      color: var(--text-main);
       letter-spacing: -0.3px;
     }
 
     .page-sub {
       margin: 2px 0 0;
       font-size: 0.78rem;
-      color: #64748b;
+      color: var(--text-muted);
     }
 
     /* ══════════════════════════════════════
        Calendar card
     ══════════════════════════════════════ */
     .cal-card {
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(18px) saturate(180%);
-      -webkit-backdrop-filter: blur(18px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow);
       overflow: hidden;
     }
 
@@ -156,7 +154,7 @@ interface CalendarView { key: string; label: string; }
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      border-bottom: 1px solid var(--border);
       flex-wrap: wrap;
       gap: 12px;
     }
@@ -170,35 +168,35 @@ interface CalendarView { key: string; label: string; }
     .nav-btn {
       width: 32px; height: 32px;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #94a3b8;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
       mat-icon { font-size: 18px; width: 18px; height: 18px; }
-      &:hover { background: rgba(255,255,255,0.1); color: #f1f5f9; }
+      &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
     }
 
     .today-btn {
       height: 32px;
       padding: 0 14px;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #94a3b8;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
       font-size: 0.8rem;
       font-weight: 500;
       font-family: inherit;
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
-      &:hover { background: rgba(255,255,255,0.1); color: #f1f5f9; }
+      &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
     }
 
     .cal-title {
       font-size: 1rem;
       font-weight: 600;
-      color: #e2e8f0;
+      color: var(--text-main);
       margin-left: 8px;
       text-transform: capitalize;
       white-space: nowrap;
@@ -207,8 +205,8 @@ interface CalendarView { key: string; label: string; }
     .toolbar-right {
       display: flex;
       gap: 4px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 3px;
     }
@@ -219,13 +217,13 @@ interface CalendarView { key: string; label: string; }
       border-radius: 7px;
       background: transparent;
       border: none;
-      color: #64748b;
+      color: var(--text-muted);
       font-size: 0.78rem;
       font-weight: 500;
       font-family: inherit;
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
-      &:hover { color: #cbd5e1; }
+      &:hover { color: var(--text-secondary); }
     }
 
     .view-btn.active {
@@ -247,16 +245,16 @@ interface CalendarView { key: string; label: string; }
        FullCalendar dark theme overrides
     ══════════════════════════════════════ */
     :host ::ng-deep {
-      /* Core variables */
-      --fc-border-color: rgba(255, 255, 255, 0.07);
+      /* Core variables — reference app CSS vars */
+      --fc-border-color: var(--border);
       --fc-page-bg-color: transparent;
-      --fc-neutral-bg-color: rgba(255, 255, 255, 0.03);
+      --fc-neutral-bg-color: var(--bg-panel);
       --fc-today-bg-color: rgba(99, 102, 241, 0.1);
       --fc-highlight-color: rgba(99, 102, 241, 0.15);
       --fc-event-bg-color: #6366f1;
       --fc-event-border-color: transparent;
       --fc-event-text-color: #fff;
-      --fc-non-business-color: rgba(255, 255, 255, 0.015);
+      --fc-non-business-color: var(--bg-panel);
 
       /* Remove default button toolbar (we use our own) */
       .fc-header-toolbar { display: none !important; }
@@ -265,17 +263,17 @@ interface CalendarView { key: string; label: string; }
       .fc-scrollgrid,
       .fc-scrollgrid-section > td,
       .fc-scrollgrid-section > th {
-        border-color: rgba(255, 255, 255, 0.07) !important;
+        border-color: var(--border) !important;
       }
 
       /* Day header (Mon Tue …) */
       .fc-col-header-cell {
         padding: 10px 0;
-        background: rgba(255, 255, 255, 0.03);
+        background: var(--bg-panel);
       }
 
       .fc-col-header-cell-cushion {
-        color: #64748b !important;
+        color: var(--text-muted) !important;
         font-size: 0.72rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -285,7 +283,7 @@ interface CalendarView { key: string; label: string; }
 
       /* Day number */
       .fc-daygrid-day-number {
-        color: #475569;
+        color: var(--text-secondary);
         font-size: 0.78rem;
         font-weight: 500;
         padding: 6px 10px;
@@ -295,7 +293,7 @@ interface CalendarView { key: string; label: string; }
 
       /* Today highlight */
       .fc-day-today .fc-daygrid-day-number {
-        color: #818cf8 !important;
+        color: var(--primary) !important;
         font-weight: 700;
       }
 
@@ -305,12 +303,13 @@ interface CalendarView { key: string; label: string; }
 
       /* Outside days */
       .fc-day-other .fc-daygrid-day-number {
-        color: #2d3748 !important;
+        color: var(--text-muted) !important;
+        opacity: 0.5;
       }
 
       /* Cell hover */
       .fc-daygrid-day:hover {
-        background: rgba(255, 255, 255, 0.02) !important;
+        background: var(--bg-panel) !important;
       }
 
       /* Events */
@@ -340,7 +339,7 @@ interface CalendarView { key: string; label: string; }
 
       /* "more" link */
       .fc-daygrid-more-link {
-        color: #6366f1 !important;
+        color: var(--primary) !important;
         font-size: 0.7rem !important;
         font-weight: 600 !important;
       }
@@ -348,7 +347,7 @@ interface CalendarView { key: string; label: string; }
       /* Time grid (week/day) */
       .fc-timegrid-slot-label-cushion,
       .fc-timegrid-axis-cushion {
-        color: #475569 !important;
+        color: var(--text-muted) !important;
         font-size: 0.7rem !important;
       }
 
@@ -362,7 +361,7 @@ interface CalendarView { key: string; label: string; }
       .fc-scroller::-webkit-scrollbar { width: 4px; height: 4px; }
       .fc-scroller::-webkit-scrollbar-track { background: transparent; }
       .fc-scroller::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.1);
+        background: var(--border);
         border-radius: 10px;
       }
     }

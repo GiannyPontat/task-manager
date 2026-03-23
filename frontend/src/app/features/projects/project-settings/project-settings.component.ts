@@ -187,8 +187,8 @@ import { InvitationService } from '../../../core/services/invitation.service';
     .dlg {
       width: 580px;
       max-width: 95vw;
-      background: #0f172a;
-      color: #f8fafc;
+      background: var(--bg-app);
+      color: var(--text-main);
       font-family: 'Inter', -apple-system, sans-serif;
       border-radius: 20px;
       overflow: hidden;
@@ -202,8 +202,8 @@ import { InvitationService } from '../../../core/services/invitation.service';
       align-items: center;
       justify-content: space-between;
       padding: 18px 20px;
-      background: #1e293b;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
     .header-left { display: flex; align-items: center; gap: 12px; }
@@ -213,28 +213,28 @@ import { InvitationService } from '../../../core/services/invitation.service';
       border: 1px solid rgba(99,102,241,0.3);
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      mat-icon { font-size: 17px; width: 17px; height: 17px; color: #818cf8; }
+      mat-icon { font-size: 17px; width: 17px; height: 17px; color: var(--primary); }
     }
-    .dlg-title { margin: 0; font-size: 0.95rem; font-weight: 700; color: #f8fafc; line-height: 1.2; }
-    .project-name-sub { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+    .dlg-title { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main); line-height: 1.2; }
+    .project-name-sub { font-size: 0.72rem; color: var(--text-muted); }
     .header-right { display: flex; align-items: center; gap: 10px; }
     .role-badge {
       font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
       padding: 2px 8px; border-radius: 4px;
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
-      color: rgba(255,255,255,0.4);
+      background: var(--bg-panel); border: 1px solid var(--border-panel);
+      color: var(--text-muted);
     }
     .role-badge.is-admin { color: #a78bfa; background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.3); }
-    .close-btn { color: rgba(255,255,255,0.35) !important; &:hover { color: #f8fafc !important; } }
+    .close-btn { color: var(--text-muted) !important; &:hover { color: var(--text-main) !important; } }
 
     /* ── Tabs ── */
     ::ng-deep .settings-tabs .mat-mdc-tab-header {
-      background: #1e293b;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
     }
-    ::ng-deep .settings-tabs .mdc-tab__text-label { color: rgba(255,255,255,0.4) !important; font-size: 0.82rem !important; font-weight: 500 !important; }
-    ::ng-deep .settings-tabs .mdc-tab--active .mdc-tab__text-label { color: #f8fafc !important; }
-    ::ng-deep .settings-tabs .mdc-tab-indicator__content--underline { background-color: #6366f1 !important; }
+    ::ng-deep .settings-tabs .mdc-tab__text-label { color: var(--text-muted) !important; font-size: 0.82rem !important; font-weight: 500 !important; }
+    ::ng-deep .settings-tabs .mdc-tab--active .mdc-tab__text-label { color: var(--text-main) !important; }
+    ::ng-deep .settings-tabs .mdc-tab-indicator__content--underline { background-color: var(--primary) !important; }
     ::ng-deep .settings-tabs .mat-mdc-tab-body-wrapper { flex: 1; }
 
     /* ── Tab body ── */
@@ -243,13 +243,13 @@ import { InvitationService } from '../../../core/services/invitation.service';
       max-height: 55vh;
       overflow-y: auto;
       scrollbar-width: thin;
-      scrollbar-color: rgba(255,255,255,0.1) transparent;
+      scrollbar-color: var(--border) transparent;
     }
 
     .section-label {
       display: block;
       font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.1em; color: rgba(255,255,255,0.35);
+      letter-spacing: 0.1em; color: var(--text-muted);
       margin-bottom: 14px;
     }
 
@@ -270,30 +270,30 @@ import { InvitationService } from '../../../core/services/invitation.service';
     }
     .invite-field { flex: 1; margin-bottom: -1.25em; }
     .btn-invite {
-      color: #818cf8 !important; font-size: 0.78rem !important; font-weight: 600 !important;
+      color: var(--primary) !important; font-size: 0.78rem !important; font-weight: 600 !important;
       mat-icon { font-size: 16px; width: 16px; height: 16px; margin-right: 4px; }
     }
     .btn-primary-sm {
       height: 36px; padding: 0 16px !important; border-radius: 8px !important;
-      background: #6366f1 !important; color: #fff !important;
+      background: var(--primary) !important; color: #fff !important;
       font-size: 0.78rem !important; font-weight: 600 !important; white-space: nowrap;
     }
-    .btn-cancel-sm { color: rgba(255,255,255,0.3) !important; flex-shrink: 0; }
+    .btn-cancel-sm { color: var(--text-muted) !important; flex-shrink: 0; }
 
     /* ── Members table ── */
     .members-table { width: 100%; background: transparent !important; }
 
     ::ng-deep .members-table th.mat-mdc-header-cell {
-      background: transparent !important; color: rgba(255,255,255,0.3) !important;
+      background: transparent !important; color: var(--text-muted) !important;
       font-size: 0.62rem !important; font-weight: 700 !important; text-transform: uppercase !important;
-      letter-spacing: 0.08em !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+      letter-spacing: 0.08em !important; border-bottom: 1px solid var(--border) !important;
       padding: 8px 12px !important;
     }
     ::ng-deep .members-table td.mat-mdc-cell {
-      border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+      border-bottom: 1px solid var(--border) !important;
       padding: 10px 12px !important; background: transparent !important;
     }
-    ::ng-deep .members-table tr.mat-mdc-row:hover td { background: rgba(255,255,255,0.02) !important; }
+    ::ng-deep .members-table tr.mat-mdc-row:hover td { background: var(--bg-panel) !important; }
 
     .user-cell { display: flex; align-items: center; gap: 10px; }
     .member-avatar {
@@ -303,16 +303,16 @@ import { InvitationService } from '../../../core/services/invitation.service';
       font-size: 0.72rem; font-weight: 700; color: #fff;
     }
     .user-info { display: flex; flex-direction: column; }
-    .member-username { font-size: 0.82rem; font-weight: 500; color: #f8fafc; }
-    .member-email { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+    .member-username { font-size: 0.82rem; font-weight: 500; color: var(--text-main); }
+    .member-email { font-size: 0.72rem; color: var(--text-muted); }
 
     .role-select {
       width: 110px;
       ::ng-deep .mdc-notched-outline__leading,
       ::ng-deep .mdc-notched-outline__notch,
-      ::ng-deep .mdc-notched-outline__trailing { border-color: rgba(255,255,255,0.1) !important; }
-      ::ng-deep .mat-mdc-select-value { font-size: 0.78rem !important; font-weight: 600 !important; color: #818cf8 !important; }
-      ::ng-deep .mat-mdc-select-arrow { color: #818cf8 !important; }
+      ::ng-deep .mdc-notched-outline__trailing { border-color: var(--border) !important; }
+      ::ng-deep .mat-mdc-select-value { font-size: 0.78rem !important; font-weight: 600 !important; color: var(--primary) !important; }
+      ::ng-deep .mat-mdc-select-arrow { color: var(--primary) !important; }
     }
 
     .role-chip {
@@ -320,23 +320,23 @@ import { InvitationService } from '../../../core/services/invitation.service';
       border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;
     }
     .role-ADMIN   { color: #a78bfa; background: rgba(167,139,250,0.12); }
-    .role-EDITOR  { color: #34d399; background: rgba(52,211,153,0.1); }
-    .role-VIEWER  { color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.06); }
+    .role-EDITOR  { color: #059669; background: rgba(5,150,105,0.1); }
+    .role-VIEWER  { color: var(--text-muted); background: var(--bg-panel); }
 
-    .remove-btn { color: rgba(255,255,255,0.25) !important; &:hover { color: #ff4d4d !important; } }
+    .remove-btn { color: var(--text-muted) !important; &:hover { color: #ff4d4d !important; } }
 
     /* ── General form ── */
     .full-field {
       width: 100%; margin-bottom: 16px;
-      ::ng-deep .mdc-text-field { background: rgba(255,255,255,0.04) !important; border-radius: 12px !important; }
+      ::ng-deep .mdc-text-field { background: var(--input-bg) !important; border-radius: 12px !important; }
       ::ng-deep .mdc-notched-outline__leading,
       ::ng-deep .mdc-notched-outline__notch,
-      ::ng-deep .mdc-notched-outline__trailing { border-color: rgba(255,255,255,0.1) !important; }
+      ::ng-deep .mdc-notched-outline__trailing { border-color: var(--border) !important; }
       ::ng-deep .mdc-text-field--focused .mdc-notched-outline__leading,
       ::ng-deep .mdc-text-field--focused .mdc-notched-outline__notch,
       ::ng-deep .mdc-text-field--focused .mdc-notched-outline__trailing { border-color: rgba(99,102,241,0.6) !important; }
-      ::ng-deep input, ::ng-deep textarea { color: #f8fafc !important; }
-      ::ng-deep .mdc-floating-label { color: rgba(255,255,255,0.4) !important; }
+      ::ng-deep input, ::ng-deep textarea { color: var(--text-main) !important; }
+      ::ng-deep .mdc-floating-label { color: var(--text-muted) !important; }
     }
     .form-footer { display: flex; justify-content: flex-end; margin-top: 4px; }
     .btn-primary {
@@ -349,7 +349,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
     /* ── Danger zone ── */
     .divider {
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
       margin: 28px 0 24px;
     }
     .danger-label { color: rgba(255,77,77,0.6) !important; }
@@ -362,7 +362,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
     }
     .danger-text p { margin: 0; }
     .danger-title { font-size: 0.85rem; font-weight: 600; color: #ff4d4d; }
-    .danger-desc { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 4px !important; }
+    .danger-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px !important; }
     .btn-danger {
       height: 36px; padding: 0 16px !important; border-radius: 9px !important;
       background: rgba(255,77,77,0.9) !important; color: #fff !important;

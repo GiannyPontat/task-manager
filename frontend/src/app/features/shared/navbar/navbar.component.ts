@@ -90,15 +90,15 @@ import { NotificationService } from '../../../core/services/notification.service
     .navbar {
       height: 58px;
       padding: 0 24px;
-      background: #1e293b;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.05), 0 4px 20px rgba(0,0,0,0.25);
+      background: var(--navbar-bg);
+      box-shadow: var(--shadow);
       position: sticky;
       top: 0;
       z-index: 100;
     }
 
-    .hamburger-btn { color: #94a3b8 !important; margin-right: 8px; transition: color 0.15s; }
-    .hamburger-btn:hover { color: #f1f5f9 !important; }
+    .hamburger-btn { color: var(--text-muted) !important; margin-right: 8px; transition: color 0.15s; }
+    .hamburger-btn:hover { color: var(--text-main) !important; }
 
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand-mark {
@@ -107,22 +107,22 @@ import { NotificationService } from '../../../core/services/notification.service
       border-radius: 8px; display: flex; align-items: center; justify-content: center;
       font-size: 15px; font-weight: 800; color: #fff; flex-shrink: 0;
     }
-    .brand-name { font-size: 1rem; font-weight: 700; color: #f1f5f9; letter-spacing: -0.2px; }
+    .brand-name { font-size: 1rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.2px; }
 
     .spacer { flex: 1 1 auto; }
 
-    .nav-link { color: #94a3b8 !important; font-size: 0.875rem !important; font-weight: 500 !important; border-radius: 8px !important; margin-right: 4px; transition: color 0.15s, background 0.15s; letter-spacing: 0; }
-    .nav-link:hover { color: #f1f5f9 !important; background: rgba(255,255,255,0.07) !important; }
-    :host ::ng-deep .nav-active.nav-link { color: #60a5fa !important; background: rgba(59,130,246,0.14) !important; }
+    .nav-link { color: var(--text-muted) !important; font-size: 0.875rem !important; font-weight: 500 !important; border-radius: 8px !important; margin-right: 4px; transition: color 0.15s, background 0.15s; letter-spacing: 0; }
+    .nav-link:hover { color: var(--text-main) !important; background: var(--bg-panel) !important; }
+    :host ::ng-deep .nav-active.nav-link { color: var(--primary) !important; background: rgba(99,102,241,0.1) !important; }
 
     /* Bell */
     .notif-btn {
       position: relative;
-      color: #475569 !important;
+      color: var(--text-muted) !important;
       margin: 0 4px;
       transition: color 0.15s;
     }
-    .notif-btn:hover { color: #f1f5f9 !important; }
+    .notif-btn:hover { color: var(--text-main) !important; }
 
     .badge {
       position: absolute;
@@ -138,7 +138,7 @@ import { NotificationService } from '../../../core/services/notification.service
       align-items: center;
       justify-content: center;
       padding: 0 3px;
-      border: 2px solid #1e293b;
+      border: 2px solid var(--navbar-bg);
       line-height: 1;
     }
 
@@ -147,10 +147,10 @@ import { NotificationService } from '../../../core/services/notification.service
       padding: 12px 16px 8px;
       font-size: 0.72rem;
       font-weight: 700;
-      color: #64748b;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid var(--border);
     }
 
     .notif-list {
@@ -158,7 +158,7 @@ import { NotificationService } from '../../../core/services/notification.service
       overflow-y: auto;
     }
     .notif-list::-webkit-scrollbar { width: 3px; }
-    .notif-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+    .notif-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
     .notif-item {
       display: flex;
@@ -168,11 +168,11 @@ import { NotificationService } from '../../../core/services/notification.service
       padding: 10px 16px;
       background: transparent;
       border: none;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--border);
       cursor: pointer;
       text-align: left;
       transition: background 0.15s;
-      &:hover { background: rgba(255,255,255,0.05); }
+      &:hover { background: var(--bg-panel); }
       &.read { opacity: 0.45; }
     }
 
@@ -183,15 +183,15 @@ import { NotificationService } from '../../../core/services/notification.service
       margin-top: 5px;
       background: transparent;
     }
-    .notif-dot.unread-dot { background: #6366f1; }
+    .notif-dot.unread-dot { background: var(--primary); }
 
     .notif-content { display: flex; flex-direction: column; gap: 3px; }
-    .notif-msg { color: #e2e8f0; font-size: 0.82rem; line-height: 1.4; white-space: normal; }
-    .notif-time { color: #475569; font-size: 0.7rem; }
+    .notif-msg { color: var(--text-main); font-size: 0.82rem; line-height: 1.4; white-space: normal; }
+    .notif-time { color: var(--text-muted); font-size: 0.7rem; }
 
-    .notif-empty { padding: 28px 16px; text-align: center; color: #334155; font-size: 0.82rem; }
+    .notif-empty { padding: 28px 16px; text-align: center; color: var(--text-muted); font-size: 0.82rem; }
 
-    .sep { width: 1px; height: 22px; background: rgba(255,255,255,0.1); margin: 0 16px; }
+    .sep { width: 1px; height: 22px; background: var(--border); margin: 0 16px; }
 
     .user-area { display: flex; align-items: center; gap: 9px; margin-right: 6px; }
     .avatar {
@@ -200,12 +200,12 @@ import { NotificationService } from '../../../core/services/notification.service
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
       font-size: 0.78rem; font-weight: 700; color: #fff; text-transform: uppercase; flex-shrink: 0;
     }
-    .username-label { font-size: 0.875rem; color: #cbd5e1; font-weight: 500; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .username-label { font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .logout-btn { color: #475569 !important; transition: color 0.15s; }
+    .logout-btn { color: var(--text-muted) !important; transition: color 0.15s; }
     .logout-btn:hover { color: #f87171 !important; }
 
-    .auth-link { color: #94a3b8 !important; font-size: 0.875rem; }
+    .auth-link { color: var(--text-muted) !important; font-size: 0.875rem; }
     .cta-btn {
       background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%) !important;
       color: #fff !important; border-radius: 8px !important; font-size: 0.875rem !important;
