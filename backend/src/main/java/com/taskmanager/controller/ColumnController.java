@@ -9,11 +9,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
+@Tag(name = "Colonnes Kanban", description = "Gestion et réorganisation des colonnes d'un projet")
 @RestController
 @RequestMapping("/api/projects/{projectId}/columns")
 @RequiredArgsConstructor

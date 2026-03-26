@@ -7,10 +7,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Tag(name = "Invitations", description = "Invitation d'utilisateurs (inscrits ou non) à rejoindre un projet")
 @RestController
 @RequestMapping("/api/invitations")
 @RequiredArgsConstructor
