@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, Output, EventEmitter, computed, signal } from '@angular/core';
+import { Component, OnInit, inject, Output, EventEmitter, computed, signal, effect } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SidebarService } from '../../../core/services/sidebar.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ProjectService } from '../../../core/services/project.service';
+import { TaskService } from '../../../core/services/task.service';
 import { InvitationService } from '../../../core/services/invitation.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { InviteDialogComponent } from './invite-dialog.component';
@@ -28,24 +29,24 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     <div class="sidebar-wrap">
       <div class="glass-panel">
 
-        <!-- ── Logo / Brand ── -->
-        <div class="brand-row">
-          <div class="brand-icon">
-            <mat-icon>task_alt</mat-icon>
+        <!-- ── Sidebar Header (workspace + user) ── -->
+        <div class="sidebar-header">
+          <div class="workspace-label">
+            <mat-icon class="workspace-icon">task_alt</mat-icon>
+            <span class="workspace-name">TaskBoard</span>
           </div>
-          <span class="brand-name">TaskBoard</span>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- Profile -->
-        <div class="profile-row">
-          <div class="user-avatar">
-            {{ userInitials() }}
-          </div>
-          <div class="profile-info">
-            <span class="profile-name">{{ authService.currentUser()?.username }}</span>
-            <span class="profile-sub">{{ authService.currentUser()?.email }}</span>
+          <div class="profile-row">
+            <div class="user-avatar">
+              @if (authService.currentUser()?.avatarUrl) {
+                <img class="avatar-img" [src]="authService.currentUser()!.avatarUrl!" alt="avatar" />
+              } @else {
+                {{ userInitials() }}
+              }
+            </div>
+            <div class="profile-info">
+              <span class="profile-name">{{ authService.currentUser()?.username }}</span>
+              <span class="profile-sub">{{ authService.currentUser()?.email }}</span>
+            </div>
           </div>
         </div>
 
@@ -94,7 +95,9 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
                 (click)="projectService.selectProject(project)"
               >
                 <mat-icon class="nav-icon">folder</mat-icon>
-                <span class="nav-label">{{ project.name }}</span>
+                <span class="nav-label project-name-label">
+                  <span class="project-name-text">{{ project.name }}</span>
+                </span>
                 <button class="project-action-btn" matTooltip="Paramètres" matTooltipPosition="right"
                         (click)="openSettings($event, project)">
                   <mat-icon>settings</mat-icon>
@@ -145,8 +148,12 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
           <div class="member-list">
             @for (m of projectService.selected()?.members ?? []; track m.userId) {
               <div class="member-row" [matTooltip]="m.username + ' · ' + m.role">
-                <div class="member-avatar">
-                  {{ m.username.substring(0, 1).toUpperCase() }}
+                <div class="member-avatar" [style.background]="memberAvatar(m) ? 'transparent' : memberColor(m.username)">
+                  @if (memberAvatar(m)) {
+                    <img class="avatar-img" [src]="memberAvatar(m)!" alt="avatar" />
+                  } @else {
+                    {{ memberInitials(m.username) }}
+                  }
                 </div>
                 <div class="member-info">
                   <span class="member-name">{{ m.username }}</span>
@@ -176,6 +183,9 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
                       [style.background]="f.color"
                       [style.box-shadow]="'0 0 8px ' + f.color + '99'"></span>
                 <span class="filter-label">{{ f.label }}</span>
+                @if (priorityCount(f.label) > 0) {
+                  <span class="priority-count">({{ priorityCount(f.label) }})</span>
+                }
               </button>
             }
           </div>
@@ -242,27 +252,35 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
 
     .glass-panel::-webkit-scrollbar { display: none; }
 
-    /* ── Brand ── */
-    .brand-row {
+    /* ── Sidebar Header ── */
+    .sidebar-header {
+      padding: 4px 6px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .workspace-label {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 4px 6px 10px;
+      gap: 6px;
     }
 
-    .brand-icon {
-      width: 36px; height: 36px; min-width: 36px;
-      border-radius: 12px;
+    .workspace-icon {
+      font-size: 13px;
+      width: 13px;
+      height: 13px;
       background: linear-gradient(135deg, #6366f1, #3b82f6);
-      display: flex; align-items: center; justify-content: center;
-      mat-icon { font-size: 18px; width: 18px; height: 18px; color: #fff; }
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .brand-name {
-      font-size: 0.95rem;
+    .workspace-name {
+      font-size: 0.62rem;
       font-weight: 700;
-      color: #f8fafc;
-      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       background: linear-gradient(135deg, #6366f1, #3b82f6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -274,12 +292,19 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 4px 6px 12px;
+    }
+
+    .avatar-img {
+      display: block;
+      width: 100%; height: 100%;
+      min-width: 0; min-height: 0;
+      object-fit: cover;
     }
 
     .user-avatar {
-      width: 36px; height: 36px; min-width: 36px;
+      width: 34px; height: 34px; min-width: 34px;
       border-radius: 12px;
+      overflow: hidden;
       background: linear-gradient(135deg, #6366f1, #3b82f6);
       display: flex; align-items: center; justify-content: center;
       font-size: 0.75rem;
@@ -341,6 +366,34 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     .nav-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
     .nav-label { white-space: nowrap; }
 
+    /* ── Défilement du nom de projet ── */
+    .project-name-label {
+      overflow: hidden;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
+      display: block;
+      mask-image: linear-gradient(to right, black 80%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    }
+
+    .project-name-text {
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .project-item:hover .project-name-text {
+      animation: marquee-scroll 2.8s ease-in-out infinite;
+    }
+
+    @keyframes marquee-scroll {
+      0%   { transform: translateX(0); }
+      20%  { transform: translateX(0); }
+      70%  { transform: translateX(-55px); }
+      85%  { transform: translateX(-55px); }
+      100% { transform: translateX(0); }
+    }
+
     /* ════════════════════════════
        MEMBERS SECTION
     ════════════════════════════ */
@@ -394,6 +447,7 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     .member-avatar {
       width: 30px; height: 30px; min-width: 30px;
       border-radius: 50%;
+      overflow: hidden;
       display: flex; align-items: center; justify-content: center;
       font-size: 0.65rem;
       font-weight: 700;
@@ -534,7 +588,14 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       flex-shrink: 0;
     }
 
-    .filter-label { white-space: nowrap; }
+    .filter-label { white-space: nowrap; flex: 1; }
+
+    .priority-count {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
 
     /* ── Spacer ── */
     .spacer { flex: 1; }
@@ -604,7 +665,8 @@ export class SidebarComponent implements OnInit {
   readonly authService    = inject(AuthService);
   readonly themeService   = inject(ThemeService);
   readonly sidebarService = inject(SidebarService);
-  readonly projectService     = inject(ProjectService);
+  readonly projectService = inject(ProjectService);
+  private readonly taskService       = inject(TaskService);
   private readonly invitationService = inject(InvitationService);
   private readonly dialog = inject(MatDialog);
   private readonly snack  = inject(MatSnackBar);
@@ -612,10 +674,57 @@ export class SidebarComponent implements OnInit {
   creatingProject = signal(false);
   newProjectName  = '';
 
+  private readonly PRIORITY_MAP: Record<string, string> = {
+    'Urgent': 'HIGH', 'Moyen': 'MEDIUM', 'Bas': 'LOW',
+  };
+  private readonly taskCounts = signal<Record<string, number>>({});
+
+  constructor() {
+    effect(() => {
+      const pid = this.projectService.selected()?.id;
+      this.taskService.tasksChanged(); // re-déclenche quand une tâche est mutée
+      if (!pid) return;
+      this.taskService.getTasks(pid, undefined, 0, 200).subscribe(page => {
+        const counts: Record<string, number> = { HIGH: 0, MEDIUM: 0, LOW: 0 };
+        for (const task of page.content ?? []) counts[task.priority] = (counts[task.priority] ?? 0) + 1;
+        this.taskCounts.set(counts);
+      });
+    });
+  }
+
+  priorityCount(label: string): number {
+    return this.taskCounts()[this.PRIORITY_MAP[label]] ?? 0;
+  }
+
   readonly userInitials = computed(() => {
     const name = this.authService.currentUser()?.username ?? '';
     return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
   });
+
+  private readonly AVATAR_COLORS = [
+    '#e53935', '#d81b60', '#8e24aa', '#5e35b1',
+    '#1e88e5', '#039be5', '#00897b', '#43a047',
+    '#f4511e', '#fb8c00', '#00acc1', '#6d4c41',
+  ];
+
+  memberColor(username: string): string {
+    let hash = 0;
+    for (let i = 0; i < username.length; i++) hash = username.charCodeAt(i) + ((hash << 5) - hash);
+    return this.AVATAR_COLORS[Math.abs(hash) % this.AVATAR_COLORS.length];
+  }
+
+  memberAvatar(m: { email: string; avatarUrl?: string }): string | null {
+    if (m.email === this.authService.currentUser()?.email) {
+      return this.authService.currentUser()?.avatarUrl ?? null;
+    }
+    return m.avatarUrl ?? null;
+  }
+
+  memberInitials(username: string): string {
+    const parts = username.trim().split(/\s+/);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return username.slice(0, 2).toUpperCase();
+  }
 
   readonly activeFilter = computed(() => {
     const p = this.sidebarService.priorityFilter();

@@ -56,8 +56,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   `,
   styles: [`
     .dlg {
-      background: #1e293b;
-      color: #f1f5f9;
+      background: var(--navbar-bg);
+      color: var(--text-main);
       font-family: 'Inter', -apple-system, sans-serif;
       border-radius: 16px;
       min-width: 380px;
@@ -69,7 +69,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
       align-items: center;
       gap: 12px;
       padding: 20px 20px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid var(--divider);
     }
 
     .header-icon {
@@ -85,31 +85,31 @@ import { MatFormFieldModule } from '@angular/material/form-field';
       font-size: 1rem;
       font-weight: 600;
       margin: 0;
-      color: #f8fafc;
+      color: var(--text-main);
     }
 
-    .close-btn { color: #475569 !important; &:hover { color: #94a3b8 !important; } }
+    .close-btn { color: var(--text-muted) !important; &:hover { color: var(--text-secondary) !important; } }
 
     .dlg-body { padding: 18px 20px 8px; display: flex; flex-direction: column; gap: 12px; }
 
-    .dlg-hint { font-size: 0.82rem; color: #64748b; margin: 0; line-height: 1.5; }
+    .dlg-hint { font-size: 0.82rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
 
     .email-field { width: 100%; }
 
-    .prefix-icon { font-size: 17px; width: 17px; height: 17px; color: #475569; margin-right: 4px; }
+    .prefix-icon { font-size: 17px; width: 17px; height: 17px; color: var(--text-muted); margin-right: 4px; }
 
-    /* Override Material form field for dark theme */
+    /* Override Material form field for theme */
     :host ::ng-deep .email-field .mat-mdc-text-field-wrapper {
-      background: rgba(255,255,255,0.04) !important;
+      background: var(--input-bg) !important;
     }
     :host ::ng-deep .email-field .mdc-notched-outline__leading,
     :host ::ng-deep .email-field .mdc-notched-outline__notch,
     :host ::ng-deep .email-field .mdc-notched-outline__trailing {
-      border-color: rgba(255,255,255,0.12) !important;
+      border-color: var(--border-panel) !important;
     }
     :host ::ng-deep .email-field .mat-mdc-form-field-label,
-    :host ::ng-deep .email-field .mdc-floating-label { color: #64748b !important; }
-    :host ::ng-deep .email-field input { color: #f1f5f9 !important; caret-color: #6366f1; }
+    :host ::ng-deep .email-field .mdc-floating-label { color: var(--text-muted) !important; }
+    :host ::ng-deep .email-field input { color: var(--text-main) !important; caret-color: #6366f1; }
     :host ::ng-deep .email-field.mat-focused .mdc-notched-outline__leading,
     :host ::ng-deep .email-field.mat-focused .mdc-notched-outline__notch,
     :host ::ng-deep .email-field.mat-focused .mdc-notched-outline__trailing {
@@ -124,7 +124,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
       padding: 12px 20px 18px;
     }
 
-    .cancel-btn { color: #64748b !important; font-size: 0.875rem !important; }
+    .cancel-btn { color: var(--text-muted) !important; font-size: 0.875rem !important; }
 
     .invite-btn {
       height: 38px;

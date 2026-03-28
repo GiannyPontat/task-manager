@@ -17,6 +17,7 @@ $theme: mat.define-light-theme((
 // ─── CSS Design Tokens ────────────────────────────────────────────────────────
 :root {
   // Light (default) — fond doux, reposant pour les yeux
+  --color-scheme:   light;
   --bg-app:         #E8EDF5;
   --bg-card:        #F0F4FA;
   --text-main:      #1E293B;
@@ -37,9 +38,11 @@ $theme: mat.define-light-theme((
   --input-bg:       #F8FAFC;
   --divider:        #CBD5E1;
   --bg-deep:        #E8EDF5;
+  --bg-main:        #F1F5F9;
 }
 
 [data-theme="dark"] {
+  --color-scheme:   dark;
   --bg-app:         #0B0E14;
   --bg-card:        #161B22;
   --text-main:      #F8FAFC;
@@ -60,6 +63,7 @@ $theme: mat.define-light-theme((
   --input-bg:       rgba(255,255,255,0.04);
   --divider:        rgba(255,255,255,0.1);
   --bg-deep:        #0B0E14;
+  --bg-main:        #0B0E14;
 }
 
 // ─── Transition globale ───────────────────────────────────────────────────────

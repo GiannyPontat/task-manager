@@ -17,7 +17,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
 export interface TaskDialogData { task?: Task; projectId?: number; }
 
 interface ChecklistItem { label: string; done: boolean; }
-interface Member { name: string; initials: string; color: string; }
+interface Member { name: string; initials: string; color: string; avatarUrl?: string; }
 
 @Component({
   selector: 'app-task-form',
@@ -61,8 +61,12 @@ interface Member { name: string; initials: string; color: string; }
               <div class="assigned-badges">
                 @for (name of assignedMembers(); track name) {
                   <div class="member-badge">
-                    <div class="avatar sm" [style.background]="memberData(name)?.color">
-                      {{ memberData(name)?.initials }}
+                    <div class="avatar sm" [style.background]="memberData(name)?.avatarUrl ? 'transparent' : memberData(name)?.color">
+                      @if (memberData(name)?.avatarUrl) {
+                        <img class="avatar-img" [src]="memberData(name)!.avatarUrl!" alt="avatar" />
+                      } @else {
+                        {{ memberData(name)?.initials }}
+                      }
                     </div>
                     <span>{{ name }}</span>
                     <button mat-icon-button class="unassign-btn" (click)="removeMember(name)" matTooltip="Retirer">
@@ -183,7 +187,13 @@ interface Member { name: string; initials: string; color: string; }
               <div class="member-picker">
                 @for (m of members(); track m.name) {
                   <button class="picker-option" (click)="toggleMember(m)">
-                    <div class="avatar sm" [style.background]="m.color">{{ m.initials }}</div>
+                    <div class="avatar sm" [style.background]="m.avatarUrl ? 'transparent' : m.color">
+                      @if (m.avatarUrl) {
+                        <img class="avatar-img" [src]="m.avatarUrl" alt="avatar" />
+                      } @else {
+                        {{ m.initials }}
+                      }
+                    </div>
                     <span>{{ m.name }}</span>
                     @if (assignedMembers().includes(m.name)) {
                       <mat-icon class="check-icon">check</mat-icon>
@@ -296,8 +306,8 @@ interface Member { name: string; initials: string; color: string; }
        Root container
     ════════════════════════════════════════ */
     .dlg-root {
-      background: #1e293b;
-      color: #f1f5f9;
+      background: var(--navbar-bg);
+      color: var(--text-main);
       font-family: 'Inter', -apple-system, sans-serif;
       min-width: 620px;
       max-width: 760px;
@@ -313,7 +323,7 @@ interface Member { name: string; initials: string; color: string; }
       align-items: center;
       gap: 12px;
       padding: 20px 20px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid var(--divider);
     }
 
     .header-icon {
@@ -331,14 +341,14 @@ interface Member { name: string; initials: string; color: string; }
       outline: none;
       font-size: 1.05rem;
       font-weight: 600;
-      color: #f8fafc;
+      color: var(--text-main);
       caret-color: #6366f1;
-      &::placeholder { color: #475569; }
+      &::placeholder { color: var(--text-muted); }
     }
 
     .close-btn {
-      color: #475569 !important;
-      &:hover { color: #94a3b8 !important; }
+      color: var(--text-muted) !important;
+      &:hover { color: var(--text-secondary) !important; }
     }
 
     .title-error {
@@ -384,7 +394,7 @@ interface Member { name: string; initials: string; color: string; }
       text-transform: uppercase;
       letter-spacing: 0.08em;
       font-weight: 600;
-      color: #475569;
+      color: var(--text-muted);
       white-space: nowrap;
     }
 
@@ -392,17 +402,17 @@ interface Member { name: string; initials: string; color: string; }
       display: flex;
       align-items: center;
       gap: 7px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 20px;
       padding: 3px 10px 3px 4px;
       font-size: 0.8rem;
-      color: #cbd5e1;
+      color: var(--text-secondary);
     }
 
     .unassign-btn {
       width: 18px !important; height: 18px !important;
-      color: #475569 !important;
+      color: var(--text-muted) !important;
       mat-icon { font-size: 12px; width: 12px; height: 12px; }
     }
 
@@ -417,43 +427,43 @@ interface Member { name: string; initials: string; color: string; }
 
     .sh-icon {
       font-size: 17px; width: 17px; height: 17px;
-      color: #64748b;
+      color: var(--text-muted);
     }
 
     .section-title {
       font-size: 0.82rem;
       font-weight: 600;
-      color: #94a3b8;
+      color: var(--text-muted);
       flex: 1;
     }
 
     .progress-pct {
       font-size: 0.72rem;
-      color: #64748b;
+      color: var(--text-muted);
     }
 
     /* Description textarea */
     .desc-area {
       width: 100%;
       box-sizing: border-box;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 12px 14px;
-      color: #e2e8f0;
+      color: var(--text-main);
       font-size: 0.875rem;
       font-family: inherit;
       resize: vertical;
       outline: none;
       transition: border-color 0.18s;
-      &::placeholder { color: #475569; }
+      &::placeholder { color: var(--text-muted); }
       &:focus { border-color: rgba(99,102,241,0.6); }
     }
 
     /* Progress bar */
     .progress-track {
       height: 4px;
-      background: rgba(255,255,255,0.08);
+      background: var(--border);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -477,20 +487,20 @@ interface Member { name: string; initials: string; color: string; }
       padding: 4px 6px;
       border-radius: 7px;
       transition: background 0.15s;
-      &:hover { background: rgba(255,255,255,0.04); }
+      &:hover { background: var(--bg-panel-hover); }
     }
 
     .item-label {
       flex: 1;
       font-size: 0.875rem;
-      color: #cbd5e1;
-      &.done { text-decoration: line-through; color: #475569; }
+      color: var(--text-secondary);
+      &.done { text-decoration: line-through; color: var(--text-muted); }
     }
 
     .remove-btn {
       width: 22px !important; height: 22px !important;
       opacity: 0;
-      color: #475569 !important;
+      color: var(--text-muted) !important;
       transition: opacity 0.15s;
       mat-icon { font-size: 13px; width: 13px; height: 13px; }
     }
@@ -506,15 +516,15 @@ interface Member { name: string; initials: string; color: string; }
 
     .add-item-input {
       flex: 1;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 7px 12px;
-      color: #e2e8f0;
+      color: var(--text-main);
       font-size: 0.82rem;
       font-family: inherit;
       outline: none;
-      &::placeholder { color: #475569; }
+      &::placeholder { color: var(--text-muted); }
       &:focus { border-color: rgba(99,102,241,0.5); }
     }
 
@@ -542,10 +552,10 @@ interface Member { name: string; initials: string; color: string; }
       gap: 1px;
     }
 
-    .activity-empty { font-size: 0.78rem; color: #334155; font-style: italic; margin: 0; }
-    .activity-user { font-size: 0.78rem; font-weight: 600; color: #94a3b8; }
-    .activity-text { font-size: 0.82rem; color: #64748b; }
-    .activity-time { font-size: 0.68rem; color: #334155; }
+    .activity-empty { font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin: 0; }
+    .activity-user { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); }
+    .activity-text { font-size: 0.82rem; color: var(--text-muted); }
+    .activity-time { font-size: 0.68rem; color: var(--text-muted); }
 
     .add-comment-row {
       display: flex;
@@ -570,21 +580,28 @@ interface Member { name: string; initials: string; color: string; }
 
     .comment-input {
       flex: 1;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
       border-radius: 20px;
       padding: 8px 16px;
-      color: #e2e8f0;
+      color: var(--text-main);
       font-size: 0.82rem;
       font-family: inherit;
       outline: none;
-      &::placeholder { color: #475569; }
+      &::placeholder { color: var(--text-muted); }
       &:focus { border-color: rgba(99,102,241,0.4); }
     }
 
     /* ════ AVATARS ════ */
+    .avatar-img {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
     .avatar {
       width: 30px; height: 30px; border-radius: 50%;
+      overflow: hidden;
       display: flex; align-items: center; justify-content: center;
       font-size: 0.7rem; font-weight: 700; color: #fff;
       flex-shrink: 0; text-transform: uppercase;
@@ -597,8 +614,8 @@ interface Member { name: string; initials: string; color: string; }
     .sidebar-col {
       width: 176px;
       min-width: 176px;
-      border-left: 1px solid rgba(255,255,255,0.07);
-      background: #172033;
+      border-left: 1px solid var(--divider);
+      background: var(--bg-card);
       padding: 16px 14px;
       display: flex;
       flex-direction: column;
@@ -612,7 +629,7 @@ interface Member { name: string; initials: string; color: string; }
       text-transform: uppercase;
       letter-spacing: 0.1em;
       font-weight: 700;
-      color: #475569;
+      color: var(--text-muted);
       margin: 0;
     }
 
@@ -622,10 +639,10 @@ interface Member { name: string; initials: string; color: string; }
       gap: 7px;
       width: 100%;
       padding: 7px 10px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.07);
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
       border-radius: 8px;
-      color: #94a3b8;
+      color: var(--text-muted);
       font-size: 0.8rem;
       font-weight: 500;
       font-family: inherit;
@@ -633,7 +650,7 @@ interface Member { name: string; initials: string; color: string; }
       text-align: left;
       transition: background 0.15s, color 0.15s;
       mat-icon { font-size: 15px; width: 15px; height: 15px; flex-shrink: 0; }
-      &:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+      &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
     }
 
     .sb-btn.danger {
@@ -643,8 +660,8 @@ interface Member { name: string; initials: string; color: string; }
 
     /* Member picker */
     .member-picker {
-      background: #0f172a;
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--bg-app);
+      border: 1px solid var(--border-panel);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -657,25 +674,25 @@ interface Member { name: string; initials: string; color: string; }
       padding: 8px 10px;
       background: transparent;
       border: none;
-      color: #94a3b8;
+      color: var(--text-muted);
       font-size: 0.8rem;
       font-family: inherit;
       cursor: pointer;
       text-align: left;
       transition: background 0.15s;
-      &:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
+      &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
     }
 
     .check-icon {
       margin-left: auto;
       font-size: 14px; width: 14px; height: 14px;
-      color: #6366f1;
+      color: var(--primary);
     }
 
     /* Invite section */
     .picker-divider {
       height: 1px;
-      background: rgba(255,255,255,0.07);
+      background: var(--divider);
       margin: 4px 0;
     }
 
@@ -694,15 +711,15 @@ interface Member { name: string; initials: string; color: string; }
     .invite-input {
       flex: 1;
       min-width: 0;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
       border-radius: 6px;
       padding: 5px 8px;
-      color: #e2e8f0;
+      color: var(--text-main);
       font-size: 0.75rem;
       font-family: inherit;
       outline: none;
-      &::placeholder { color: #475569; }
+      &::placeholder { color: var(--text-muted); }
       &:focus { border-color: rgba(99,102,241,0.5); }
     }
 
@@ -734,14 +751,14 @@ interface Member { name: string; initials: string; color: string; }
     }
 
     :host ::ng-deep .sb-select .mat-mdc-select-trigger {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.09);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 6px 10px;
-      color: #cbd5e1;
+      color: var(--text-secondary);
     }
 
-    :host ::ng-deep .sb-select .mat-mdc-select-arrow { color: #475569; }
+    :host ::ng-deep .sb-select .mat-mdc-select-arrow { color: var(--text-muted); }
 
     /* Quick checklist input */
     .quick-add {
@@ -752,30 +769,30 @@ interface Member { name: string; initials: string; color: string; }
     .quick-input {
       flex: 1;
       min-width: 0;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
       border-radius: 6px;
       padding: 5px 8px;
-      color: #e2e8f0;
+      color: var(--text-main);
       font-size: 0.75rem;
       font-family: inherit;
       outline: none;
-      &::placeholder { color: #475569; }
+      &::placeholder { color: var(--text-muted); }
     }
 
     /* ── Date input ── */
     .date-input {
       width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.09);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 7px 10px;
-      color: #e2e8f0;
+      color: var(--text-main);
       font-size: 0.8rem;
       font-family: inherit;
       outline: none;
       cursor: pointer;
-      color-scheme: dark;
+      color-scheme: var(--color-scheme, light);
       &:focus { border-color: rgba(99,102,241,0.5); }
     }
 
@@ -797,13 +814,13 @@ interface Member { name: string; initials: string; color: string; }
       align-items: center;
       gap: 10px;
       padding: 14px 20px;
-      border-top: 1px solid rgba(255,255,255,0.07);
+      border-top: 1px solid var(--divider);
     }
 
     .cancel-btn {
-      color: #64748b !important;
+      color: var(--text-muted) !important;
       font-size: 0.875rem !important;
-      &:hover { color: #94a3b8 !important; }
+      &:hover { color: var(--text-secondary) !important; }
     }
 
     .save-btn {
@@ -821,13 +838,13 @@ interface Member { name: string; initials: string; color: string; }
     /* ── Scrollbar ── */
     .dlg-body::-webkit-scrollbar { width: 4px; }
     .dlg-body::-webkit-scrollbar-track { background: transparent; }
-    .dlg-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    .dlg-body::-webkit-scrollbar-thumb { background: var(--border-panel); border-radius: 10px; }
 
     /* ── Responsive ── */
     @media (max-width: 640px) {
       .dlg-root { min-width: 100vw; }
       .dlg-body { flex-direction: column; }
-      .sidebar-col { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.07); }
+      .sidebar-col { width: 100%; border-left: none; border-top: 1px solid var(--divider); }
     }
   `],
 })
@@ -890,11 +907,12 @@ export class TaskFormComponent implements OnInit {
 
   ngOnInit(): void {
     const pid = this.data.projectId ?? this.data.task?.projectId;
-    const loadMembers = (projectMembers: { userId: number; username: string }[]) => {
+    const loadMembers = (projectMembers: { userId: number; username: string; avatarUrl?: string }[]) => {
       this.members.set(projectMembers.map(m => ({
         name: m.username,
         initials: m.username.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
         color: this.AVATAR_COLORS[m.userId % this.AVATAR_COLORS.length],
+        avatarUrl: m.avatarUrl,
       })));
     };
     const existing = this.projectService.selected()?.members;

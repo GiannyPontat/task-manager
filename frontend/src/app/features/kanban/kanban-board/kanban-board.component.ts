@@ -516,9 +516,10 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     :host ::ng-deep .cdk-drag-preview {
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
       border-radius: 10px;
-      background: rgba(30,41,59,0.95);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       padding: 10px 12px 12px;
-      border-left: 3px solid #6366f1;
+      border-left: 3px solid var(--primary);
     }
 
     :host ::ng-deep .cdk-drag-animating {
@@ -676,6 +677,24 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     .column-form { display: flex; flex-direction: column; gap: 8px; padding: 8px 0; }
     .full-width { width: 100%; }
     .form-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+    /* mat-form-field inside add-column form */
+    :host ::ng-deep .new-column-form .mat-mdc-text-field-wrapper {
+      background: var(--input-bg) !important;
+    }
+    :host ::ng-deep .new-column-form .mdc-notched-outline__leading,
+    :host ::ng-deep .new-column-form .mdc-notched-outline__notch,
+    :host ::ng-deep .new-column-form .mdc-notched-outline__trailing {
+      border-color: var(--border) !important;
+    }
+    :host ::ng-deep .new-column-form .mat-focused .mdc-notched-outline__leading,
+    :host ::ng-deep .new-column-form .mat-focused .mdc-notched-outline__notch,
+    :host ::ng-deep .new-column-form .mat-focused .mdc-notched-outline__trailing {
+      border-color: var(--primary) !important;
+    }
+    :host ::ng-deep .new-column-form .mdc-floating-label { color: var(--text-muted) !important; }
+    :host ::ng-deep .new-column-form input.mat-mdc-input-element { color: var(--text-main) !important; caret-color: var(--primary); }
+    :host ::ng-deep .new-column-form .mat-mdc-button { color: var(--text-muted) !important; }
 
     /* ══════════════════════════════════════════
        Responsive — mobile ≤ 600px
@@ -869,6 +888,7 @@ export class TaskBoardComponent {
           this.columns.update(cols =>
             cols.map(c => c.id === col.id ? { ...c, tasks: [...c.tasks, task] } : c)
           );
+          this.taskService.tasksChanged.update(v => v + 1);
           this.notify(`Tâche "${task.title}" créée`);
         },
         error: () => this.notify('Erreur lors de la création'),
@@ -877,7 +897,7 @@ export class TaskBoardComponent {
   }
 
   editTask(col: KanbanColumn, task: Task): void {
-    const ref = this.dialog.open(TaskFormComponent, { data: { task, projectId: this.projectId }, maxWidth: '760px', minWidth: '620px' });
+    const ref = this.dialog.open(TaskFormComponent, { data: { task, projectId: this.projectId }, maxWidth: '760px', minWidth: '620px', panelClass: 'dark-dialog', backdropClass: 'dark-backdrop' });
     ref.afterClosed().subscribe((payload: TaskRequest | undefined) => {
       if (!payload) return;
       this.taskService.updateTask(this.projectId, task.id, { ...payload, columnId: col.id }).subscribe({
@@ -887,6 +907,7 @@ export class TaskBoardComponent {
               ? { ...c, tasks: c.tasks.map(t => t.id === task.id ? updated : t) }
               : c)
           );
+          this.taskService.tasksChanged.update(v => v + 1);
           this.notify('Tâche modifiée');
         },
         error: () => this.notify('Erreur lors de la modification'),
@@ -902,6 +923,7 @@ export class TaskBoardComponent {
             ? { ...c, tasks: c.tasks.filter(t => t.id !== task.id) }
             : c)
         );
+        this.taskService.tasksChanged.update(v => v + 1);
         this.notify('Tâche supprimée');
       },
       error: () => this.notify('Erreur lors de la suppression'),
