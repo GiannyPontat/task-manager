@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://TON-APP.onrender.com/api'
+  apiUrl: 'https://flowly-wgw6.onrender.com/api'
 };
