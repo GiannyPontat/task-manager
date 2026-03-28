@@ -43,7 +43,7 @@ class AuthControllerTest {
         request.setEmail("alice@test.com");
         request.setPassword("password123");
 
-        AuthResponse response = new AuthResponse("jwt-token", "alice", "alice@test.com", "USER");
+        AuthResponse response = new AuthResponse("jwt-token", "alice", "alice@test.com", "USER", null);
         when(authService.register(any(RegisterRequest.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/auth/register")
@@ -124,7 +124,7 @@ class AuthControllerTest {
         request.setEmail("alice@test.com");
         request.setPassword("password123");
 
-        AuthResponse response = new AuthResponse("jwt-token", "alice", "alice@test.com", "USER");
+        AuthResponse response = new AuthResponse("jwt-token", "alice", "alice@test.com", "USER", null);
         when(authService.login(any(LoginRequest.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/auth/login")
