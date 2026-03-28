@@ -33,12 +33,24 @@ import { UserService } from '../../core/services/user.service';
         <div class="avatar-section">
           <div class="avatar-wrapper">
             <div class="avatar-circle">
-              <span class="avatar-initials">{{ initials() }}</span>
+              @if (avatarUrl()) {
+                <img class="avatar-img" [src]="avatarUrl()!" alt="avatar" />
+              } @else {
+                <span class="avatar-initials">{{ initials() }}</span>
+              }
             </div>
-            <button class="change-photo-btn" matRipple>
+            <input #fileInput type="file" accept="image/*" style="display:none"
+                   (change)="onFileSelected($event)" />
+            <button class="change-photo-btn" matRipple (click)="fileInput.click()">
               <mat-icon>photo_camera</mat-icon>
               Changer la photo
             </button>
+            @if (avatarUrl()) {
+              <button class="remove-photo-btn" matRipple (click)="removeAvatar()">
+                <mat-icon>person</mat-icon>
+                Utiliser les initiales
+              </button>
+            }
           </div>
           <div class="user-identity">
             <h1 class="user-name">{{ username() }}</h1>
@@ -211,6 +223,14 @@ import { UserService } from '../../core/services/user.service';
       align-items: center;
       justify-content: center;
       box-shadow: 0 0 0 4px rgba(99,102,241,0.2), 0 8px 24px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .avatar-img {
+      display: block;
+      width: 96px;
+      height: 96px;
+      object-fit: cover;
     }
 
     .avatar-initials {
@@ -221,7 +241,7 @@ import { UserService } from '../../core/services/user.service';
       text-transform: uppercase;
     }
 
-    .change-photo-btn {
+    .change-photo-btn, .remove-photo-btn {
       display: inline-flex;
       align-items: center;
       gap: 5px;
@@ -500,6 +520,8 @@ export class ProfileComponent implements OnInit {
   showOld    = signal(false);
   showNew    = signal(false);
 
+  avatarUrl = computed(() => this.auth.currentUser()?.avatarUrl ?? null);
+
   doneTasks    = signal(0);
   pendingTasks = signal(0);
   totalTasks   = signal(0);
@@ -541,6 +563,25 @@ export class ProfileComponent implements OnInit {
         this.pendingTasks.set(tasks.filter(t => t.status === 'TODO').length);
       },
     });
+  }
+
+  removeAvatar(): void {
+    this.userSvc.updateAvatar(null).subscribe({
+      error: () => this.snack.open('Erreur lors de la suppression de la photo', 'OK', { duration: 3000 }),
+    });
+  }
+
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      this.userSvc.updateAvatar(dataUrl).subscribe({
+        error: () => this.snack.open('Erreur lors de la mise à jour de la photo', 'OK', { duration: 3000 }),
+      });
+    };
+    reader.readAsDataURL(file);
   }
 
   saveInfo(): void {

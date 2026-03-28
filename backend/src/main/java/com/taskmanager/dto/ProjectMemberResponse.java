@@ -9,4 +9,5 @@ public class ProjectMemberResponse {
     private String username;
     private String email;
     private ProjectRole role;
+    private String avatarUrl;
 }

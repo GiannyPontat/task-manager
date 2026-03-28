@@ -16,6 +16,7 @@ export interface ProjectMember {
   username: string;
   email: string;
   role: ProjectRole;
+  avatarUrl?: string;
 }
 
 export interface ProjectRequest {

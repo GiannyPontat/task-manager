@@ -34,9 +34,10 @@ public class UserService {
         }
 
         user.setUsername(request.getUsername());
+        user.setAvatarUrl(request.getAvatarUrl());
         userRepository.save(user);
 
         String token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getDisplayName(), user.getEmail(), user.getRole().name());
+        return new AuthResponse(token, user.getDisplayName(), user.getEmail(), user.getRole().name(), user.getAvatarUrl());
     }
 }

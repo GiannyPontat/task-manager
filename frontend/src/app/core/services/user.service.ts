@@ -19,4 +19,11 @@ export class UserService {
       .patch<AuthResponse>(`${environment.apiUrl}/users/me`, { username })
       .pipe(tap(res => this.auth.refreshSession(res)));
   }
+
+  updateAvatar(avatarUrl: string | null) {
+    const username = this.auth.currentUser()?.username ?? '';
+    return this.http
+      .patch<AuthResponse>(`${environment.apiUrl}/users/me`, { username, avatarUrl })
+      .pipe(tap(res => this.auth.refreshSession(res)));
+  }
 }

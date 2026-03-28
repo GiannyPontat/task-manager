@@ -151,6 +151,7 @@ public class ProjectService {
         r.setUsername(m.getUser().getDisplayName());
         r.setEmail(m.getUser().getEmail());
         r.setRole(m.getRole());
+        r.setAvatarUrl(m.getUser().getAvatarUrl());
         return r;
     }
 
