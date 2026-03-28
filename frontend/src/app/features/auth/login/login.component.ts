@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -69,6 +69,13 @@ import { AuthService } from '../../../core/services/auth.service';
               }
             </mat-form-field>
 
+            @if (warmingUp()) {
+              <div class="warmup-banner">
+                <mat-spinner diameter="16" class="warmup-spinner"></mat-spinner>
+                <span>Le serveur se réveille, merci de patienter&nbsp;☕</span>
+              </div>
+            }
+
             @if (errorMessage) {
               <p class="error-message">
                 <mat-icon>error_outline</mat-icon>
@@ -106,7 +113,7 @@ import { AuthService } from '../../../core/services/auth.service';
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f8fafc;
+      background: var(--bg-main, #f8fafc);
       padding: 24px;
     }
 
@@ -115,7 +122,8 @@ import { AuthService } from '../../../core/services/auth.service';
       max-width: 400px;
       border-radius: 16px !important;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 20px 60px rgba(0,0,0,0.09) !important;
-      border: 1px solid #e2e8f0;
+      background: var(--bg-card, #fff) !important;
+      border: 1px solid var(--border, #e2e8f0) !important;
     }
 
     mat-card-header { padding: 32px 32px 4px; }
@@ -126,7 +134,7 @@ import { AuthService } from '../../../core/services/auth.service';
       gap: 10px;
       font-size: 1.6rem !important;
       font-weight: 700 !important;
-      color: #0f172a;
+      color: var(--text-main, #0f172a);
       letter-spacing: -0.5px;
     }
 
@@ -140,13 +148,32 @@ import { AuthService } from '../../../core/services/auth.service';
 
     :host ::ng-deep mat-card-subtitle {
       font-size: 0.9rem !important;
-      color: #64748b !important;
+      color: var(--text-muted, #64748b) !important;
       margin-top: 4px !important;
     }
 
     mat-card-content { padding: 20px 32px 8px; }
 
     .full-width { width: 100%; }
+
+    /* Theme-aware Material fields */
+    :host ::ng-deep .full-width .mat-mdc-text-field-wrapper {
+      background: var(--input-bg, #f8fafc) !important;
+    }
+    :host ::ng-deep .full-width .mdc-notched-outline__leading,
+    :host ::ng-deep .full-width .mdc-notched-outline__notch,
+    :host ::ng-deep .full-width .mdc-notched-outline__trailing {
+      border-color: var(--border, #e2e8f0) !important;
+    }
+    :host ::ng-deep .full-width.mat-focused .mdc-notched-outline__leading,
+    :host ::ng-deep .full-width.mat-focused .mdc-notched-outline__notch,
+    :host ::ng-deep .full-width.mat-focused .mdc-notched-outline__trailing {
+      border-color: rgba(99,102,241,0.7) !important;
+    }
+    :host ::ng-deep .full-width .mdc-floating-label,
+    :host ::ng-deep .full-width .mat-mdc-form-field-label { color: var(--text-muted, #64748b) !important; }
+    :host ::ng-deep .full-width input { color: var(--text-main, #0f172a) !important; caret-color: #6366f1; }
+    :host ::ng-deep .full-width button mat-icon { color: var(--text-muted, #64748b); }
 
     .submit-btn {
       margin-top: 12px;
@@ -166,13 +193,34 @@ import { AuthService } from '../../../core/services/auth.service';
 
     .btn-spinner { display: inline-block; }
 
+    .warmup-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.83rem;
+      color: var(--text-muted, #64748b);
+      margin: 4px 0 8px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .warmup-spinner { flex-shrink: 0; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
     .error-message {
       display: flex;
       align-items: center;
       gap: 6px;
       color: #ef4444;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
       border-radius: 8px;
       padding: 8px 12px;
       font-size: 0.85rem;
@@ -196,10 +244,10 @@ import { AuthService } from '../../../core/services/auth.service';
       gap: 4px;
     }
 
-    .redirect-hint { color: #64748b; font-size: 0.875rem; }
+    .redirect-hint { color: var(--text-muted, #64748b); font-size: 0.875rem; }
   `],
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -208,6 +256,8 @@ export class LoginComponent {
   hidePassword = true;
   loading = false;
   errorMessage = '';
+  warmingUp = signal(false);
+  private warmUpTimer: ReturnType<typeof setTimeout> | null = null;
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -222,6 +272,8 @@ export class LoginComponent {
 
     this.loading = true;
     this.errorMessage = '';
+    this.warmingUp.set(false);
+    this.warmUpTimer = setTimeout(() => this.warmingUp.set(true), 5000);
 
     const { email, password } = this.form.getRawValue();
 
@@ -232,12 +284,20 @@ export class LoginComponent {
         this.snackBar.open(msg, 'Fermer', { duration: 4000, panelClass: 'snack-error' });
         return of(null);
       }),
-      finalize(() => { this.loading = false; }),
+      finalize(() => {
+        this.loading = false;
+        this.warmingUp.set(false);
+        if (this.warmUpTimer) clearTimeout(this.warmUpTimer);
+      }),
     ).subscribe(res => {
       if (res) {
         this.snackBar.open(`Bienvenue, ${res.username} !`, '', { duration: 3000 });
         this.router.navigate(['/tasks']);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.warmUpTimer) clearTimeout(this.warmUpTimer);
   }
 }
