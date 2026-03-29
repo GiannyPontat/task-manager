@@ -65,7 +65,7 @@ import { AuthService } from '../../../core/services/auth.service';
         </mat-card-content>
 
         <mat-card-actions align="end">
-          <a mat-button routerLink="/login">
+          <a mat-button routerLink="/login" class="back-link">
             <mat-icon>arrow_back</mat-icon>
             Retour à la connexion
           </a>
@@ -79,7 +79,7 @@ import { AuthService } from '../../../core/services/auth.service';
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f8fafc;
+      background: var(--bg-main, #f8fafc);
       padding: 24px;
     }
 
@@ -88,7 +88,8 @@ import { AuthService } from '../../../core/services/auth.service';
       max-width: 400px;
       border-radius: 16px !important;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 20px 60px rgba(0,0,0,0.09) !important;
-      border: 1px solid #e2e8f0;
+      background: var(--bg-card, #fff) !important;
+      border: 1px solid var(--border, #e2e8f0) !important;
     }
 
     mat-card-header { padding: 32px 32px 4px; }
@@ -146,6 +147,8 @@ import { AuthService } from '../../../core/services/auth.service';
     }
 
     mat-card-actions { padding: 8px 32px 24px; }
+
+    .back-link { color: #6366f1; font-weight: 500; }
   `],
 })
 export class ForgotPasswordComponent {
