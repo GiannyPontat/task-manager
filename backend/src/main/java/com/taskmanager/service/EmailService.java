@@ -12,7 +12,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username:}")
+    @Value("${spring.mail.username:${SPRING_MAIL_USERNAME:}}")
     private String fromAddress;
 
     @Value("${application.frontend-url:http://localhost:4200}")
