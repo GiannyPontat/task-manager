@@ -18,7 +18,7 @@ public class EmailService {
     @Value("${application.frontend-url:http://localhost:4200}")
     private String frontendUrl;
 
-    public EmailService(JavaMailSender mailSender) {
+    public EmailService(@Autowired(required = false) JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
@@ -82,6 +82,10 @@ public class EmailService {
     }
 
     private void send(String toEmail, String subject, String html) {
+        if (mailSender == null) {
+            System.out.printf("[EMAIL - no mail sender] To: %s%n", toEmail);
+            return;
+        }
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
