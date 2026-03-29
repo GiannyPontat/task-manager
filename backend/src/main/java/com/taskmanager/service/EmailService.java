@@ -53,8 +53,7 @@ public class EmailService {
             helper.setText(html, true);
             mailSender.send(message);
         } catch (Exception e) {
-            // Simulation console si l'email n'est pas configuré
-            System.out.printf("[INVITATION EMAIL] To: %s | Link: %s%n", toEmail, registerLink);
+            System.out.printf("[INVITATION EMAIL FAILED] To: %s | Error: %s | Link: %s%n", toEmail, e.getMessage(), registerLink);
         }
     }
 
