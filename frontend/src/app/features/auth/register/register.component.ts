@@ -1,4 +1,5 @@
 import { Component, inject, computed, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AbstractControl, ReactiveFormsModule, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
@@ -9,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, of, startWith } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 
 const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
@@ -320,18 +321,23 @@ export class RegisterComponent {
 
   get f() { return this.form.controls; }
 
+  private passwordValue = toSignal(
+    this.form.get('password')!.valueChanges.pipe(startWith('')),
+    { initialValue: '' }
+  );
+
   strength = computed(() => {
-    const pw = this.f['password'].value ?? '';
+    const pw = this.passwordValue() ?? '';
     let score = 0;
-    if (pw.length >= 8)             score++;
+    if (pw.length >= 6)             score++;
     if (/[A-Z]/.test(pw))           score++;
     if (/[0-9]/.test(pw))           score++;
     if (/[^A-Za-z0-9]/.test(pw))   score++;
     return score;
   });
 
-  strengthClass = computed(() => ['', 'weak', 'fair', 'good', 'strong'][this.strength()] ?? 'weak');
-  strengthLabel = computed(() => ['', 'Faible', 'Moyen', 'Bon', 'Fort'][this.strength()] ?? '');
+  strengthClass = computed(() => ['', 'weak', 'fair', 'strong', 'strong'][this.strength()] ?? 'weak');
+  strengthLabel = computed(() => ['', 'Faible', 'Moyen', 'Fort', 'Fort'][this.strength()] ?? '');
 
   constructor() {
     const email = this.route.snapshot.queryParamMap.get('email');
