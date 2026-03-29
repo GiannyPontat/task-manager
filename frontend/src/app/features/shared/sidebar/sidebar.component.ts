@@ -132,6 +132,7 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
         <div class="divider"></div>
 
         <!-- ── Membres du Projet ── -->
+        @if (projectService.selected()) {
         <div class="section members-section">
           <div class="section-header-row">
             <p class="section-label">Membres du Projet</p>
@@ -165,6 +166,7 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
             }
           </div>
         </div>
+        } <!-- end @if selected -->
 
         <div class="divider"></div>
 
@@ -683,7 +685,7 @@ export class SidebarComponent implements OnInit {
     effect(() => {
       const pid = this.projectService.selected()?.id;
       this.taskService.tasksChanged(); // re-déclenche quand une tâche est mutée
-      if (!pid) return;
+      if (!pid) { this.taskCounts.set({ HIGH: 0, MEDIUM: 0, LOW: 0 }); return; }
       this.taskService.getTasks(pid, undefined, 0, 200).subscribe(page => {
         const counts: Record<string, number> = { HIGH: 0, MEDIUM: 0, LOW: 0 };
         for (const task of page.content ?? []) counts[task.priority] = (counts[task.priority] ?? 0) + 1;

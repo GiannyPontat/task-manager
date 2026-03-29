@@ -188,7 +188,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
                           @for (member of (task.assignedMembers ?? []); track member) {
                             <span class="chip chip-member" [matTooltip]="member">
                               <span class="member-dot">{{ memberInitials(member) }}</span>
-                              {{ member }}
+                              <span class="member-name">{{ member }}</span>
                             </span>
                           }
                         </div>
@@ -609,9 +609,13 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       color: var(--primary);
       gap: 5px;
       max-width: 120px;
+    }
+
+    .member-name {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
     }
 
     .member-dot {

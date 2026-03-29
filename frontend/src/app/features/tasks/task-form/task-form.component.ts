@@ -379,8 +379,8 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
     /* Assigned row */
     .assigned-row {
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      flex-direction: column;
+      gap: 6px;
     }
 
     .assigned-badges {
