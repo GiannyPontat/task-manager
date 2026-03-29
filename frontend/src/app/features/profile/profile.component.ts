@@ -279,7 +279,7 @@ import { UserService } from '../../core/services/user.service';
       background: rgba(99,102,241,0.15);
       border: 1px solid rgba(99,102,241,0.3);
       border-radius: 20px;
-      color: #a5b4fc;
+      color: var(--primary);
       font-size: 0.78rem;
       font-weight: 600;
       padding: 4px 12px;
@@ -410,6 +410,7 @@ import { UserService } from '../../core/services/user.service';
     :host ::ng-deep .field input { color: var(--text-main) !important; caret-color: #6366f1; }
     :host ::ng-deep .field .mat-mdc-form-field-icon-prefix mat-icon { color: var(--text-muted); }
     :host ::ng-deep .field button mat-icon { color: var(--text-muted); }
+    :host ::ng-deep .field .mat-mdc-form-field-hint { color: var(--text-muted) !important; }
 
     /* Champ en lecture seule */
     :host ::ng-deep .field-readonly input { color: var(--text-muted) !important; cursor: default; }

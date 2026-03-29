@@ -76,6 +76,16 @@ interface CalendarView { key: string; label: string; }
           </div>
         </div>
 
+        <!-- No project -->
+        @if (!projectService.selected()) {
+          <div class="cal-empty">
+            <mat-icon class="empty-icon">folder_off</mat-icon>
+            <p class="empty-title">Aucun projet sélectionné</p>
+            <p class="empty-sub">Créez ou sélectionnez un projet dans la barre latérale pour voir vos tâches ici.</p>
+          </div>
+
+        } @else {
+
         <!-- Loading -->
         @if (loading()) {
           <div class="cal-loading">
@@ -90,6 +100,7 @@ interface CalendarView { key: string; label: string; }
           [class.fc-hidden]="loading()"
         ></full-calendar>
 
+        }
       </div>
     </div>
   `,
@@ -233,6 +244,37 @@ interface CalendarView { key: string; label: string; }
     }
 
     /* ── Loading ── */
+    .cal-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 48px; width: 48px; height: 48px;
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .empty-sub {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
     .cal-loading {
       display: flex;
       justify-content: center;
@@ -376,7 +418,7 @@ export class CalendarComponent implements OnInit {
   @ViewChild('calendarRef') calendarRef!: FullCalendarComponent;
 
   private readonly columnService  = inject(ColumnService);
-  private readonly projectService = inject(ProjectService);
+  readonly projectService = inject(ProjectService);
   private readonly dialog         = inject(MatDialog);
 
   events   = signal<EventInput[]>([]);
