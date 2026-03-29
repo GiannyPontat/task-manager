@@ -1,26 +1,26 @@
 package com.taskmanager.service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class EmailService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final JavaMailSender mailSender;
 
-    @Value("${resend.api-key:}")
-    private String apiKey;
-
-    @Value("${resend.from:Flowly <onboarding@resend.dev>}")
+    @Value("${spring.mail.username:}")
     private String fromAddress;
 
     @Value("${application.frontend-url:http://localhost:4200}")
     private String frontendUrl;
+
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void sendInvitationEmail(String toEmail, String inviterName, String taskTitle, String token) {
         String registerLink = frontendUrl + "/register?email=" + toEmail + "&inviteToken=" + token;
@@ -48,7 +48,7 @@ public class EmailService {
             </div>
             """.formatted(inviterName, taskLine, registerLink);
 
-        send(toEmail, inviterName + " vous invite à rejoindre Flowly", html, registerLink);
+        send(toEmail, inviterName + " vous invite à rejoindre Flowly", html);
     }
 
     public void sendPasswordResetEmail(String toEmail, String token) {
@@ -75,37 +75,23 @@ public class EmailService {
             """.formatted(resetLink);
 
         try {
-            send(toEmail, "Réinitialisation de votre mot de passe – Flowly", html, resetLink);
+            send(toEmail, "Réinitialisation de votre mot de passe – Flowly", html);
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de l'envoi de l'email", e);
         }
     }
 
-    private void send(String toEmail, String subject, String html, String fallbackLink) {
-        if (apiKey == null || apiKey.isBlank()) {
-            System.out.printf("[EMAIL - no API key] To: %s | Link: %s%n", toEmail, fallbackLink);
-            return;
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
-
-        Map<String, Object> body = Map.of(
-                "from", fromAddress,
-                "to", List.of(toEmail),
-                "subject", subject,
-                "html", html
-        );
-
+    private void send(String toEmail, String subject, String html) {
         try {
-            ResponseEntity<String> response = restTemplate.exchange(
-                    "https://api.resend.com/emails",
-                    HttpMethod.POST,
-                    new HttpEntity<>(body, headers),
-                    String.class
-            );
-            System.out.printf("[EMAIL SENT] To: %s | Status: %s%n", toEmail, response.getStatusCode());
-        } catch (Exception e) {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromAddress);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+            mailSender.send(message);
+            System.out.printf("[EMAIL SENT] To: %s%n", toEmail);
+        } catch (MessagingException e) {
             System.out.printf("[EMAIL FAILED] To: %s | Error: %s%n", toEmail, e.getMessage());
         }
     }
