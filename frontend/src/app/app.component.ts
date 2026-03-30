@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { SidebarComponent } from './features/shared/sidebar/sidebar.component';
+import { NavbarComponent } from './features/shared/navbar/navbar.component';
 import { SidebarService } from './core/services/sidebar.service';
 import { AuthService } from './core/services/auth.service';
 import { ThemeService } from './core/services/theme.service';
@@ -20,6 +21,7 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
     RouterOutlet,
     MatSidenavModule,
     SidebarComponent,
+    NavbarComponent,
   ],
   template: `
     <div class="app-bg">
@@ -30,6 +32,7 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
 
         @if (authService.currentUser() && !isAuthRoute) {
           <mat-sidenav
+            #sidenav
             class="app-sidenav"
             [mode]="isMobile ? 'over' : 'side'"
             [opened]="isMobile ? false : true"
@@ -41,6 +44,9 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
         }
 
         <mat-sidenav-content class="sidenav-content">
+          @if (authService.currentUser() && !isAuthRoute) {
+            <app-navbar (menuToggle)="sidenav?.toggle()" />
+          }
           <main class="main-content">
             <router-outlet />
           </main>
@@ -124,6 +130,7 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
   `],
 })
 export class AppComponent implements OnInit, OnDestroy {
+  @ViewChild('sidenav') sidenav?: MatSidenav;
   isMobile = false;
   isAuthRoute = false;
   private sub!: Subscription;

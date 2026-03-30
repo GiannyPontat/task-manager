@@ -100,6 +100,10 @@ import { NotificationService } from '../../../core/services/notification.service
     .hamburger-btn { color: var(--text-muted) !important; margin-right: 8px; transition: color 0.15s; }
     .hamburger-btn:hover { color: var(--text-main) !important; }
 
+    @media (min-width: 769px) {
+      .hamburger-btn { display: none; }
+    }
+
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand-mark {
       width: 30px; height: 30px;
