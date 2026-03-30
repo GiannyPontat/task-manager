@@ -93,6 +93,13 @@ PATCH  /api/notifications/{id}/read
 POST   /api/invitations
 ```
 
+## Compte démo
+
+| Champ | Valeur |
+|-------|--------|
+| Email | `demo@taskmanager.com` |
+| Mot de passe | `demo123` |
+
 ## Lancer avec Docker (recommandé)
 
 ```bash
