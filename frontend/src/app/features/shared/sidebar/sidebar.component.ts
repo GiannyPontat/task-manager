@@ -354,9 +354,10 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       font-size: 0.82rem;
       font-weight: 500;
       border: 1px solid transparent;
-      transition: background 0.18s, color 0.18s, border-color 0.18s;
+      transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.1s;
       cursor: pointer;
       &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
+      &:active { transform: scale(0.98); }
     }
 
     .nav-item.active {
@@ -412,21 +413,22 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     .section-header-row .section-label { margin: 4px 0 0 8px; }
 
     .invite-btn {
-      width: 22px; height: 22px;
+      width: 32px; height: 32px;
       background: var(--bg-panel);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       color: var(--text-muted);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
       flex-shrink: 0;
-      mat-icon { font-size: 13px; width: 13px; height: 13px; }
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
       &:hover {
         background: rgba(99,102,241,0.15);
         border-color: var(--primary);
         color: var(--primary);
       }
+      &:active { transform: scale(0.92); }
     }
 
     .member-list {
@@ -497,18 +499,21 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
 
     .project-action-btn {
       margin-left: auto;
-      width: 20px; height: 20px;
+      width: 30px; height: 30px;
       background: none;
       border: none;
-      border-radius: 5px;
+      border-radius: 7px;
       color: #64748b;
+      display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
       padding: 0;
-      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      transition: color 0.15s, background 0.15s, transform 0.1s;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
       &:hover { color: #818cf8; background: rgba(99,102,241,0.15); }
+      &:active { transform: scale(0.90); }
     }
 
     /* ── Inline project create form ── */
@@ -537,12 +542,14 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     .inline-actions { display: flex; gap: 4px; justify-content: flex-end; }
 
     .action-btn {
-      width: 24px; height: 24px;
+      width: 32px; height: 32px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      transition: background 0.15s, transform 0.1s;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+      &:active { transform: scale(0.92); }
     }
 
     .action-btn.check {
@@ -574,8 +581,9 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       cursor: pointer;
       text-align: left;
       width: 100%;
-      transition: background 0.18s, color 0.18s, border-color 0.18s;
+      transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.1s;
       &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
+      &:active { transform: scale(0.98); }
     }
 
     .filter-item.active {
