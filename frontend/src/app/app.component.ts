@@ -3,8 +3,8 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
 import { SidebarComponent } from './features/shared/sidebar/sidebar.component';
-import { NavbarComponent } from './features/shared/navbar/navbar.component';
 import { SidebarService } from './core/services/sidebar.service';
 import { AuthService } from './core/services/auth.service';
 import { ThemeService } from './core/services/theme.service';
@@ -21,7 +21,7 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
     RouterOutlet,
     MatSidenavModule,
     SidebarComponent,
-    NavbarComponent,
+    MatIconModule,
   ],
   template: `
     <div class="app-bg">
@@ -44,8 +44,10 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
         }
 
         <mat-sidenav-content class="sidenav-content">
-          @if (authService.currentUser() && !isAuthRoute) {
-            <app-navbar (menuToggle)="sidenav?.toggle()" />
+          @if (authService.currentUser() && !isAuthRoute && isMobile) {
+            <button class="hamburger-fab" (click)="sidenav?.toggle()" aria-label="Menu">
+              <mat-icon>menu</mat-icon>
+            </button>
           }
           <main class="main-content">
             <router-outlet />
@@ -122,6 +124,26 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
       flex: 1;
       padding: 24px 20px;
       overflow-y: auto;
+    }
+
+    .hamburger-fab {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 200;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background 0.15s, transform 0.1s;
+      &:active { transform: scale(0.92); }
     }
 
     @media (max-width: 768px) {
