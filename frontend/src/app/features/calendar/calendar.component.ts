@@ -177,31 +177,33 @@ interface CalendarView { key: string; label: string; }
     }
 
     .nav-btn {
-      width: 32px; height: 32px;
-      border-radius: 8px;
+      width: 44px; height: 44px;
+      border-radius: 10px;
       background: var(--bg-panel);
       border: 1px solid var(--border);
       color: var(--text-muted);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+      transition: background 0.15s, color 0.15s, transform 0.1s;
+      mat-icon { font-size: 20px; width: 20px; height: 20px; }
       &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
+      &:active { transform: scale(0.93); }
     }
 
     .today-btn {
-      height: 32px;
-      padding: 0 14px;
-      border-radius: 8px;
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 10px;
       background: var(--bg-panel);
       border: 1px solid var(--border);
       color: var(--text-muted);
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 500;
       font-family: inherit;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
       &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
+      &:active { transform: scale(0.93); }
     }
 
     .cal-title {
@@ -219,17 +221,17 @@ interface CalendarView { key: string; label: string; }
       background: var(--bg-panel);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 3px;
+      padding: 4px;
     }
 
     .view-btn {
-      height: 28px;
-      padding: 0 14px;
-      border-radius: 7px;
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 8px;
       background: transparent;
       border: none;
       color: var(--text-muted);
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       font-weight: 500;
       font-family: inherit;
       cursor: pointer;
@@ -413,10 +415,22 @@ interface CalendarView { key: string; label: string; }
       padding: 0 4px 16px;
     }
 
+    @media (max-width: 768px) {
+      .cal-page { padding: 20px 16px 32px; }
+      .page-title { font-size: 1.25rem; }
+    }
+
     @media (max-width: 600px) {
       .cal-page { padding: 16px 12px 32px; }
       .cal-title { display: none; }
-      .toolbar-left { gap: 4px; }
+      .cal-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      .toolbar-left { gap: 6px; }
+      .view-btn { flex: 1; }
     }
   `],
 })
