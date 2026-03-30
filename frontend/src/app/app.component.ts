@@ -150,8 +150,8 @@ export class AppComponent implements OnInit, OnDestroy {
       });
 
     this.routeSub = this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe((e: NavigationEnd) => {
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe(e => {
         this.isAuthRoute = AUTH_ROUTES.some(r => e.urlAfterRedirects.startsWith(r));
       });
     this.isAuthRoute = AUTH_ROUTES.some(r => this.router.url.startsWith(r));
