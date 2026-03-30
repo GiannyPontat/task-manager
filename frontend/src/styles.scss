@@ -86,6 +86,10 @@ body {
   background-color: var(--bg-app);
   color: var(--text-main);
   transition: background-color 0.3s ease, color 0.3s ease;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 // ─── Global overrides (Angular Material + encapsulation pierce) ───────────────
@@ -313,6 +317,25 @@ h2[mat-dialog-title] {
   padding: 0 !important;
 
   .mat-mdc-menu-content { padding: 0 !important; }
+}
+
+// ─── Native-app feel ──────────────────────────────────────────────────────────
+// Safe area iPhone notch / home bar
+.main-content {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
+}
+
+// Scroll fluide iOS
+.sidenav-content, .glass-panel, .board-scroll-wrapper {
+  -webkit-overflow-scrolling: touch;
+}
+
+// Désactive le highlight bleu au tap et la sélection sur les éléments interactifs
+button, a, [role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 // ─── Responsive: dialogs on mobile ────────────────────────────────────────────
