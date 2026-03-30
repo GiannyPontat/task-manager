@@ -113,7 +113,7 @@ DB_PASSWORD=taskmanager
 
 # Resend (emails transactionnels)
 RESEND_API_KEY=re_xxxxxxxxxxxx
-RESEND_FROM=Flowly <no-reply@gianny-dev.com>
+RESEND_FROM=AppName <no-reply@tondomaine.com>
 ```
 
 ## Lancer en développement
