@@ -153,6 +153,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(e => {
         this.isAuthRoute = AUTH_ROUTES.some(r => e.urlAfterRedirects.startsWith(r));
+        if (this.isMobile) this.sidenav?.close();
       });
     this.isAuthRoute = AUTH_ROUTES.some(r => this.router.url.startsWith(r));
   }
