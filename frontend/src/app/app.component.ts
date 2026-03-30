@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -8,6 +8,9 @@ import { SidebarService } from './core/services/sidebar.service';
 import { AuthService } from './core/services/auth.service';
 import { ThemeService } from './core/services/theme.service';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
+const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
 
 @Component({
   selector: 'app-root',
@@ -25,7 +28,7 @@ import { Subscription } from 'rxjs';
 
       <mat-sidenav-container class="sidenav-container" autosize>
 
-        @if (authService.currentUser()) {
+        @if (authService.currentUser() && !isAuthRoute) {
           <mat-sidenav
             class="app-sidenav"
             [mode]="isMobile ? 'over' : 'side'"
@@ -118,9 +121,12 @@ import { Subscription } from 'rxjs';
 })
 export class AppComponent implements OnInit, OnDestroy {
   isMobile = false;
+  isAuthRoute = false;
   private sub!: Subscription;
+  private routeSub!: Subscription;
 
   private breakpointObserver = inject(BreakpointObserver);
+  private router = inject(Router);
   readonly sidebarService = inject(SidebarService);
   readonly authService = inject(AuthService);
   readonly themeService = inject(ThemeService);
@@ -131,9 +137,17 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe(result => {
         this.isMobile = result.matches;
       });
+
+    this.routeSub = this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe((e: NavigationEnd) => {
+        this.isAuthRoute = AUTH_ROUTES.some(r => e.urlAfterRedirects.startsWith(r));
+      });
+    this.isAuthRoute = AUTH_ROUTES.some(r => this.router.url.startsWith(r));
   }
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
+    this.routeSub?.unsubscribe();
   }
 }

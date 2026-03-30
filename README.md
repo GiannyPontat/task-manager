@@ -1,6 +1,6 @@
 # Task Manager
 
-Application web full-stack de gestion de tâches style Kanban, réalisée pour portfolio développeur Java junior.
+Application web full-stack de gestion de tâches style Kanban.
 
 ## Stack technique
 
@@ -75,12 +75,21 @@ DELETE /api/columns/{id}
 PUT    /api/columns/reorder
 ```
 
-### Autres
+### Utilisateurs
+```
+GET    /api/users
+PATCH  /api/users/me
+```
+
+### Notifications
 ```
 GET    /api/notifications
-PUT    /api/notifications/{id}/read
-GET    /api/users/me
-PUT    /api/users/me
+GET    /api/notifications/unread-count
+PATCH  /api/notifications/{id}/read
+```
+
+### Invitations
+```
 POST   /api/invitations
 ```
 
@@ -101,6 +110,10 @@ Créer un fichier `.env` à la racine :
 ```env
 DB_USERNAME=taskmanager
 DB_PASSWORD=taskmanager
+
+# Resend (emails transactionnels)
+RESEND_API_KEY=re_xxxxxxxxxxxx
+RESEND_FROM=Flowly <noreply@tondomaine.com>
 ```
 
 ## Lancer en développement
@@ -144,4 +157,4 @@ npx cypress open
 
 ## Auteur
 
-Projet réalisé pour portfolio développeur Java junior.
+Développé par [GiannyPontat](https://github.com/GiannyPontat).
