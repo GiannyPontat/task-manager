@@ -314,3 +314,15 @@ h2[mat-dialog-title] {
 
   .mat-mdc-menu-content { padding: 0 !important; }
 }
+
+// ─── Responsive: dialogs on mobile ────────────────────────────────────────────
+@media (max-width: 640px) {
+  .cdk-overlay-pane {
+    max-width: 95vw !important;
+    min-width: unset !important;
+  }
+  .notif-panel {
+    min-width: unset !important;
+    width: calc(100vw - 24px) !important;
+  }
+}

@@ -117,6 +117,10 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
       padding: 24px 20px;
       overflow-y: auto;
     }
+
+    @media (max-width: 768px) {
+      .main-content { padding: 16px 12px; }
+    }
   `],
 })
 export class AppComponent implements OnInit, OnDestroy {

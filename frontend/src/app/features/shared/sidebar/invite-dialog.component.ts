@@ -60,7 +60,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
       color: var(--text-main);
       font-family: 'Inter', -apple-system, sans-serif;
       border-radius: 16px;
-      min-width: 380px;
+      min-width: min(380px, calc(100vw - 32px));
       overflow: hidden;
     }
 

@@ -412,6 +412,12 @@ interface CalendarView { key: string; label: string; }
     :host ::ng-deep .fc {
       padding: 0 4px 16px;
     }
+
+    @media (max-width: 600px) {
+      .cal-page { padding: 16px 12px 32px; }
+      .cal-title { display: none; }
+      .toolbar-left { gap: 4px; }
+    }
   `],
 })
 export class CalendarComponent implements OnInit {
