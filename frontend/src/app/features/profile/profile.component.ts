@@ -604,13 +604,20 @@ export class ProfileComponent implements OnInit {
 
   savePassword(): void {
     if (this.passwordForm.invalid) return;
+    const { oldPassword, newPassword } = this.passwordForm.value;
     this.savingPwd.set(true);
-    // TODO: PUT /api/users/me/password
-    setTimeout(() => {
-      this.savingPwd.set(false);
-      this.passwordForm.reset();
-      this.snack.open('Mot de passe modifié', 'OK', { duration: 3000 });
-    }, 800);
+    this.userSvc.changePassword(oldPassword!, newPassword!).subscribe({
+      next: () => {
+        this.savingPwd.set(false);
+        this.snack.open('Mot de passe modifié. Reconnectez-vous.', 'OK', { duration: 3000 });
+        setTimeout(() => this.auth.logout(), 2000);
+      },
+      error: (err) => {
+        this.savingPwd.set(false);
+        const msg = err?.error?.message ?? 'Ancien mot de passe incorrect';
+        this.snack.open(msg, 'OK', { duration: 4000 });
+      },
+    });
   }
 
   deleteAccount(): void {

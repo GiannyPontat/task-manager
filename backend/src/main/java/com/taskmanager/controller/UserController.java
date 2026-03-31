@@ -1,6 +1,7 @@
 package com.taskmanager.controller;
 
 import com.taskmanager.dto.AuthResponse;
+import com.taskmanager.dto.ChangePasswordRequest;
 import com.taskmanager.dto.UserProfileRequest;
 import com.taskmanager.dto.UserSummaryResponse;
 import com.taskmanager.service.UserService;
@@ -33,5 +34,13 @@ public class UserController {
             @Valid @RequestBody UserProfileRequest request) {
         AuthResponse response = userService.updateUserProfile(principal.getUsername(), request);
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/me/password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal UserDetails principal,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(principal.getUsername(), request);
+        return ResponseEntity.noContent().build();
     }
 }

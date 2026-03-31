@@ -1,12 +1,14 @@
 package com.taskmanager.service;
 
 import com.taskmanager.dto.AuthResponse;
+import com.taskmanager.dto.ChangePasswordRequest;
 import com.taskmanager.dto.UserProfileRequest;
 import com.taskmanager.dto.UserSummaryResponse;
 import com.taskmanager.entity.User;
 import com.taskmanager.repository.UserRepository;
 import com.taskmanager.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +19,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public List<UserSummaryResponse> getAllUsers() {
         return userRepository.findAll().stream()
@@ -39,5 +42,17 @@ public class UserService {
 
         String token = jwtService.generateToken(user);
         return new AuthResponse(token, user.getDisplayName(), user.getEmail(), user.getRole().name(), user.getAvatarUrl());
+    }
+
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Ancien mot de passe incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

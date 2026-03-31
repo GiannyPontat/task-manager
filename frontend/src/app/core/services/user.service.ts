@@ -26,4 +26,8 @@ export class UserService {
       .patch<AuthResponse>(`${environment.apiUrl}/users/me`, { username, avatarUrl })
       .pipe(tap(res => this.auth.refreshSession(res)));
   }
+
+  changePassword(oldPassword: string, newPassword: string) {
+    return this.http.patch<void>(`${environment.apiUrl}/users/me/password`, { oldPassword, newPassword });
+  }
 }
