@@ -16,6 +16,7 @@ frontend/coverage/
 .claude/
 */.claude/settings.local.json
 CLAUDE.md
+design-system.md
 
 # IDE
 .idea/
