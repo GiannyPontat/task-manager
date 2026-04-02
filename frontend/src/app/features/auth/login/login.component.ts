@@ -103,6 +103,8 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
       <!-- ── RIGHT PANEL — Form ── -->
       <main class="right-panel">
+
+        <div class="rp-center">
         <div class="form-wrap" [@formStagger]>
 
           <div class="f-item form-header">
@@ -220,6 +222,9 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
           </form>
 
+          <!-- Separator -->
+          <div class="f-item form-sep"></div>
+
           <!-- Register link -->
           <div class="f-item register-row">
             <span class="register-hint">Pas encore de compte ?</span>
@@ -227,6 +232,18 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
           </div>
 
         </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="rp-footer">
+          <span class="rp-footer-copy">© 2025 Flowly</span>
+          <div class="rp-footer-links">
+            <a href="https://github.com/GiannyPontat/task-manager" target="_blank" rel="noopener" class="rp-footer-a">GitHub</a>
+            <span class="rp-footer-dot"></span>
+            <a routerLink="/" class="rp-footer-a">Accueil</a>
+          </div>
+        </footer>
+
       </main>
 
     </div>
@@ -351,6 +368,15 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     /* ── Right panel ── */
     .right-panel {
       display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      padding: 0;
+    }
+
+    .rp-center {
+      flex: 1;
+      display: flex;
       align-items: center;
       justify-content: center;
       padding: 48px 24px;
@@ -358,11 +384,49 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
     .form-wrap {
       width: 100%;
-      max-width: 400px;
+      max-width: 440px;
       display: flex;
       flex-direction: column;
       gap: 28px;
     }
+
+    /* ── Footer ── */
+    .rp-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      border-top: 1px solid var(--border);
+    }
+    .rp-footer-copy {
+      font-size: 11.5px;
+      color: rgba(226,232,240,0.25);
+    }
+    .rp-footer-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .rp-footer-a {
+      font-size: 11.5px;
+      color: rgba(226,232,240,0.3);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .rp-footer-a:hover { color: rgba(226,232,240,0.65); }
+    .rp-footer-dot {
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: rgba(226,232,240,0.2);
+    }
+
+    /* ── Form separator ── */
+    .form-sep {
+      height: 1px;
+      background: var(--border);
+    }
+
+    .form-header { text-align: center; }
 
     .form-eyebrow {
       display: inline-flex;
@@ -589,8 +653,9 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     @media (max-width: 768px) {
       .page { grid-template-columns: 1fr; }
       .left-panel { display: none; }
-      .right-panel { padding: 40px 20px; align-items: flex-start; padding-top: 80px; }
+      .rp-center { padding: 80px 20px 40px; align-items: flex-start; }
       .form-wrap { max-width: 100%; }
+      .rp-footer { padding: 14px 20px; }
     }
   `],
 })

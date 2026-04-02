@@ -1,17 +1,12 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AbstractControl, ReactiveFormsModule, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { catchError, finalize, of, startWith } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
+import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 
 const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
   const pw  = group.get('password')?.value  ?? '';
@@ -22,294 +17,381 @@ const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationErrors |
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, MatSnackBarModule],
+  animations: [
+    trigger('formStagger', [
+      transition(':enter', [
+        query('.f-item', [
+          style({ opacity: 0, transform: 'translateY(16px)' }),
+          stagger(55, [animate('500ms cubic-bezier(0.16, 1, 0.3, 1)', style({ opacity: 1, transform: 'translateY(0)' }))])
+        ], { optional: true })
+      ])
+    ]),
   ],
   template: `
-    <div class="auth-container">
-      <mat-card class="auth-card">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon class="title-icon">person_add</mat-icon>
-            Inscription
-          </mat-card-title>
-          <mat-card-subtitle>Créez votre compte gratuitement</mat-card-subtitle>
-        </mat-card-header>
+    <div class="page">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
 
-        <mat-card-content>
-          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="page-center">
+        <div class="card" [@formStagger]>
+
+          <!-- Brand -->
+          <div class="f-item card-brand">
+            <a routerLink="/" class="brand-logo">Flowly</a>
+            <span class="brand-sep"></span>
+            <span class="brand-tag">Créer un compte</span>
+          </div>
+
+          <!-- Header -->
+          <div class="f-item">
+            <h1 class="card-title">Rejoignez Flowly.</h1>
+            <p class="card-sub">Gérez vos projets et tâches en équipe.</p>
+          </div>
+
+          <!-- Form -->
+          <form class="f-item card-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
             <!-- Username -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Nom d'utilisateur</mat-label>
-              <input matInput formControlName="username"
-                     placeholder="john_doe" autocomplete="username" />
-              <mat-icon matSuffix>badge</mat-icon>
-              @if (f['username'].hasError('required') && f['username'].touched) {
-                <mat-error>Le nom d'utilisateur est requis.</mat-error>
-              } @else if (f['username'].hasError('minlength') && f['username'].touched) {
-                <mat-error>Minimum 3 caractères.</mat-error>
-              } @else if (f['username'].hasError('maxlength') && f['username'].touched) {
-                <mat-error>Maximum 50 caractères.</mat-error>
+            <div class="field-group">
+              <label class="field-label" for="username">Nom d'utilisateur</label>
+              <div class="field-wrap" [class.field-focus]="usernameFocused" [class.field-error]="usernameErr">
+                <svg class="field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <input id="username" type="text" class="field-input" formControlName="username"
+                  placeholder="votre_pseudo" autocomplete="username"
+                  (focus)="usernameFocused=true" (blur)="usernameFocused=false" />
+              </div>
+              @if (usernameErr) {
+                <span class="field-err-msg">
+                  {{ f['username'].hasError('required') ? 'Nom requis.' : f['username'].hasError('minlength') ? 'Minimum 3 caractères.' : 'Maximum 50 caractères.' }}
+                </span>
               }
-            </mat-form-field>
+            </div>
 
             <!-- Email -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Adresse email</mat-label>
-              <input matInput type="email" formControlName="email"
-                     placeholder="vous@exemple.com" autocomplete="email"
-                     [readonly]="emailFromInvite" />
-              <mat-icon matSuffix>{{ emailFromInvite ? 'lock' : 'email' }}</mat-icon>
-              @if (f['email'].hasError('required') && f['email'].touched) {
-                <mat-error>L'email est requis.</mat-error>
-              } @else if (f['email'].hasError('email') && f['email'].touched) {
-                <mat-error>Format d'email invalide.</mat-error>
+            <div class="field-group">
+              <label class="field-label" for="reg-email">Adresse email</label>
+              <div class="field-wrap" [class.field-focus]="emailFocused" [class.field-error]="emailErr" [class.field-locked]="emailFromInvite">
+                <svg class="field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  @if (emailFromInvite) {
+                    <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+                  } @else {
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                  }
+                </svg>
+                <input id="reg-email" type="email" class="field-input" formControlName="email"
+                  placeholder="vous&#64;exemple.com" autocomplete="email" [readonly]="emailFromInvite"
+                  (focus)="emailFocused=true" (blur)="emailFocused=false" />
+              </div>
+              @if (emailErr) {
+                <span class="field-err-msg">{{ f['email'].hasError('required') ? 'Email requis.' : 'Format invalide.' }}</span>
               }
-            </mat-form-field>
+              @if (emailFromInvite) {
+                <span class="field-hint">Email pré-rempli depuis votre invitation.</span>
+              }
+            </div>
 
             <!-- Password -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Mot de passe</mat-label>
-              <input matInput [type]="hidePassword ? 'password' : 'text'"
-                     formControlName="password" autocomplete="new-password" />
-              <button mat-icon-button matSuffix type="button"
-                      (click)="hidePassword = !hidePassword"
-                      [attr.aria-label]="hidePassword ? 'Afficher' : 'Masquer'">
-                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-              @if (f['password'].hasError('required') && f['password'].touched) {
-                <mat-error>Le mot de passe est requis.</mat-error>
-              } @else if (f['password'].hasError('minlength') && f['password'].touched) {
-                <mat-error>Minimum 8 caractères.</mat-error>
-              }
-            </mat-form-field>
-
-            <!-- Password strength -->
-            @if (f['password'].value) {
-              <div class="strength-bar-wrap">
-                <div class="strength-bar">
-                  @for (i of [0,1,2,3]; track i) {
-                    <div class="strength-segment" [class]="i < strength() ? strengthClass() : 'empty'"></div>
+            <div class="field-group">
+              <label class="field-label" for="reg-password">Mot de passe</label>
+              <div class="field-wrap" [class.field-focus]="passwordFocused" [class.field-error]="passwordErr">
+                <svg class="field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+                </svg>
+                <input id="reg-password" [type]="showPassword ? 'text' : 'password'" class="field-input"
+                  formControlName="password" autocomplete="new-password"
+                  (focus)="passwordFocused=true" (blur)="passwordFocused=false" />
+                <button type="button" class="toggle-btn" (click)="showPassword = !showPassword">
+                  @if (showPassword) {
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  } @else {
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
                   }
+                </button>
+              </div>
+              @if (passwordErr) {
+                <span class="field-err-msg">{{ f['password'].hasError('required') ? 'Mot de passe requis.' : 'Minimum 8 caractères.' }}</span>
+              }
+              @if (f['password'].value) {
+                <div class="strength-wrap">
+                  <div class="strength-bar">
+                    @for (i of [0,1,2,3]; track i) {
+                      <div class="strength-seg" [class]="i < strength() ? strengthClass() : ''"></div>
+                    }
+                  </div>
+                  <span class="strength-label" [class]="strengthClass()">{{ strengthLabel() }}</span>
                 </div>
-                <span class="strength-label" [class]="strengthClass()">{{ strengthLabel() }}</span>
+              }
+            </div>
+
+            <!-- Confirm password -->
+            <div class="field-group">
+              <label class="field-label" for="reg-confirm">Confirmer le mot de passe</label>
+              <div class="field-wrap" [class.field-focus]="confirmFocused" [class.field-error]="confirmErr">
+                <svg class="field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <input id="reg-confirm" [type]="showConfirm ? 'text' : 'password'" class="field-input"
+                  formControlName="confirm" autocomplete="new-password"
+                  (focus)="confirmFocused=true" (blur)="confirmFocused=false" />
+                <button type="button" class="toggle-btn" (click)="showConfirm = !showConfirm">
+                  @if (showConfirm) {
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  } @else {
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+              @if (confirmErr) {
+                <span class="field-err-msg">
+                  {{ f['confirm'].hasError('required') ? 'Confirmation requise.' : 'Les mots de passe ne correspondent pas.' }}
+                </span>
+              }
+            </div>
+
+            <!-- Error banner -->
+            @if (errorMessage) {
+              <div class="error-banner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {{ errorMessage }}
               </div>
             }
 
-            <!-- Confirm password -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Confirmer le mot de passe</mat-label>
-              <input matInput [type]="hideConfirm ? 'password' : 'text'"
-                     formControlName="confirm" autocomplete="new-password" />
-              <button mat-icon-button matSuffix type="button"
-                      (click)="hideConfirm = !hideConfirm"
-                      [attr.aria-label]="hideConfirm ? 'Afficher' : 'Masquer'">
-                <mat-icon>{{ hideConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-              @if (f['confirm'].hasError('required') && f['confirm'].touched) {
-                <mat-error>Veuillez confirmer le mot de passe.</mat-error>
-              } @else if (form.hasError('mismatch') && f['confirm'].touched) {
-                <mat-error>Les mots de passe ne correspondent pas.</mat-error>
-              }
-            </mat-form-field>
-
-            <!-- API error -->
-            @if (errorMessage) {
-              <p class="error-message">
-                <mat-icon>error_outline</mat-icon>
-                {{ errorMessage }}
-              </p>
-            }
-
-            <button mat-raised-button color="primary" type="submit"
-                    class="full-width submit-btn"
-                    [disabled]="form.invalid || loading">
+            <!-- Submit -->
+            <button type="submit" class="submit-btn" [disabled]="form.invalid || loading">
               @if (loading) {
-                <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
-                Inscription...
+                <span class="btn-spinner"></span><span>Création...</span>
               } @else {
-                <mat-icon>person_add</mat-icon>
-                Créer mon compte
+                <span>Créer mon compte</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
               }
             </button>
-          </form>
-        </mat-card-content>
 
-        <mat-card-actions align="end">
-          <span class="redirect-hint">Déjà un compte ?</span>
-          <a mat-button color="accent" routerLink="/login">Se connecter</a>
-        </mat-card-actions>
-      </mat-card>
+          </form>
+
+          <div class="f-item form-sep"></div>
+
+          <div class="f-item login-row">
+            <span class="login-hint">Déjà un compte ?</span>
+            <a routerLink="/login" class="login-link">Se connecter</a>
+          </div>
+
+        </div>
+      </div>
+
+      <footer class="page-footer">
+        <span class="footer-copy">© 2025 Flowly</span>
+        <div class="footer-links">
+          <a href="https://github.com/GiannyPontat/task-manager" target="_blank" rel="noopener" class="footer-a">GitHub</a>
+          <span class="footer-dot"></span>
+          <a routerLink="/" class="footer-a">Accueil</a>
+        </div>
+      </footer>
     </div>
   `,
   styles: [`
-    .auth-container {
-      min-height: 100vh;
+    .page {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      background: #090f1a;
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      color: #e2e8f0;
+      position: relative;
+      overflow: hidden;
+      --accent: #3b82f6;
+      --border: rgba(255,255,255,0.08);
+      --border-focus: rgba(59,130,246,0.5);
+      --glass: rgba(255,255,255,0.04);
+      --muted: rgba(226,232,240,0.45);
+      --error: #f87171;
+    }
+
+    .blob { position: fixed; border-radius: 50%; pointer-events: none; }
+    .blob-1 {
+      width: 500px; height: 500px; top: -200px; left: -150px;
+      background: radial-gradient(ellipse, rgba(59,130,246,0.14) 0%, transparent 70%);
+    }
+    .blob-2 {
+      width: 400px; height: 400px; bottom: -150px; right: -100px;
+      background: radial-gradient(ellipse, rgba(14,165,233,0.08) 0%, transparent 70%);
+    }
+
+    .page-center {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--bg-main, #f8fafc);
-      padding: 24px;
+      padding: 48px 24px;
+      position: relative;
+      z-index: 1;
     }
 
-    .auth-card {
+    .card {
       width: 100%;
-      max-width: 420px;
-      border-radius: 16px !important;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 20px 60px rgba(0,0,0,0.09) !important;
-      background: var(--bg-card, #fff) !important;
-      border: 1px solid var(--border, #e2e8f0) !important;
-    }
-
-    mat-card-header { padding: 32px 32px 4px; }
-
-    mat-card-title {
+      max-width: 460px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 40px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
       display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.6rem !important;
-      font-weight: 700 !important;
-      color: var(--text-main, #0f172a);
-      letter-spacing: -0.5px;
+      flex-direction: column;
+      gap: 22px;
     }
 
-    .title-icon {
-      width: 40px; height: 40px; font-size: 22px;
-      background: linear-gradient(135deg, #6366f1, #3b82f6);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff;
-    }
+    .card-brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo { font-size: 1.05rem; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; text-decoration: none; }
+    .brand-sep { width: 1px; height: 16px; background: var(--border); }
+    .brand-tag { font-size: 12px; color: var(--muted); }
 
-    :host ::ng-deep mat-card-subtitle {
-      font-size: 0.9rem !important;
-      color: var(--text-muted, #64748b) !important;
-      margin-top: 4px !important;
-    }
+    .card-title { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.04em; color: #f1f5f9; margin: 0 0 6px; }
+    .card-sub { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.5; }
 
-    mat-card-content { padding: 20px 32px 8px; }
+    .card-form { display: flex; flex-direction: column; gap: 15px; }
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font-size: 12px; font-weight: 600; color: rgba(226,232,240,0.6); letter-spacing: 0.01em; }
 
-    .full-width { width: 100%; }
+    .field-wrap {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 11px; padding: 0 14px; height: 44px;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .field-wrap.field-focus {
+      border-color: var(--border-focus);
+      background: rgba(59,130,246,0.04);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+    }
+    .field-wrap.field-error { border-color: rgba(248,113,113,0.5); background: rgba(248,113,113,0.04); }
+    .field-wrap.field-locked { opacity: 0.6; }
 
-    /* Theme-aware Material fields */
-    :host ::ng-deep .full-width .mat-mdc-text-field-wrapper {
-      background: var(--input-bg, #f8fafc) !important;
+    .field-icon { color: var(--muted); flex-shrink: 0; }
+    .field-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      font-family: 'Outfit', system-ui, sans-serif; font-size: 14px;
+      color: #e2e8f0; caret-color: var(--accent);
     }
-    :host ::ng-deep .full-width .mdc-notched-outline__leading,
-    :host ::ng-deep .full-width .mdc-notched-outline__notch,
-    :host ::ng-deep .full-width .mdc-notched-outline__trailing {
-      border-color: var(--border, #e2e8f0) !important;
-    }
-    :host ::ng-deep .full-width.mat-focused .mdc-notched-outline__leading,
-    :host ::ng-deep .full-width.mat-focused .mdc-notched-outline__notch,
-    :host ::ng-deep .full-width.mat-focused .mdc-notched-outline__trailing {
-      border-color: rgba(99,102,241,0.7) !important;
-    }
-    :host ::ng-deep .full-width .mdc-floating-label,
-    :host ::ng-deep .full-width .mat-mdc-form-field-label { color: var(--text-muted, #64748b) !important; }
-    :host ::ng-deep .full-width input { color: var(--text-main, #0f172a) !important; caret-color: #6366f1; }
-    :host ::ng-deep .full-width button mat-icon { color: var(--text-muted, #64748b); }
+    .field-input::placeholder { color: rgba(226,232,240,0.2); }
+    .field-err-msg { font-size: 11.5px; color: var(--error); padding-left: 4px; }
+    .field-hint { font-size: 11px; color: rgba(59,130,246,0.7); padding-left: 4px; }
 
-    /* Password strength */
-    .strength-bar-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: -6px 0 10px;
+    .toggle-btn {
+      background: none; border: none; padding: 4px; cursor: pointer;
+      color: var(--muted); display: flex; align-items: center;
+      border-radius: 5px; transition: color 0.15s, background 0.15s;
     }
+    .toggle-btn:hover { color: #e2e8f0; background: rgba(255,255,255,0.06); }
 
-    .strength-bar {
-      display: flex;
-      gap: 4px;
-      flex: 1;
-    }
-
-    .strength-segment {
-      height: 4px;
-      flex: 1;
-      border-radius: 2px;
-      background: var(--border, #e2e8f0);
+    .strength-wrap { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
+    .strength-bar { display: flex; gap: 4px; flex: 1; }
+    .strength-seg {
+      height: 3px; flex: 1; border-radius: 2px;
+      background: rgba(255,255,255,0.08);
       transition: background 0.25s;
-      &.weak   { background: #ef4444; }
-      &.fair   { background: #f59e0b; }
-      &.good   { background: #3b82f6; }
-      &.strong { background: #10b981; }
-      &.empty  { background: var(--border, #e2e8f0); }
     }
+    .strength-seg.weak   { background: #f87171; }
+    .strength-seg.fair   { background: #fb923c; }
+    .strength-seg.strong { background: #4ade80; }
+    .strength-label { font-size: 11px; font-weight: 600; min-width: 40px; text-align: right; }
+    .strength-label.weak   { color: #f87171; }
+    .strength-label.fair   { color: #fb923c; }
+    .strength-label.strong { color: #4ade80; }
 
-    .strength-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      min-width: 48px;
-      text-align: right;
-      &.weak   { color: #ef4444; }
-      &.fair   { color: #f59e0b; }
-      &.good   { color: #3b82f6; }
-      &.strong { color: #10b981; }
+    .error-banner {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(248,113,113,0.07);
+      border: 1px solid rgba(248,113,113,0.2);
+      border-radius: 10px; padding: 10px 14px;
+      font-size: 12.5px; color: #fca5a5;
+      animation: fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
     .submit-btn {
-      margin-top: 12px;
-      height: 48px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border-radius: 10px !important;
-      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%) !important;
-      color: #fff !important;
-      box-shadow: 0 4px 14px rgba(99,102,241,0.35) !important;
-      transition: box-shadow 0.2s, transform 0.15s;
-      &:hover:not(:disabled) {
-        box-shadow: 0 6px 20px rgba(99,102,241,0.45) !important;
-        transform: translateY(-1px);
-      }
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; height: 48px; margin-top: 4px;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 12px;
+      font-family: 'Outfit', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
     }
-
-    .btn-spinner { display: inline-block; }
-
-    .error-message {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #ef4444;
-      background: rgba(239,68,68,0.08);
-      border: 1px solid rgba(239,68,68,0.25);
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      margin: 4px 0 8px;
+    .submit-btn::before {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(255,255,255,0.08); transform: translateX(-100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
+    .submit-btn:hover:not(:disabled) { opacity: 0.93; transform: translateY(-2px); box-shadow: 0 6px 28px rgba(59,130,246,0.42); }
+    .submit-btn:hover:not(:disabled)::before { transform: translateX(0); }
+    .submit-btn:active:not(:disabled) { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    mat-card-actions {
-      padding: 8px 32px 24px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+    .btn-spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin 0.75s linear infinite;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .redirect-hint { color: var(--text-muted, #64748b); font-size: 0.875rem; }
+    .form-sep { height: 1px; background: var(--border); }
+    .login-row { display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .login-hint { font-size: 13px; color: var(--muted); }
+    .login-link { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; transition: opacity 0.15s; }
+    .login-link:hover { opacity: 0.8; }
+
+    .page-footer {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 40px; border-top: 1px solid var(--border);
+    }
+    .footer-copy { font-size: 11.5px; color: rgba(226,232,240,0.25); }
+    .footer-links { display: flex; align-items: center; gap: 10px; }
+    .footer-a { font-size: 11.5px; color: rgba(226,232,240,0.3); text-decoration: none; transition: color 0.15s; }
+    .footer-a:hover { color: rgba(226,232,240,0.65); }
+    .footer-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(226,232,240,0.2); }
+
+    @media (max-width: 640px) {
+      .page-center { padding: 32px 16px; }
+      .card { padding: 28px 20px; }
+      .page-footer { padding: 14px 20px; }
+    }
   `],
 })
 export class RegisterComponent {
-  private readonly fb = inject(FormBuilder);
+  private readonly fb          = inject(FormBuilder);
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly router      = inject(Router);
+  private readonly route       = inject(ActivatedRoute);
+  private readonly snackBar    = inject(MatSnackBar);
 
-  hidePassword = true;
-  hideConfirm  = true;
-  loading = false;
-  errorMessage = '';
+  showPassword    = false;
+  showConfirm     = false;
+  usernameFocused = false;
+  emailFocused    = false;
+  passwordFocused = false;
+  confirmFocused  = false;
+  loading         = false;
+  errorMessage    = '';
   emailFromInvite = false;
 
   form = this.fb.group({
@@ -326,18 +408,25 @@ export class RegisterComponent {
     { initialValue: '' }
   );
 
-  strength = computed(() => {
+  strength      = computed(() => {
     const pw = this.passwordValue() ?? '';
     let score = 0;
-    if (pw.length >= 6)             score++;
-    if (/[A-Z]/.test(pw))           score++;
-    if (/[0-9]/.test(pw))           score++;
-    if (/[^A-Za-z0-9]/.test(pw))   score++;
+    if (pw.length >= 6)           score++;
+    if (/[A-Z]/.test(pw))         score++;
+    if (/[0-9]/.test(pw))         score++;
+    if (/[^A-Za-z0-9]/.test(pw))  score++;
     return score;
   });
-
   strengthClass = computed(() => ['', 'weak', 'fair', 'strong', 'strong'][this.strength()] ?? 'weak');
   strengthLabel = computed(() => ['', 'Faible', 'Moyen', 'Fort', 'Fort'][this.strength()] ?? '');
+
+  get usernameErr(): boolean { const c = this.f['username']; return !!(c.invalid && c.touched); }
+  get emailErr():    boolean { const c = this.f['email'];    return !!(c.invalid && c.touched); }
+  get passwordErr(): boolean { const c = this.f['password']; return !!(c.invalid && c.touched); }
+  get confirmErr():  boolean {
+    const c = this.f['confirm'];
+    return !!(c.invalid && c.touched) || !!(this.form.hasError('mismatch') && c.touched);
+  }
 
   constructor() {
     const email = this.route.snapshot.queryParamMap.get('email');
@@ -349,19 +438,13 @@ export class RegisterComponent {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading = true;
     this.errorMessage = '';
-
     const { username, email, password } = this.form.getRawValue();
-
     this.authService.register({ username: username!, email: email!, password: password! }).pipe(
       catchError(err => {
-        const msg = err?.error?.message ?? 'Une erreur est survenue lors de l\'inscription.';
+        const msg = err?.error?.message ?? "Une erreur est survenue lors de l'inscription.";
         this.errorMessage = msg;
         this.snackBar.open(msg, 'Fermer', { duration: 4000, panelClass: 'snack-error' });
         return of(null);
