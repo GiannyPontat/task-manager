@@ -48,8 +48,11 @@ export class AuthService {
     if (!exp) return;
     const delay = exp - Date.now() - REFRESH_BEFORE_MS;
     if (delay <= 0) {
-      // Token déjà expiré ou sur le point d'expirer
-      this.logout();
+      // Token expiré — on nettoie la session sans rediriger (l'utilisateur peut être sur une route publique)
+      if (this.refreshTimer) clearTimeout(this.refreshTimer);
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      this.currentUser.set(null);
       return;
     }
     this.refreshTimer = setTimeout(() => {

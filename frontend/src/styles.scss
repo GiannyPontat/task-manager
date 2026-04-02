@@ -14,6 +14,11 @@ $theme: mat.define-light-theme((
 
 @include mat.all-component-themes($theme);
 
+// Neutralise le background blanc injecté par Material sur le drawer content
+.mat-drawer-content, .mat-sidenav-content {
+  background: transparent !important;
+}
+
 // ─── CSS Design Tokens ────────────────────────────────────────────────────────
 :root {
   // Light (default) — fond doux, reposant pour les yeux

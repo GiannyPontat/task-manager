@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
+const NO_SIDEBAR_EXACT = ['/'];
 
 @Component({
   selector: 'app-root',
@@ -49,7 +50,7 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
               <mat-icon>menu</mat-icon>
             </button>
           }
-          <main class="main-content">
+          <main [class]="isAuthRoute ? 'main-content--bare' : 'main-content'">
             <router-outlet />
           </main>
         </mat-sidenav-content>
@@ -118,12 +119,18 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
       display: flex;
       flex-direction: column;
       background: transparent;
+      scroll-behavior: smooth;
     }
 
     .main-content {
       flex: 1;
       padding: 24px 20px;
       overflow-y: auto;
+    }
+    .main-content--bare {
+      flex: 1;
+      padding: 0;
+      background: #090f1a;
     }
 
     .hamburger-fab {
@@ -174,10 +181,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.routeSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(e => {
-        this.isAuthRoute = AUTH_ROUTES.some(r => e.urlAfterRedirects.startsWith(r));
+        const url = e.urlAfterRedirects.split('#')[0] || '/';
+        this.isAuthRoute = AUTH_ROUTES.some(r => url.startsWith(r)) || NO_SIDEBAR_EXACT.includes(url);
         if (this.isMobile) this.sidenav?.close();
       });
-    this.isAuthRoute = AUTH_ROUTES.some(r => this.router.url.startsWith(r));
+    const initUrl = this.router.url.split('#')[0] || '/';
+    this.isAuthRoute = AUTH_ROUTES.some(r => initUrl.startsWith(r)) || NO_SIDEBAR_EXACT.includes(initUrl);
   }
 
   ngOnDestroy() {
