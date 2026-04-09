@@ -365,11 +365,9 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
     /* ── Navbar ── */
     .nav {
-      position: fixed;
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
-      z-index: 200;
+      z-index: 100;
       background: rgba(9,15,26,0.75);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -426,7 +424,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       z-index: 1;
       max-width: 1120px;
       margin: 0 auto;
-      padding: 144px 28px 72px;
+      padding: 88px 28px 72px;
       display: grid;
       grid-template-columns: 1.15fr 0.85fr;
       gap: 48px;
