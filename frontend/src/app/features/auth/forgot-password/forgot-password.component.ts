@@ -127,16 +127,27 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      background: #090f1a;
+      background: var(--bg-app);
       font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-      color: #e2e8f0;
+      color: var(--text-main);
       position: relative;
       overflow: hidden;
       --accent: #3b82f6;
-      --border: rgba(255,255,255,0.08);
+      --border: rgba(0,0,0,0.1);
       --border-focus: rgba(59,130,246,0.5);
-      --muted: rgba(226,232,240,0.6);
+      --muted: rgba(15,23,42,0.45);
       --error: #f87171;
+    }
+
+    :host-context([data-theme="dark"]) {
+      --border: rgba(255,255,255,0.08);
+      --glass: rgba(255,255,255,0.04);
+      --muted: rgba(226,232,240,0.45);
+      --field-label-color: rgba(226,232,240,0.6);
+      --footer-copy-color: rgba(226,232,240,0.25);
+      --field-bg: rgba(255,255,255,0.05);
+      --placeholder-color: rgba(226,232,240,0.25);
+      --back-btn-color: rgba(226,232,240,0.7);
     }
 
     .blob { position: fixed; border-radius: 50%; pointer-events: none; }
@@ -156,20 +167,20 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
     .card {
       width: 100%; max-width: 420px;
-      background: rgba(255,255,255,0.03);
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 20px; padding: 36px 40px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
       display: flex; flex-direction: column; gap: 24px;
     }
 
-    .card-brand { display: flex; align-items: center; gap: 12px; }
+    .card-brand { display: flex; align-items: center; justify-content: center; gap: 12px; }
     .brand-logo { font-size: 1.05rem; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; text-decoration: none; }
     .brand-sep { width: 1px; height: 16px; background: var(--border); }
     .brand-tag { font-size: 12px; color: var(--muted); }
 
-    .card-title { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.04em; color: #f1f5f9; margin: 0 0 8px; }
-    .card-sub { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.6; }
+    .card-title { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.04em; color: var(--text-main); margin: 0 0 8px; text-align: center; }
+    .card-sub { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.6; text-align: center; }
 
     /* Success state */
     .success-state { display: flex; flex-direction: column; gap: 14px; }
@@ -181,20 +192,20 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .back-btn {
       display: inline-flex; align-items: center; gap: 8px;
       margin-top: 4px; padding: 10px 18px;
-      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      background: var(--field-bg, rgba(0,0,0,0.04)); border: 1px solid var(--border);
       border-radius: 10px; text-decoration: none;
-      font-size: 13px; font-weight: 600; color: rgba(226,232,240,0.7);
+      font-size: 13px; font-weight: 600; color: var(--back-btn-color, rgba(15,23,42,0.65));
       transition: background 0.15s, color 0.15s; align-self: flex-start;
     }
-    .back-btn:hover { background: rgba(255,255,255,0.09); color: #e2e8f0; }
+    .back-btn:hover { background: var(--toggle-hover-bg, rgba(0,0,0,0.07)); color: var(--text-main); }
 
     .card-form { display: flex; flex-direction: column; gap: 16px; }
     .field-group { display: flex; flex-direction: column; gap: 6px; }
-    .field-label { font-size: 12px; font-weight: 600; color: rgba(226,232,240,0.75); letter-spacing: 0.01em; }
+    .field-label { font-size: 12px; font-weight: 600; color: var(--field-label-color, rgba(15,23,42,0.55)); letter-spacing: 0.01em; }
 
     .field-wrap {
       display: flex; align-items: center; gap: 10px;
-      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      background: rgba(0,0,0,0.03); border: 1px solid var(--border);
       border-radius: 11px; padding: 0 14px; height: 46px;
       transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
     }
@@ -208,9 +219,9 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .field-input {
       flex: 1; background: transparent; border: none; outline: none;
       font-family: 'Outfit', system-ui, sans-serif; font-size: 14px;
-      color: #e2e8f0; caret-color: var(--accent);
+      color: var(--text-main); caret-color: var(--accent);
     }
-    .field-input::placeholder { color: rgba(226,232,240,0.4); }
+    .field-input::placeholder { color: var(--placeholder-color, rgba(15,23,42,0.25)); }
     .field-err-msg { font-size: 11.5px; color: var(--error); padding-left: 4px; }
 
     .submit-btn {
@@ -246,18 +257,18 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       font-size: 13px; font-weight: 500; color: var(--muted);
       text-decoration: none; transition: color 0.15s;
     }
-    .back-link:hover { color: #e2e8f0; }
+    .back-link:hover { color: var(--text-main); }
 
     .page-footer {
       position: relative; z-index: 1;
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 40px; border-top: 1px solid var(--border);
     }
-    .footer-copy { font-size: 11.5px; color: rgba(226,232,240,0.5); }
+    .footer-copy { font-size: 11.5px; color: var(--footer-copy-color, rgba(15,23,42,0.25)); }
     .footer-links { display: flex; align-items: center; gap: 10px; }
-    .footer-a { font-size: 11.5px; color: rgba(226,232,240,0.65); text-decoration: none; transition: color 0.15s; }
-    .footer-a:hover { color: rgba(226,232,240,0.9); }
-    .footer-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(226,232,240,0.2); }
+    .footer-a { font-size: 11.5px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .footer-a:hover { color: var(--text-main); }
+    .footer-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border); }
 
     @media (max-width: 640px) {
       .page-center { padding: 32px 16px; }

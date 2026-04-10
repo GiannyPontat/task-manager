@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
@@ -19,7 +19,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
   selector: 'app-project-settings',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, ReactiveFormsModule,
+    CommonModule, DatePipe, FormsModule, ReactiveFormsModule,
     MatTabsModule, MatTableModule, MatSelectModule,
     MatFormFieldModule, MatInputModule, MatButtonModule,
     MatIconModule, MatDialogModule, MatSnackBarModule, MatTooltipModule,
@@ -27,25 +27,101 @@ import { InvitationService } from '../../../core/services/invitation.service';
   template: `
     <div class="dlg">
 
-      <!-- Header -->
+      <!-- ── Header ── -->
       <header class="dlg-header">
         <div class="header-left">
-          <div class="header-icon"><mat-icon>settings</mat-icon></div>
-          <div>
-            <h2 class="dlg-title">Paramètres</h2>
-            <span class="project-name-sub">{{ data.project.name }}</span>
+          <div class="project-avatar">{{ data.project.name.charAt(0).toUpperCase() }}</div>
+          <div class="header-meta">
+            <div class="header-top-row">
+              <h2 class="dlg-title">{{ data.project.name }}</h2>
+              <span class="role-badge" [class.is-admin]="isAdmin">{{ data.project.currentUserRole }}</span>
+            </div>
+            <div class="header-progress-row">
+              <div class="mini-progress-track">
+                <div class="mini-progress-fill" [style.width.%]="progressPercent"></div>
+              </div>
+              <span class="progress-label">{{ progressPercent }}% complété</span>
+            </div>
           </div>
         </div>
-        <div class="header-right">
-          <span class="role-badge" [class.is-admin]="isAdmin">{{ data.project.currentUserRole }}</span>
-          <button mat-icon-button class="close-btn" (click)="dialogRef.close()">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
+        <button mat-icon-button class="close-btn" (click)="dialogRef.close()">
+          <mat-icon>close</mat-icon>
+        </button>
       </header>
 
-      <!-- Tabs -->
-      <mat-tab-group animationDuration="180ms" class="settings-tabs">
+      <!-- ── Tabs ── -->
+      <mat-tab-group animationDuration="200ms" class="settings-tabs">
+
+        <!-- ── Aperçu ── -->
+        <mat-tab label="Aperçu">
+          <div class="tab-body">
+
+            <span class="section-label">Progression des tâches</span>
+
+            <div class="progress-block">
+              <div class="progress-numbers">
+                <span class="progress-count">{{ taskStats.done }}<span class="progress-total">/{{ taskStats.total }}</span></span>
+                <span class="progress-pct">{{ progressPercent }}%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="progressPercent"></div>
+              </div>
+              <div class="progress-legend">
+                <span class="legend-dot done"></span><span>{{ taskStats.done }} terminées</span>
+                <span class="legend-dot in-progress"></span><span>{{ taskStats.inProgress }} en cours</span>
+                <span class="legend-dot todo"></span><span>{{ taskStats.todo }} à faire</span>
+              </div>
+            </div>
+
+            <span class="section-label" style="margin-top:24px">Statistiques</span>
+
+            <div class="stat-grid">
+              <div class="stat-card stat-todo">
+                <div class="stat-icon-wrap todo-icon">
+                  <mat-icon>pending_actions</mat-icon>
+                </div>
+                <div class="stat-value">{{ taskStats.todo }}</div>
+                <div class="stat-label">À faire</div>
+              </div>
+              <div class="stat-card stat-in-progress">
+                <div class="stat-icon-wrap inprogress-icon">
+                  <mat-icon>autorenew</mat-icon>
+                </div>
+                <div class="stat-value">{{ taskStats.inProgress }}</div>
+                <div class="stat-label">En cours</div>
+              </div>
+              <div class="stat-card stat-done">
+                <div class="stat-icon-wrap done-icon">
+                  <mat-icon>task_alt</mat-icon>
+                </div>
+                <div class="stat-value">{{ taskStats.done }}</div>
+                <div class="stat-label">Terminées</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <span class="section-label">Détails du projet</span>
+            <div class="meta-list">
+              <div class="meta-row">
+                <mat-icon class="meta-icon">person_outline</mat-icon>
+                <span class="meta-key">Propriétaire</span>
+                <span class="meta-val">{{ data.project.ownerName }}</span>
+              </div>
+              <div class="meta-row">
+                <mat-icon class="meta-icon">group_outline</mat-icon>
+                <span class="meta-key">Membres</span>
+                <span class="meta-val">{{ data.project.memberCount }}</span>
+              </div>
+              <div class="meta-row">
+                <mat-icon class="meta-icon">calendar_today</mat-icon>
+                <span class="meta-key">Créé le</span>
+                <span class="meta-val">{{ data.project.createdAt | date:'dd MMM yyyy' }}</span>
+              </div>
+            </div>
+
+          </div>
+        </mat-tab>
 
         <!-- ── Membres ── -->
         <mat-tab label="Membres">
@@ -56,7 +132,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
               @if (isAdmin && !showInvite) {
                 <button mat-button class="btn-invite" (click)="showInvite = true">
                   <mat-icon>person_add</mat-icon>
-                  Inviter un membre
+                  Inviter
                 </button>
               }
             </div>
@@ -81,7 +157,6 @@ import { InvitationService } from '../../../core/services/invitation.service';
             }
 
             <table mat-table [dataSource]="members" class="members-table">
-
               <ng-container matColumnDef="user">
                 <th mat-header-cell *matHeaderCellDef>Utilisateur</th>
                 <td mat-cell *matCellDef="let m">
@@ -94,7 +169,6 @@ import { InvitationService } from '../../../core/services/invitation.service';
                   </div>
                 </td>
               </ng-container>
-
               <ng-container matColumnDef="role">
                 <th mat-header-cell *matHeaderCellDef>Rôle</th>
                 <td mat-cell *matCellDef="let m">
@@ -112,7 +186,6 @@ import { InvitationService } from '../../../core/services/invitation.service';
                   }
                 </td>
               </ng-container>
-
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let m">
@@ -125,7 +198,6 @@ import { InvitationService } from '../../../core/services/invitation.service';
                   }
                 </td>
               </ng-container>
-
               <tr mat-header-row *matHeaderRowDef="cols"></tr>
               <tr mat-row *matRowDef="let row; columns: cols;"></tr>
             </table>
@@ -139,17 +211,14 @@ import { InvitationService } from '../../../core/services/invitation.service';
 
             <form [formGroup]="generalForm" (ngSubmit)="onSave()">
               <span class="section-label">Informations</span>
-
               <mat-form-field appearance="outline" class="full-field">
                 <mat-label>Nom du projet</mat-label>
                 <input matInput formControlName="name" />
               </mat-form-field>
-
               <mat-form-field appearance="outline" class="full-field">
                 <mat-label>Description</mat-label>
                 <textarea matInput formControlName="description" rows="3"></textarea>
               </mat-form-field>
-
               @if (isAdmin) {
                 <div class="form-footer">
                   <button mat-flat-button class="btn-primary" type="submit"
@@ -162,7 +231,6 @@ import { InvitationService } from '../../../core/services/invitation.service';
 
             @if (isAdmin) {
               <div class="divider"></div>
-
               <div class="danger-zone">
                 <span class="section-label danger-label">Zone de danger</span>
                 <div class="danger-card">
@@ -186,16 +254,15 @@ import { InvitationService } from '../../../core/services/invitation.service';
   `,
   styles: [`
     .dlg {
-      width: 580px;
+      width: 620px;
       max-width: 95vw;
-      background: var(--bg-app);
+      background: var(--bg-card);
       color: var(--text-main);
       font-family: 'Inter', -apple-system, sans-serif;
       border-radius: 20px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      /* MDC tokens — cascade to all nested Material components in this dialog */
       --mdc-outlined-text-field-input-text-color: var(--text-main);
       --mdc-outlined-text-field-label-text-color: var(--text-muted);
       --mdc-outlined-text-field-outline-color: var(--border);
@@ -208,11 +275,8 @@ import { InvitationService } from '../../../core/services/invitation.service';
       --mdc-outlined-text-field-input-text-placeholder-color: var(--text-muted);
     }
 
-    /* Placeholder color — not covered by MDC input-text-color token */
     ::ng-deep .full-field input::placeholder,
     ::ng-deep .full-field textarea::placeholder { color: var(--text-muted) !important; opacity: 1; }
-
-    /* Select trigger value text (belt-and-suspenders over MDC token) */
     ::ng-deep .role-select .mat-mdc-select-value-text { color: var(--text-main) !important; }
 
     /* ── Header ── */
@@ -220,35 +284,64 @@ import { InvitationService } from '../../../core/services/invitation.service';
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 20px;
-      background: var(--bg-card);
+      padding: 20px 20px 16px;
+      background: var(--bg-app);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
+      gap: 12px;
     }
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .header-icon {
-      width: 34px; height: 34px;
-      background: rgba(99,102,241,0.2);
-      border: 1px solid rgba(99,102,241,0.3);
-      border-radius: 10px;
+    .header-left { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
+
+    .project-avatar {
+      width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
       display: flex; align-items: center; justify-content: center;
-      mat-icon { font-size: 17px; width: 17px; height: 17px; color: var(--primary); }
+      font-size: 1.1rem; font-weight: 800; color: #fff;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.4);
     }
-    .dlg-title { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main); line-height: 1.2; }
-    .project-name-sub { font-size: 0.72rem; color: var(--text-muted); }
-    .header-right { display: flex; align-items: center; gap: 10px; }
+
+    .header-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+
+    .header-top-row { display: flex; align-items: center; gap: 10px; }
+
+    .dlg-title {
+      margin: 0;
+      font-size: 1rem; font-weight: 700; color: var(--text-main);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
     .role-badge {
-      font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
-      padding: 2px 8px; border-radius: 4px;
+      font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
       background: var(--bg-panel); border: 1px solid var(--border-panel);
       color: var(--text-muted);
     }
     .role-badge.is-admin { color: #a78bfa; background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.3); }
-    .close-btn { color: var(--text-muted) !important; &:hover { color: var(--text-main) !important; } }
+
+    .header-progress-row { display: flex; align-items: center; gap: 8px; }
+
+    .mini-progress-track {
+      flex: 1; height: 4px; border-radius: 99px;
+      background: var(--border);
+      overflow: hidden;
+    }
+    .mini-progress-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: fillIn 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes fillIn {
+      from { width: 0% !important; }
+    }
+    .progress-label { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+
+    .close-btn { color: var(--text-muted) !important; flex-shrink: 0; }
+    .close-btn:hover { color: var(--text-main) !important; }
 
     /* ── Tabs ── */
     ::ng-deep .settings-tabs .mat-mdc-tab-header {
-      background: var(--bg-card);
+      background: var(--bg-app);
       border-bottom: 1px solid var(--border);
     }
     ::ng-deep .settings-tabs .mdc-tab__text-label { color: var(--text-muted) !important; font-size: 0.82rem !important; font-weight: 500 !important; }
@@ -260,8 +353,8 @@ import { InvitationService } from '../../../core/services/invitation.service';
 
     /* ── Tab body ── */
     .tab-body {
-      padding: 24px 24px 28px;
-      max-height: 55vh;
+      padding: 22px 22px 26px;
+      max-height: 58vh;
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: var(--border) transparent;
@@ -269,11 +362,98 @@ import { InvitationService } from '../../../core/services/invitation.service';
 
     .section-label {
       display: block;
-      font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.1em; color: var(--text-muted);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
+    /* ── Progress block ── */
+    .progress-block {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 6px;
+    }
+    .progress-numbers {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .progress-count {
+      font-size: 1.6rem; font-weight: 800; color: var(--text-main); line-height: 1;
+    }
+    .progress-total { font-size: 1rem; font-weight: 500; color: var(--text-muted); }
+    .progress-pct { font-size: 0.9rem; font-weight: 700; color: var(--primary); }
+    .progress-track {
+      height: 8px; border-radius: 99px;
+      background: var(--border);
+      overflow: hidden; margin-bottom: 12px;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      animation: fillIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .progress-legend {
+      display: flex; align-items: center; gap: 14px;
+      font-size: 0.72rem; color: var(--text-muted);
+    }
+    .legend-dot {
+      display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    }
+    .legend-dot.done { background: #a855f7; box-shadow: 0 0 6px rgba(168,85,247,0.6); }
+    .legend-dot.in-progress { background: #0ea5e9; box-shadow: 0 0 6px rgba(14,165,233,0.6); }
+    .legend-dot.todo { background: var(--border); }
+
+    /* ── Stat grid ── */
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin-bottom: 6px;
+    }
+    .stat-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 14px;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+      transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s;
+      cursor: default;
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    .stat-icon-wrap {
+      width: 32px; height: 32px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      mat-icon { font-size: 17px; width: 17px; height: 17px; }
+    }
+    .todo-icon { background: rgba(255,189,46,0.12); mat-icon { color: #ffbd2e; } }
+    .inprogress-icon { background: rgba(14,165,233,0.12); mat-icon { color: #0ea5e9; animation: spin 2.4s linear infinite; } }
+    .done-icon { background: rgba(46,204,113,0.12); mat-icon { color: #2ecc71; } }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text-main); line-height: 1; }
+    .stat-label { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── Meta list ── */
+    .meta-list { display: flex; flex-direction: column; gap: 2px; }
+    .meta-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 10px;
+      transition: background 0.15s;
+    }
+    .meta-row:hover { background: var(--bg-panel); }
+    .meta-icon { font-size: 16px !important; width: 16px !important; height: 16px !important; color: var(--text-muted); flex-shrink: 0; }
+    .meta-key { font-size: 0.78rem; color: var(--text-muted); flex: 1; }
+    .meta-val { font-size: 0.78rem; font-weight: 600; color: var(--text-main); }
+
+    /* ── Tab section header ── */
     .tab-section-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 12px;
@@ -283,8 +463,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
     /* ── Invite row ── */
     .invite-row {
       display: flex; align-items: center; gap: 10px;
-      margin-bottom: 16px;
-      padding: 12px;
+      margin-bottom: 16px; padding: 12px;
       background: rgba(99,102,241,0.06);
       border: 1px solid rgba(99,102,241,0.2);
       border-radius: 12px;
@@ -303,7 +482,6 @@ import { InvitationService } from '../../../core/services/invitation.service';
 
     /* ── Members table ── */
     .members-table { width: 100%; background: transparent !important; }
-
     ::ng-deep .members-table th.mat-mdc-header-cell {
       background: transparent !important; color: var(--text-muted) !important;
       font-size: 0.62rem !important; font-weight: 700 !important; text-transform: uppercase !important;
@@ -343,7 +521,6 @@ import { InvitationService } from '../../../core/services/invitation.service';
     .role-ADMIN   { color: #a78bfa; background: rgba(167,139,250,0.12); }
     .role-EDITOR  { color: #059669; background: rgba(5,150,105,0.1); }
     .role-VIEWER  { color: var(--text-muted); background: var(--bg-panel); }
-
     .remove-btn { color: var(--text-muted) !important; &:hover { color: #ff4d4d !important; } }
 
     /* ── General form ── */
@@ -367,16 +544,18 @@ import { InvitationService } from '../../../core/services/invitation.service';
       box-shadow: 0 4px 14px rgba(99,102,241,0.3) !important;
     }
 
-    /* ── Danger zone ── */
+    /* ── Divider ── */
     .divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin: 28px 0 24px;
+      margin: 24px 0 20px;
     }
+
+    /* ── Danger zone ── */
     .danger-label { color: rgba(255,77,77,0.6) !important; }
     .danger-card {
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      padding: 18px 20px;
+      padding: 16px 18px;
       background: rgba(255,77,77,0.05);
       border: 1px solid rgba(255,77,77,0.2);
       border-radius: 14px;
@@ -403,6 +582,9 @@ export class ProjectSettingsComponent implements OnInit {
   isAdmin = this.data.project.currentUserRole === 'ADMIN';
   members: ProjectMember[] = [...(this.data.project.members ?? [])];
   cols = ['user', 'role', 'actions'];
+
+  taskStats = { todo: 4, inProgress: 3, done: 8, total: 15 };
+  get progressPercent(): number { return Math.round((this.taskStats.done / this.taskStats.total) * 100); }
 
   showInvite = false;
   inviteEmail = '';

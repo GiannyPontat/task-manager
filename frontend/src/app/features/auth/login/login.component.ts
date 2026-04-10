@@ -254,15 +254,25 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: grid;
       grid-template-columns: 420px 1fr;
       min-height: 100dvh;
-      background: #090f1a;
+      background: var(--bg-app);
       font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-      color: #e2e8f0;
+      color: var(--text-main);
       --accent: #3b82f6;
-      --border: rgba(255,255,255,0.08);
+      --border: rgba(0,0,0,0.1);
       --border-focus: rgba(59,130,246,0.5);
-      --glass: rgba(255,255,255,0.04);
-      --muted: rgba(226,232,240,0.6);
+      --glass: rgba(0,0,0,0.04);
+      --muted: rgba(15,23,42,0.45);
       --error: #f87171;
+    }
+
+    :host-context([data-theme="dark"]) {
+      --border: rgba(255,255,255,0.08);
+      --glass: rgba(255,255,255,0.04);
+      --muted: rgba(226,232,240,0.45);
+      --footer-copy-color: rgba(226,232,240,0.25);
+      --field-bg: rgba(255,255,255,0.05);
+      --toggle-hover-bg: rgba(255,255,255,0.08);
+      --placeholder-color: rgba(226,232,240,0.25);
     }
 
     /* ── Left panel ── */
@@ -400,7 +410,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .rp-footer-copy {
       font-size: 11.5px;
-      color: rgba(226,232,240,0.5);
+      color: var(--footer-copy-color, rgba(15,23,42,0.25));
     }
     .rp-footer-links {
       display: flex;
@@ -409,15 +419,15 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .rp-footer-a {
       font-size: 11.5px;
-      color: rgba(226,232,240,0.65);
+      color: var(--muted);
       text-decoration: none;
       transition: color 0.15s;
     }
-    .rp-footer-a:hover { color: rgba(226,232,240,0.9); }
+    .rp-footer-a:hover { color: var(--text-main); }
     .rp-footer-dot {
       width: 3px; height: 3px;
       border-radius: 50%;
-      background: rgba(226,232,240,0.2);
+      background: var(--border);
     }
 
     /* ── Form separator ── */
@@ -454,7 +464,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       font-size: 1.9rem;
       font-weight: 800;
       letter-spacing: -0.04em;
-      color: #f1f5f9;
+      color: var(--text-main);
       margin: 0 0 8px;
     }
     .form-sub {
@@ -472,7 +482,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .field-label {
       font-size: 12px;
       font-weight: 600;
-      color: rgba(226,232,240,0.75);
+      color: rgba(15,23,42,0.55);
       letter-spacing: 0.01em;
     }
     .field-label-row {
@@ -493,7 +503,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(255,255,255,0.04);
+      background: var(--field-bg, rgba(0,0,0,0.03));
       border: 1px solid var(--border);
       border-radius: 11px;
       padding: 0 14px;
@@ -520,10 +530,10 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       outline: none;
       font-family: 'Outfit', system-ui, sans-serif;
       font-size: 14px;
-      color: #e2e8f0;
+      color: var(--text-main);
       caret-color: var(--accent);
     }
-    .field-input::placeholder { color: rgba(226,232,240,0.4); }
+    .field-input::placeholder { color: var(--placeholder-color, rgba(15,23,42,0.25)); }
 
     .toggle-btn {
       background: none;
@@ -536,7 +546,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       border-radius: 5px;
       transition: color 0.15s, background 0.15s;
     }
-    .toggle-btn:hover { color: #e2e8f0; background: rgba(255,255,255,0.06); }
+    .toggle-btn:hover { color: var(--text-main); background: var(--toggle-hover-bg, rgba(0,0,0,0.06)); }
 
     .field-err-msg {
       font-size: 11.5px;
@@ -554,7 +564,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 12.5px;
-      color: rgba(226,232,240,0.6);
+      color: rgba(15,23,42,0.55);
       animation: fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .warmup-spinner {

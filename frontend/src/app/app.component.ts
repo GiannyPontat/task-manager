@@ -12,7 +12,6 @@ import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
-const NO_SIDEBAR_EXACT = ['/'];
 
 @Component({
   selector: 'app-root',
@@ -25,37 +24,43 @@ const NO_SIDEBAR_EXACT = ['/'];
     MatIconModule,
   ],
   template: `
-    <div class="app-bg">
+    <div [class]="isLanding ? 'app-bg app-bg--scroll' : 'app-bg'">
       <div class="blob blob-1" [style.opacity]="themeService.theme() === 'dark' ? 0.18 : 0.07"></div>
       <div class="blob blob-2" [style.opacity]="themeService.theme() === 'dark' ? 0.14 : 0.05"></div>
 
-      <mat-sidenav-container class="sidenav-container" autosize>
+      @if (isLanding) {
+        <main class="main-content--bare">
+          <router-outlet />
+        </main>
+      } @else {
+        <mat-sidenav-container class="sidenav-container" autosize>
 
-        @if (authService.currentUser() && !isAuthRoute) {
-          <mat-sidenav
-            #sidenav
-            class="app-sidenav"
-            [mode]="isMobile ? 'over' : 'side'"
-            [opened]="isMobile ? false : true"
-            [fixedInViewport]="true"
-            [fixedTopGap]="0"
-          >
-            <app-sidebar />
-          </mat-sidenav>
-        }
-
-        <mat-sidenav-content class="sidenav-content">
-          @if (authService.currentUser() && !isAuthRoute && isMobile) {
-            <button class="hamburger-fab" (click)="sidenav?.toggle()" aria-label="Menu">
-              <mat-icon>menu</mat-icon>
-            </button>
+          @if (authService.currentUser() && !isAuthRoute) {
+            <mat-sidenav
+              #sidenav
+              class="app-sidenav"
+              [mode]="isMobile ? 'over' : 'side'"
+              [opened]="isMobile ? false : true"
+              [fixedInViewport]="true"
+              [fixedTopGap]="0"
+            >
+              <app-sidebar />
+            </mat-sidenav>
           }
-          <main [class]="isAuthRoute ? 'main-content--bare' : 'main-content'">
-            <router-outlet />
-          </main>
-        </mat-sidenav-content>
 
-      </mat-sidenav-container>
+          <mat-sidenav-content class="sidenav-content">
+            @if (authService.currentUser() && !isAuthRoute && isMobile) {
+              <button class="hamburger-fab" (click)="sidenav?.toggle()" aria-label="Menu">
+                <mat-icon>menu</mat-icon>
+              </button>
+            }
+            <main [class]="isAuthRoute ? 'main-content--bare' : 'main-content'">
+              <router-outlet />
+            </main>
+          </mat-sidenav-content>
+
+        </mat-sidenav-container>
+      }
     </div>
   `,
   styles: [`
@@ -74,8 +79,15 @@ const NO_SIDEBAR_EXACT = ['/'];
       transition: background-color 0.3s ease;
     }
 
+    .app-bg--scroll {
+      position: fixed;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
     .blob {
-      position: absolute;
+      position: fixed;
       border-radius: 50%;
       pointer-events: none;
     }
@@ -128,9 +140,14 @@ const NO_SIDEBAR_EXACT = ['/'];
       overflow-y: auto;
     }
     .main-content--bare {
-      flex: 1;
       padding: 0;
-      background: #090f1a;
+    }
+
+    .main-content--landing {
+      position: fixed;
+      inset: 0;
+      overflow-y: auto;
+      padding: 0;
     }
 
     .hamburger-fab {
@@ -162,6 +179,7 @@ export class AppComponent implements OnInit, OnDestroy {
   @ViewChild('sidenav') sidenav?: MatSidenav;
   isMobile = false;
   isAuthRoute = false;
+  isLanding = false;
   private sub!: Subscription;
   private routeSub!: Subscription;
 
@@ -182,11 +200,13 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(e => {
         const url = e.urlAfterRedirects.split('#')[0] || '/';
-        this.isAuthRoute = AUTH_ROUTES.some(r => url.startsWith(r)) || NO_SIDEBAR_EXACT.includes(url);
+        this.isLanding = url === '/';
+        this.isAuthRoute = AUTH_ROUTES.some(r => url.startsWith(r));
         if (this.isMobile) this.sidenav?.close();
       });
     const initUrl = this.router.url.split('#')[0] || '/';
-    this.isAuthRoute = AUTH_ROUTES.some(r => initUrl.startsWith(r)) || NO_SIDEBAR_EXACT.includes(initUrl);
+    this.isLanding = initUrl === '/';
+    this.isAuthRoute = AUTH_ROUTES.some(r => initUrl.startsWith(r));
   }
 
   ngOnDestroy() {

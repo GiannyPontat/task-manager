@@ -102,26 +102,28 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
                 <span>À faire</span>
                 <span class="mc-badge">3</span>
               </div>
-              <div class="mock-task">Intégration CI/CD</div>
-              <div class="mock-task">Tests unitaires</div>
-              <div class="mock-task">Documentation</div>
+              <div class="mock-task">Tests E2E Cypress</div>
+              <div class="mock-task">Tests intégration backend</div>
+              <div class="mock-task">Documentation API</div>
             </div>
             <div class="mock-col">
               <div class="mock-col-hd">
                 <span>En cours</span>
                 <span class="mc-badge mc-blue">2</span>
               </div>
-              <div class="mock-task mock-active">Landing redesign</div>
-              <div class="mock-task">Refresh tokens</div>
+              <div class="mock-task mock-active">Tests unitaires frontend</div>
+              <div class="mock-task mock-active">Tests unitaires backend</div>
             </div>
             <div class="mock-col">
               <div class="mock-col-hd">
                 <span>Terminé</span>
-                <span class="mc-badge mc-green">5</span>
+                <span class="mc-badge mc-green">8</span>
               </div>
-              <div class="mock-task mock-done">Auth JWT</div>
-              <div class="mock-task mock-done">Docker setup</div>
-              <div class="mock-task mock-done">API endpoints</div>
+              <div class="mock-task mock-done">Auth JWT + Refresh tokens</div>
+              <div class="mock-task mock-done">API REST complète</div>
+              <div class="mock-task mock-done">Kanban drag-and-drop</div>
+              <div class="mock-task mock-done">Docker + CI/CD</div>
+              <div class="mock-task mock-done">Déploiement Vercel / Render</div>
             </div>
           </div>
         </div>
@@ -318,22 +320,40 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
   styles: [`
     /* ── Host & tokens ── */
     :host {
-      display: block;
       min-height: 100dvh;
-      background: #090f1a;
-      color: #e2e8f0;
+      background: var(--bg-app);
+      color: var(--text-main);
       font-family: 'Outfit', system-ui, -apple-system, sans-serif;
       position: relative;
       overflow-x: hidden;
       --accent: #3b82f6;
-      --accent-dim: rgba(59,130,246,0.12);
-      --accent-border: rgba(59,130,246,0.22);
+      --accent-dim: rgba(59,130,246,0.1);
+      --accent-border: rgba(59,130,246,0.2);
+      --glass: rgba(0,0,0,0.04);
+      --glass-hover: rgba(0,0,0,0.07);
+      --border: rgba(0,0,0,0.08);
+      --border-strong: rgba(0,0,0,0.12);
+      --muted: rgba(15,23,42,0.5);
+      --radius: 20px;
+    }
+
+    :host-context([data-theme="dark"]) {
       --glass: rgba(255,255,255,0.04);
       --glass-hover: rgba(255,255,255,0.07);
       --border: rgba(255,255,255,0.08);
       --border-strong: rgba(255,255,255,0.12);
-      --muted: rgba(226,232,240,0.6);
-      --radius: 20px;
+      --muted:      rgba(226,232,240,0.45);
+      --text-sub:   rgba(226,232,240,0.6);
+      --text-soft:  rgba(226,232,240,0.75);
+      --text-dim:   rgba(226,232,240,0.3);
+      --text-faint: rgba(226,232,240,0.2);
+    }
+
+    :host {
+      --text-sub:   rgba(15,23,42,0.6);
+      --text-soft:  rgba(15,23,42,0.75);
+      --text-dim:   rgba(15,23,42,0.3);
+      --text-faint: rgba(15,23,42,0.18);
     }
 
     /* ── Background blobs ── */
@@ -342,7 +362,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       inset: 0;
       pointer-events: none;
       z-index: 0;
-      overflow: clip;
+      overflow: hidden;
     }
     .blob {
       position: absolute;
@@ -350,14 +370,14 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .b1 {
       width: 640px; height: 640px;
-      top: -180px; left: -60px;
+      top: -180px; left: -120px;
       background: radial-gradient(ellipse, #4f46e5 0%, transparent 70%);
       opacity: 0.18;
       filter: blur(60px);
     }
     .b2 {
       width: 560px; height: 560px;
-      bottom: -120px; right: -40px;
+      bottom: -120px; right: -80px;
       background: radial-gradient(ellipse, #0ea5e9 0%, transparent 70%);
       opacity: 0.14;
       filter: blur(55px);
@@ -368,7 +388,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(9,15,26,0.75);
+      background: color-mix(in srgb, var(--bg-app) 80%, transparent);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-bottom: 1px solid var(--border);
@@ -403,7 +423,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       border-radius: 8px;
       transition: color 0.15s, background 0.15s;
     }
-    .nav-a:hover { color: #e2e8f0; background: var(--glass); }
+    .nav-a:hover { color: var(--text-main); background: var(--glass); }
     .btn-login {
       text-decoration: none;
       font-size: 13px;
@@ -461,7 +481,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       font-weight: 800;
       line-height: 1.08;
       letter-spacing: -0.04em;
-      color: #f1f5f9;
+      color: var(--text-main);
       margin: 0 0 20px;
     }
     .hero-em {
@@ -473,11 +493,11 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .hero-p {
       font-size: 15px;
       line-height: 1.72;
-      color: rgba(226,232,240,0.72);
+      color: var(--text-sub);
       max-width: 440px;
       margin: 0 0 32px;
     }
-    .hero-p strong { color: #e2e8f0; font-weight: 600; }
+    .hero-p strong { color: var(--text-main); font-weight: 600; }
 
     .hero-actions {
       display: flex;
@@ -528,7 +548,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       text-decoration: none;
       font-size: 14px;
       font-weight: 600;
-      color: rgba(226,232,240,0.7);
+      color: var(--text-soft);
       background: var(--glass);
       border: 1px solid var(--border);
       padding: 11px 20px;
@@ -536,7 +556,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       backdrop-filter: blur(8px);
       transition: background 0.15s, color 0.15s, transform 0.15s;
     }
-    .btn-ghost:hover { background: var(--glass-hover); color: #e2e8f0; transform: translateY(-2px); }
+    .btn-ghost:hover { background: var(--glass-hover); color: var(--text-main); transform: translateY(-2px); }
     .btn-ghost:active { transform: scale(0.97); }
 
     /* Pills */
@@ -566,7 +586,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
 
     .mock-window {
-      background: rgba(15,23,42,0.85);
+      background: color-mix(in srgb, var(--bg-app) 90%, transparent);
       backdrop-filter: blur(20px) saturate(160%);
       -webkit-backdrop-filter: blur(20px) saturate(160%);
       border: 1px solid var(--border-strong);
@@ -627,8 +647,8 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .mc-badge {
       font-size: 10px;
       font-weight: 600;
-      color: rgba(226,232,240,0.55);
-      background: rgba(255,255,255,0.06);
+      color: var(--text-dim);
+      background: var(--glass-hover);
       border-radius: 4px;
       padding: 1px 5px;
       font-family: 'JetBrains Mono', monospace;
@@ -638,16 +658,16 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
     .mock-task {
       font-size: 11px;
-      color: rgba(226,232,240,0.65);
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--muted);
+      background: var(--glass);
+      border: 1px solid var(--border);
       border-radius: 6px;
       padding: 6px 8px;
       line-height: 1.4;
       transition: border-color 0.2s;
     }
     .mock-active {
-      color: rgba(226,232,240,0.8);
+      color: var(--text-soft);
       background: rgba(59,130,246,0.07);
       border-color: rgba(59,130,246,0.3);
       animation: activePulse 2.5s ease-in-out infinite;
@@ -657,7 +677,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       50%       { border-color: rgba(59,130,246,0.65); }
     }
     .mock-done {
-      color: rgba(226,232,240,0.45);
+      color: var(--text-dim);
       background: transparent;
       border-color: transparent;
       text-decoration: line-through;
@@ -689,7 +709,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       font-weight: 700;
       line-height: 1.2;
       letter-spacing: -0.03em;
-      color: #f1f5f9;
+      color: var(--text-main);
       margin: 0;
     }
 
@@ -744,29 +764,29 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .bcard-h {
       font-size: 15px;
       font-weight: 700;
-      color: #f1f5f9;
+      color: var(--text-main);
       margin: 0 0 8px;
       letter-spacing: -0.02em;
     }
     .bcard-p {
       font-size: 13px;
       line-height: 1.65;
-      color: rgba(226,232,240,0.7);
+      color: var(--muted);
       margin: 0 0 18px;
     }
-    .bcard-p strong { color: rgba(226,232,240,0.9); }
+    .bcard-p strong { color: var(--text-soft); }
     .bcard-tag {
       font-size: 10px;
       font-weight: 600;
       letter-spacing: 0.07em;
       text-transform: uppercase;
-      color: rgba(226,232,240,0.45);
+      color: var(--text-dim);
       margin-top: auto;
     }
 
     /* ── Mock invite UI ── */
     .mock-invite {
-      background: rgba(9,15,26,0.5);
+      background: color-mix(in srgb, var(--bg-app) 60%, transparent);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 12px;
@@ -793,14 +813,14 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .mi-a { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.25); }
     .mi-b { background: rgba(236,72,153,0.15); color: #f9a8d4; border: 1px solid rgba(236,72,153,0.2); }
     .mi-info { flex: 1; min-width: 0; }
-    .mi-name  { display: block; font-size: 11px; font-weight: 600; color: rgba(226,232,240,0.75); line-height: 1.3; }
+    .mi-name  { display: block; font-size: 11px; font-weight: 600; color: var(--text-soft); line-height: 1.3; }
     .mi-email { display: block; font-size: 10px; color: var(--muted); }
     .mi-badge {
       font-size: 10px;
       font-weight: 600;
       padding: 2px 7px;
       border-radius: 5px;
-      background: rgba(255,255,255,0.06);
+      background: var(--glass-hover);
       color: var(--muted);
       white-space: nowrap;
     }
@@ -809,12 +829,12 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(255,255,255,0.04);
+      background: var(--glass);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 7px 10px;
     }
-    .mi-placeholder { font-size: 11px; color: rgba(226,232,240,0.2); }
+    .mi-placeholder { font-size: 11px; color: var(--text-faint); }
     .mi-send-btn {
       font-size: 11px;
       font-weight: 600;
@@ -834,7 +854,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       align-items: center;
       gap: 9px;
       font-size: 12px;
-      color: rgba(226,232,240,0.7);
+      color: var(--muted);
     }
     .sec-dot {
       width: 5px; height: 5px;
@@ -873,7 +893,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .mini-chart-days span {
       font-size: 10px;
-      color: rgba(226,232,240,0.45);
+      color: var(--text-faint);
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -913,17 +933,17 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .challenge-h {
       font-size: 1rem;
       font-weight: 700;
-      color: #f1f5f9;
+      color: var(--text-main);
       margin: 0 0 12px;
       letter-spacing: -0.02em;
     }
     .challenge-txt {
       font-size: 13.5px;
       line-height: 1.7;
-      color: rgba(226,232,240,0.7);
+      color: var(--muted);
       margin: 0 0 20px;
     }
-    .challenge-txt strong { color: rgba(226,232,240,0.9); }
+    .challenge-txt strong { color: var(--text-soft); }
 
     .diff-row {
       display: flex;
@@ -956,7 +976,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .code-red   { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.14); color: #fca5a5; }
     .code-green { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.14); color: #86efac; }
-    .diff-arr { color: rgba(226,232,240,0.4); flex-shrink: 0; }
+    .diff-arr { color: var(--text-faint); flex-shrink: 0; }
 
     /* ── Stack grid ── */
     .stack-grid {
@@ -980,7 +1000,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .stack-name { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+    .stack-name { font-size: 13px; font-weight: 600; color: var(--text-main); }
     .stack-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
     /* ── Footer ── */
@@ -1017,8 +1037,8 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       color: var(--muted);
       transition: color 0.15s;
     }
-    .footer-a:hover { color: #cbd5e1; }
-    .footer-copy { font-size: 11px; color: rgba(226,232,240,0.5); }
+    .footer-a:hover { color: var(--text-muted); }
+    .footer-copy { font-size: 11px; color: var(--text-faint); }
 
     /* ── Scroll reveal ── */
     [data-reveal] {
