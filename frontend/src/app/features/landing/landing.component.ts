@@ -332,7 +332,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       --glass-hover: rgba(255,255,255,0.07);
       --border: rgba(255,255,255,0.08);
       --border-strong: rgba(255,255,255,0.12);
-      --muted: rgba(226,232,240,0.45);
+      --muted: rgba(226,232,240,0.6);
       --radius: 20px;
     }
 
@@ -475,7 +475,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .hero-p {
       font-size: 15px;
       line-height: 1.72;
-      color: rgba(226,232,240,0.6);
+      color: rgba(226,232,240,0.72);
       max-width: 440px;
       margin: 0 0 32px;
     }
@@ -629,7 +629,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .mc-badge {
       font-size: 10px;
       font-weight: 600;
-      color: rgba(226,232,240,0.35);
+      color: rgba(226,232,240,0.55);
       background: rgba(255,255,255,0.06);
       border-radius: 4px;
       padding: 1px 5px;
@@ -640,7 +640,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
     .mock-task {
       font-size: 11px;
-      color: rgba(226,232,240,0.5);
+      color: rgba(226,232,240,0.65);
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 6px;
@@ -659,7 +659,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       50%       { border-color: rgba(59,130,246,0.65); }
     }
     .mock-done {
-      color: rgba(226,232,240,0.3);
+      color: rgba(226,232,240,0.45);
       background: transparent;
       border-color: transparent;
       text-decoration: line-through;
@@ -753,16 +753,16 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .bcard-p {
       font-size: 13px;
       line-height: 1.65;
-      color: rgba(226,232,240,0.55);
+      color: rgba(226,232,240,0.7);
       margin: 0 0 18px;
     }
-    .bcard-p strong { color: rgba(226,232,240,0.8); }
+    .bcard-p strong { color: rgba(226,232,240,0.9); }
     .bcard-tag {
       font-size: 10px;
       font-weight: 600;
       letter-spacing: 0.07em;
       text-transform: uppercase;
-      color: rgba(226,232,240,0.28);
+      color: rgba(226,232,240,0.45);
       margin-top: auto;
     }
 
@@ -836,7 +836,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       align-items: center;
       gap: 9px;
       font-size: 12px;
-      color: rgba(226,232,240,0.5);
+      color: rgba(226,232,240,0.7);
     }
     .sec-dot {
       width: 5px; height: 5px;
@@ -875,7 +875,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .mini-chart-days span {
       font-size: 10px;
-      color: rgba(226,232,240,0.25);
+      color: rgba(226,232,240,0.45);
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -922,10 +922,10 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .challenge-txt {
       font-size: 13.5px;
       line-height: 1.7;
-      color: rgba(226,232,240,0.55);
+      color: rgba(226,232,240,0.7);
       margin: 0 0 20px;
     }
-    .challenge-txt strong { color: rgba(226,232,240,0.8); }
+    .challenge-txt strong { color: rgba(226,232,240,0.9); }
 
     .diff-row {
       display: flex;
@@ -958,7 +958,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .code-red   { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.14); color: #fca5a5; }
     .code-green { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.14); color: #86efac; }
-    .diff-arr { color: rgba(226,232,240,0.2); flex-shrink: 0; }
+    .diff-arr { color: rgba(226,232,240,0.4); flex-shrink: 0; }
 
     /* ── Stack grid ── */
     .stack-grid {
@@ -1020,7 +1020,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       transition: color 0.15s;
     }
     .footer-a:hover { color: #cbd5e1; }
-    .footer-copy { font-size: 11px; color: rgba(226,232,240,0.2); }
+    .footer-copy { font-size: 11px; color: rgba(226,232,240,0.5); }
 
     /* ── Scroll reveal ── */
     [data-reveal] {
