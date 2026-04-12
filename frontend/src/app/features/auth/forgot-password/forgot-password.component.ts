@@ -135,7 +135,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       --accent: #3b82f6;
       --border: rgba(255,255,255,0.08);
       --border-focus: rgba(59,130,246,0.5);
-      --muted: rgba(226,232,240,0.45);
+      --muted: rgba(226,232,240,0.6);
       --error: #f87171;
     }
 
@@ -190,7 +190,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
     .card-form { display: flex; flex-direction: column; gap: 16px; }
     .field-group { display: flex; flex-direction: column; gap: 6px; }
-    .field-label { font-size: 12px; font-weight: 600; color: rgba(226,232,240,0.6); letter-spacing: 0.01em; }
+    .field-label { font-size: 12px; font-weight: 600; color: rgba(226,232,240,0.75); letter-spacing: 0.01em; }
 
     .field-wrap {
       display: flex; align-items: center; gap: 10px;
@@ -210,7 +210,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       font-family: 'Outfit', system-ui, sans-serif; font-size: 14px;
       color: #e2e8f0; caret-color: var(--accent);
     }
-    .field-input::placeholder { color: rgba(226,232,240,0.2); }
+    .field-input::placeholder { color: rgba(226,232,240,0.4); }
     .field-err-msg { font-size: 11.5px; color: var(--error); padding-left: 4px; }
 
     .submit-btn {
@@ -253,10 +253,10 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 40px; border-top: 1px solid var(--border);
     }
-    .footer-copy { font-size: 11.5px; color: rgba(226,232,240,0.25); }
+    .footer-copy { font-size: 11.5px; color: rgba(226,232,240,0.5); }
     .footer-links { display: flex; align-items: center; gap: 10px; }
-    .footer-a { font-size: 11.5px; color: rgba(226,232,240,0.3); text-decoration: none; transition: color 0.15s; }
-    .footer-a:hover { color: rgba(226,232,240,0.65); }
+    .footer-a { font-size: 11.5px; color: rgba(226,232,240,0.65); text-decoration: none; transition: color 0.15s; }
+    .footer-a:hover { color: rgba(226,232,240,0.9); }
     .footer-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(226,232,240,0.2); }
 
     @media (max-width: 640px) {

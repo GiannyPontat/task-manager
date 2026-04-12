@@ -261,7 +261,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       --border: rgba(255,255,255,0.08);
       --border-focus: rgba(59,130,246,0.5);
       --glass: rgba(255,255,255,0.04);
-      --muted: rgba(226,232,240,0.45);
+      --muted: rgba(226,232,240,0.6);
       --error: #f87171;
     }
 
@@ -400,7 +400,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .rp-footer-copy {
       font-size: 11.5px;
-      color: rgba(226,232,240,0.25);
+      color: rgba(226,232,240,0.5);
     }
     .rp-footer-links {
       display: flex;
@@ -409,11 +409,11 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .rp-footer-a {
       font-size: 11.5px;
-      color: rgba(226,232,240,0.3);
+      color: rgba(226,232,240,0.65);
       text-decoration: none;
       transition: color 0.15s;
     }
-    .rp-footer-a:hover { color: rgba(226,232,240,0.65); }
+    .rp-footer-a:hover { color: rgba(226,232,240,0.9); }
     .rp-footer-dot {
       width: 3px; height: 3px;
       border-radius: 50%;
@@ -472,7 +472,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .field-label {
       font-size: 12px;
       font-weight: 600;
-      color: rgba(226,232,240,0.6);
+      color: rgba(226,232,240,0.75);
       letter-spacing: 0.01em;
     }
     .field-label-row {
@@ -523,7 +523,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       color: #e2e8f0;
       caret-color: var(--accent);
     }
-    .field-input::placeholder { color: rgba(226,232,240,0.2); }
+    .field-input::placeholder { color: rgba(226,232,240,0.4); }
 
     .toggle-btn {
       background: none;
