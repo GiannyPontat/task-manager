@@ -273,6 +273,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       --field-bg: rgba(255,255,255,0.05);
       --toggle-hover-bg: rgba(255,255,255,0.08);
       --placeholder-color: rgba(226,232,240,0.25);
+      --error-banner-text: #fca5a5;
     }
 
     /* ── Left panel ── */
@@ -283,6 +284,10 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       flex-direction: column;
       position: relative;
       overflow: hidden;
+      /* Le panel a toujours un fond sombre — forcer les tokens texte en version claire */
+      --muted: rgba(226,232,240,0.55);
+      --glass: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.1);
     }
     .left-panel::before {
       content: '';
@@ -482,7 +487,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .field-label {
       font-size: 12px;
       font-weight: 600;
-      color: rgba(15,23,42,0.55);
+      color: var(--muted);
       letter-spacing: 0.01em;
     }
     .field-label-row {
@@ -564,7 +569,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 12.5px;
-      color: rgba(15,23,42,0.55);
+      color: var(--muted);
       animation: fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .warmup-spinner {
@@ -585,7 +590,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 12.5px;
-      color: #fca5a5;
+      color: var(--error-banner-text, #dc2626);
       animation: fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 

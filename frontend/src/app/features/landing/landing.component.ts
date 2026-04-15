@@ -974,8 +974,10 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       border-radius: 9px;
       line-height: 1.5;
     }
-    .code-red   { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.14); color: #fca5a5; }
-    .code-green { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.14); color: #86efac; }
+    .code-red   { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.14); color: #dc2626; }
+    .code-green { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.14); color: #16a34a; }
+    :host-context([data-theme="dark"]) .code-red   { color: #fca5a5; }
+    :host-context([data-theme="dark"]) .code-green { color: #86efac; }
     .diff-arr { color: var(--text-faint); flex-shrink: 0; }
 
     /* ── Stack grid ── */
