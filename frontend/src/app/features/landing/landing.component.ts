@@ -342,7 +342,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       inset: 0;
       pointer-events: none;
       z-index: 0;
-      overflow: hidden;
+      overflow: clip;
     }
     .blob {
       position: absolute;
@@ -350,14 +350,14 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .b1 {
       width: 640px; height: 640px;
-      top: -180px; left: -120px;
+      top: -180px; left: -60px;
       background: radial-gradient(ellipse, #4f46e5 0%, transparent 70%);
       opacity: 0.18;
       filter: blur(60px);
     }
     .b2 {
       width: 560px; height: 560px;
-      bottom: -120px; right: -80px;
+      bottom: -120px; right: -40px;
       background: radial-gradient(ellipse, #0ea5e9 0%, transparent 70%);
       opacity: 0.14;
       filter: blur(55px);
