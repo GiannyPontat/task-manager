@@ -132,14 +132,16 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       color: var(--text-main);
       position: relative;
       overflow: hidden;
-      --accent: #3b82f6;
+      --accent: #18181B;
       --border: rgba(0,0,0,0.1);
-      --border-focus: rgba(59,130,246,0.5);
+      --border-focus: rgba(24,24,27,0.25);
       --muted: rgba(15,23,42,0.45);
       --error: #f87171;
     }
 
     :host-context([data-theme="dark"]) {
+      --accent: #4048E7;
+      --border-focus: rgba(64,72,231,0.5);
       --border: rgba(255,255,255,0.08);
       --glass: rgba(255,255,255,0.04);
       --muted: rgba(226,232,240,0.45);
@@ -153,11 +155,17 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .blob { position: fixed; border-radius: 50%; pointer-events: none; }
     .blob-1 {
       width: 500px; height: 500px; top: -200px; left: -150px;
-      background: radial-gradient(ellipse, rgba(59,130,246,0.14) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(24,24,27,0.05) 0%, transparent 70%);
     }
     .blob-2 {
       width: 400px; height: 400px; bottom: -150px; right: -100px;
-      background: radial-gradient(ellipse, rgba(14,165,233,0.08) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(24,24,27,0.03) 0%, transparent 70%);
+    }
+    :host-context([data-theme="dark"]) .blob-1 {
+      background: radial-gradient(ellipse, rgba(64,72,231,0.18) 0%, transparent 70%);
+    }
+    :host-context([data-theme="dark"]) .blob-2 {
+      background: radial-gradient(ellipse, rgba(94,93,130,0.12) 0%, transparent 70%);
     }
 
     .page-center {
@@ -210,8 +218,8 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
     }
     .field-wrap.field-focus {
-      border-color: var(--border-focus); background: rgba(59,130,246,0.04);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+      border-color: var(--border-focus); background: var(--field-focus-bg);
+      box-shadow: 0 0 0 3px var(--field-focus-ring);
     }
     .field-wrap.field-error { border-color: rgba(248,113,113,0.5); background: rgba(248,113,113,0.04); }
 
@@ -227,25 +235,25 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .submit-btn {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; height: 48px; margin-top: 4px;
-      background: var(--accent); color: #fff; border: none; border-radius: 12px;
+      background: var(--accent); color: var(--btn-text); border: none; border-radius: 12px;
       font-family: 'Outfit', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
       position: relative; overflow: hidden;
       transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+      box-shadow: 0 4px 20px var(--accent-shadow);
     }
     .submit-btn::before {
       content: ''; position: absolute; inset: 0;
       background: rgba(255,255,255,0.08); transform: translateX(-100%);
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .submit-btn:hover:not(:disabled) { opacity: 0.93; transform: translateY(-2px); box-shadow: 0 6px 28px rgba(59,130,246,0.42); }
+    .submit-btn:hover:not(:disabled) { opacity: 0.93; transform: translateY(-2px); box-shadow: 0 6px 28px var(--accent-shadow-hover); }
     .submit-btn:hover:not(:disabled)::before { transform: translateX(0); }
     .submit-btn:active:not(:disabled) { transform: scale(0.98); }
     .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
     .btn-spinner {
       width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: var(--btn-text);
       border-radius: 50%; animation: spin 0.75s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }

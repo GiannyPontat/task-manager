@@ -257,15 +257,17 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       background: var(--bg-app);
       font-family: 'Outfit', system-ui, -apple-system, sans-serif;
       color: var(--text-main);
-      --accent: #3b82f6;
+      --accent: #18181B;
       --border: rgba(0,0,0,0.1);
-      --border-focus: rgba(59,130,246,0.5);
+      --border-focus: rgba(24,24,27,0.25);
       --glass: rgba(0,0,0,0.04);
       --muted: rgba(15,23,42,0.45);
       --error: #f87171;
     }
 
     :host-context([data-theme="dark"]) {
+      --accent: #4048E7;
+      --border-focus: rgba(64,72,231,0.5);
       --border: rgba(255,255,255,0.08);
       --glass: rgba(255,255,255,0.04);
       --muted: rgba(226,232,240,0.45);
@@ -273,16 +275,21 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       --field-bg: rgba(255,255,255,0.05);
       --toggle-hover-bg: rgba(255,255,255,0.08);
       --placeholder-color: rgba(226,232,240,0.25);
+      --error-banner-text: #fca5a5;
     }
 
     /* ── Left panel ── */
     .left-panel {
-      background: linear-gradient(160deg, rgba(59,130,246,0.08) 0%, rgba(9,15,26,0.95) 60%);
+      background: linear-gradient(160deg, rgba(24,24,27,0.02) 0%, rgba(9,15,26,0.98) 60%);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
+      /* Le panel a toujours un fond sombre — forcer les tokens texte en version claire */
+      --muted: rgba(226,232,240,0.55);
+      --glass: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.1);
     }
     .left-panel::before {
       content: '';
@@ -291,7 +298,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       left: -120px;
       width: 500px;
       height: 500px;
-      background: radial-gradient(ellipse, rgba(59,130,246,0.18) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(255,255,255,0.04) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
     }
@@ -302,7 +309,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       right: -80px;
       width: 360px;
       height: 360px;
-      background: radial-gradient(ellipse, rgba(14,165,233,0.1) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(255,255,255,0.02) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
     }
@@ -353,9 +360,9 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .feature-check {
       width: 22px; height: 22px;
       border-radius: 7px;
-      background: rgba(59,130,246,0.12);
-      border: 1px solid rgba(59,130,246,0.22);
-      color: #60a5fa;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(226,232,240,0.7);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -482,7 +489,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .field-label {
       font-size: 12px;
       font-weight: 600;
-      color: rgba(15,23,42,0.55);
+      color: var(--muted);
       letter-spacing: 0.01em;
     }
     .field-label-row {
@@ -513,8 +520,8 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
     .field-wrap.field-focus {
       border-color: var(--border-focus);
-      background: rgba(59,130,246,0.04);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+      background: var(--field-focus-bg);
+      box-shadow: 0 0 0 3px var(--field-focus-ring);
     }
     .field-wrap.field-error {
       border-color: rgba(248,113,113,0.5);
@@ -559,17 +566,17 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(59,130,246,0.07);
-      border: 1px solid rgba(59,130,246,0.15);
+      background: var(--field-focus-bg);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 12.5px;
-      color: rgba(15,23,42,0.55);
+      color: var(--muted);
       animation: fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .warmup-spinner {
       width: 14px; height: 14px;
-      border: 2px solid rgba(59,130,246,0.25);
+      border: 2px solid var(--field-focus-ring);
       border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.75s linear infinite;
@@ -585,7 +592,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 12.5px;
-      color: #fca5a5;
+      color: var(--error-banner-text, #dc2626);
       animation: fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -604,7 +611,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       height: 48px;
       margin-top: 4px;
       background: var(--accent);
-      color: #fff;
+      color: var(--btn-text);
       border: none;
       border-radius: 12px;
       font-family: 'Outfit', system-ui, sans-serif;
@@ -614,7 +621,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       position: relative;
       overflow: hidden;
       transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+      box-shadow: 0 4px 20px var(--accent-shadow);
     }
     .submit-btn::before {
       content: '';
@@ -627,7 +634,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .submit-btn:hover:not(:disabled) {
       opacity: 0.93;
       transform: translateY(-2px);
-      box-shadow: 0 6px 28px rgba(59,130,246,0.42);
+      box-shadow: 0 6px 28px var(--accent-shadow-hover);
     }
     .submit-btn:hover:not(:disabled)::before { transform: translateX(0); }
     .submit-btn:active:not(:disabled) { transform: scale(0.98); }
@@ -636,7 +643,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .btn-spinner {
       width: 16px; height: 16px;
       border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
+      border-top-color: var(--btn-text);
       border-radius: 50%;
       animation: spin 0.75s linear infinite;
     }

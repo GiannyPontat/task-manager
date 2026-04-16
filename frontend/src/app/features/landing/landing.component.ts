@@ -326,9 +326,9 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       font-family: 'Outfit', system-ui, -apple-system, sans-serif;
       position: relative;
       overflow-x: hidden;
-      --accent: #3b82f6;
-      --accent-dim: rgba(59,130,246,0.1);
-      --accent-border: rgba(59,130,246,0.2);
+      --accent: #18181B;
+      --accent-dim: rgba(24,24,27,0.06);
+      --accent-border: rgba(24,24,27,0.12);
       --glass: rgba(0,0,0,0.04);
       --glass-hover: rgba(0,0,0,0.07);
       --border: rgba(0,0,0,0.08);
@@ -338,6 +338,9 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     }
 
     :host-context([data-theme="dark"]) {
+      --accent: #4048E7;
+      --accent-dim: rgba(64,72,231,0.12);
+      --accent-border: rgba(64,72,231,0.25);
       --glass: rgba(255,255,255,0.04);
       --glass-hover: rgba(255,255,255,0.07);
       --border: rgba(255,255,255,0.08);
@@ -371,16 +374,24 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .b1 {
       width: 640px; height: 640px;
       top: -180px; left: -120px;
-      background: radial-gradient(ellipse, #4f46e5 0%, transparent 70%);
-      opacity: 0.18;
+      background: radial-gradient(ellipse, rgba(24,24,27,0.05) 0%, transparent 70%);
+      opacity: 1;
       filter: blur(60px);
     }
     .b2 {
       width: 560px; height: 560px;
       bottom: -120px; right: -80px;
-      background: radial-gradient(ellipse, #0ea5e9 0%, transparent 70%);
-      opacity: 0.14;
+      background: radial-gradient(ellipse, rgba(24,24,27,0.03) 0%, transparent 70%);
+      opacity: 1;
       filter: blur(55px);
+    }
+    :host-context([data-theme="dark"]) .b1 {
+      background: radial-gradient(ellipse, rgba(64,72,231,0.22) 0%, transparent 70%);
+      opacity: 1;
+    }
+    :host-context([data-theme="dark"]) .b2 {
+      background: radial-gradient(ellipse, rgba(94,93,130,0.14) 0%, transparent 70%);
+      opacity: 1;
     }
 
     /* ── Navbar ── */
@@ -428,12 +439,12 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       text-decoration: none;
       font-size: 13px;
       font-weight: 600;
-      color: #fff;
+      color: var(--btn-text);
       background: var(--accent);
       padding: 7px 16px;
       border-radius: 9px;
       transition: opacity 0.15s, transform 0.15s;
-      box-shadow: 0 2px 14px rgba(59,130,246,0.28);
+      box-shadow: 0 2px 14px var(--accent-shadow);
     }
     .btn-login:hover  { opacity: 0.88; transform: translateY(-1px); }
     .btn-login:active { transform: scale(0.97); }
@@ -472,8 +483,8 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       animation: eyePulse 2.4s ease-in-out infinite;
     }
     @keyframes eyePulse {
-      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
-      50%       { opacity: 0.7; transform: scale(0.9); box-shadow: 0 0 0 4px rgba(59,130,246,0); }
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(24,24,27,0.3); }
+      50%       { opacity: 0.7; transform: scale(0.9); box-shadow: 0 0 0 4px rgba(24,24,27,0); }
     }
 
     .hero-h1 {
@@ -515,14 +526,14 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       text-decoration: none;
       font-size: 14px;
       font-weight: 600;
-      color: #fff;
+      color: var(--btn-text);
       background: var(--accent);
       padding: 11px 22px;
       border-radius: 11px;
       position: relative;
       overflow: hidden;
       transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px rgba(59,130,246,0.35);
+      box-shadow: 0 4px 20px var(--accent-shadow);
     }
     .btn-primary::before {
       content: '';
@@ -532,7 +543,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       transform: translateX(-100%);
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .btn-primary:hover { opacity: 0.93; transform: translateY(-2px); box-shadow: 0 6px 28px rgba(59,130,246,0.45); }
+    .btn-primary:hover { opacity: 0.93; transform: translateY(-2px); box-shadow: 0 6px 28px var(--accent-shadow-hover); }
     .btn-primary:hover::before { transform: translateX(0); }
     .btn-primary:active { transform: scale(0.97) translateY(0); }
     .btn-arr {
@@ -974,8 +985,10 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       border-radius: 9px;
       line-height: 1.5;
     }
-    .code-red   { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.14); color: #fca5a5; }
-    .code-green { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.14); color: #86efac; }
+    .code-red   { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.14); color: #dc2626; }
+    .code-green { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.14); color: #16a34a; }
+    :host-context([data-theme="dark"]) .code-red   { color: #fca5a5; }
+    :host-context([data-theme="dark"]) .code-green { color: #86efac; }
     .diff-arr { color: var(--text-faint); flex-shrink: 0; }
 
     /* ── Stack grid ── */
