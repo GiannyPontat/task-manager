@@ -289,19 +289,19 @@ const PRIORITY_COLORS: Record<Priority, string> = {
       padding: 0 18px;
       border: none;
       border-radius: 10px;
-      background: linear-gradient(135deg, #6366f1, #3b82f6);
-      color: #fff;
+      background: var(--primary);
+      color: var(--btn-text);
       font-size: 0.85rem;
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+      box-shadow: 0 4px 14px var(--accent-shadow);
       transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
       mat-icon { font-size: 18px; width: 18px; height: 18px; }
       &:hover {
         opacity: 0.9;
         transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        box-shadow: 0 6px 20px var(--accent-shadow-hover);
       }
       &:active { transform: scale(0.97); }
     }

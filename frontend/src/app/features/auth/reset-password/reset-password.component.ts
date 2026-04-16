@@ -192,9 +192,13 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
       color: #e2e8f0;
       position: relative;
       overflow: hidden;
-      --accent: #3b82f6;
+      --accent: #4048E7;
+      --accent-shadow: rgba(64,72,231,0.3);
+      --accent-shadow-hover: rgba(64,72,231,0.48);
+      --field-focus-bg: rgba(64,72,231,0.07);
+      --field-focus-ring: rgba(64,72,231,0.14);
       --border: rgba(255,255,255,0.08);
-      --border-focus: rgba(59,130,246,0.5);
+      --border-focus: rgba(64,72,231,0.5);
       --muted: rgba(226,232,240,0.45);
       --error: #f87171;
     }
@@ -202,11 +206,11 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
     .blob { position: fixed; border-radius: 50%; pointer-events: none; }
     .blob-1 {
       width: 500px; height: 500px; top: -200px; left: -150px;
-      background: radial-gradient(ellipse, rgba(59,130,246,0.14) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(64,72,231,0.2) 0%, transparent 70%);
     }
     .blob-2 {
       width: 400px; height: 400px; bottom: -150px; right: -100px;
-      background: radial-gradient(ellipse, rgba(14,165,233,0.08) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(94,93,130,0.12) 0%, transparent 70%);
     }
 
     .page-center {
@@ -248,12 +252,12 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
     .action-btn {
       display: inline-flex; align-items: center; gap: 8px;
       margin-top: 4px; padding: 11px 20px;
-      background: var(--accent); color: #fff;
+      background: var(--accent); color: var(--btn-text);
       border-radius: 11px; text-decoration: none;
       font-size: 13.5px; font-weight: 600;
       transition: opacity 0.15s, transform 0.15s;
       align-self: flex-start;
-      box-shadow: 0 4px 16px rgba(59,130,246,0.25);
+      box-shadow: 0 4px 16px var(--accent-shadow);
     }
     .action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
@@ -268,8 +272,8 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
       transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
     }
     .field-wrap.field-focus {
-      border-color: var(--border-focus); background: rgba(59,130,246,0.04);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+      border-color: var(--border-focus); background: var(--field-focus-bg);
+      box-shadow: 0 0 0 3px var(--field-focus-ring);
     }
     .field-wrap.field-error { border-color: rgba(248,113,113,0.5); background: rgba(248,113,113,0.04); }
 
@@ -301,25 +305,25 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
     .submit-btn {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; height: 48px; margin-top: 4px;
-      background: var(--accent); color: #fff; border: none; border-radius: 12px;
+      background: var(--accent); color: var(--btn-text); border: none; border-radius: 12px;
       font-family: 'Outfit', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
       position: relative; overflow: hidden;
       transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+      box-shadow: 0 4px 20px var(--accent-shadow);
     }
     .submit-btn::before {
       content: ''; position: absolute; inset: 0;
       background: rgba(255,255,255,0.08); transform: translateX(-100%);
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .submit-btn:hover:not(:disabled) { opacity: 0.93; transform: translateY(-2px); box-shadow: 0 6px 28px rgba(59,130,246,0.42); }
+    .submit-btn:hover:not(:disabled) { opacity: 0.93; transform: translateY(-2px); box-shadow: 0 6px 28px var(--accent-shadow-hover); }
     .submit-btn:hover:not(:disabled)::before { transform: translateX(0); }
     .submit-btn:active:not(:disabled) { transform: scale(0.98); }
     .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
     .btn-spinner {
       width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: var(--btn-text);
       border-radius: 50%; animation: spin 0.75s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
