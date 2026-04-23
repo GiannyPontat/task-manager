@@ -328,7 +328,7 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
 
     .header-icon {
       width: 34px; height: 34px; flex-shrink: 0;
-      background: linear-gradient(135deg, #6366f1, #3b82f6);
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%);
       border-radius: 9px;
       display: flex; align-items: center; justify-content: center;
       mat-icon { font-size: 17px; width: 17px; height: 17px; color: #fff; }
@@ -342,7 +342,7 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
       font-size: 1.05rem;
       font-weight: 600;
       color: var(--text-main);
-      caret-color: #6366f1;
+      caret-color: #ff7335;
       &::placeholder { color: var(--text-muted); }
     }
 
@@ -457,7 +457,7 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
       outline: none;
       transition: border-color 0.18s;
       &::placeholder { color: var(--text-muted); }
-      &:focus { border-color: rgba(99,102,241,0.6); }
+      &:focus { border-color: rgba(255,115,53,0.6); }
     }
 
     /* Progress bar */
@@ -470,7 +470,7 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
 
     .progress-fill {
       height: 100%;
-      background: #6366f1;
+      background: #ff7335;
       border-radius: 10px;
       transition: width 0.3s ease, background 0.3s;
     }
@@ -525,20 +525,20 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
       font-family: inherit;
       outline: none;
       &::placeholder { color: var(--text-muted); }
-      &:focus { border-color: rgba(99,102,241,0.5); }
+      &:focus { border-color: rgba(255,115,53,0.5); }
     }
 
     .add-item-btn {
-      background: rgba(99,102,241,0.2);
-      border: 1px solid rgba(99,102,241,0.35);
+      background: rgba(255,115,53,0.2);
+      border: 1px solid rgba(255,115,53,0.35);
       border-radius: 8px;
       padding: 6px 14px;
-      color: #818cf8;
+      color: #ff7335;
       font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.15s;
-      &:hover { background: rgba(99,102,241,0.35); }
+      &:hover { background: rgba(255,115,53,0.35); }
     }
 
     /* Activity */
@@ -566,15 +566,15 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
 
     .send-btn {
       width: 30px; height: 30px; flex-shrink: 0;
-      background: rgba(99,102,241,0.15);
-      border: 1px solid rgba(99,102,241,0.3);
+      background: rgba(255,115,53,0.15);
+      border: 1px solid rgba(255,115,53,0.3);
       border-radius: 50%;
-      color: #818cf8;
+      color: #ff7335;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       transition: background 0.15s;
       mat-icon { font-size: 15px; width: 15px; height: 15px; }
-      &:hover:not(:disabled) { background: rgba(99,102,241,0.3); }
+      &:hover:not(:disabled) { background: rgba(255,115,53,0.3); }
       &:disabled { opacity: 0.35; cursor: default; }
     }
 
@@ -589,7 +589,7 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
       font-family: inherit;
       outline: none;
       &::placeholder { color: var(--text-muted); }
-      &:focus { border-color: rgba(99,102,241,0.4); }
+      &:focus { border-color: rgba(255,115,53,0.4); }
     }
 
     /* ════ AVATARS ════ */
@@ -608,7 +608,7 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
     }
 
     .avatar.sm { width: 26px; height: 26px; font-size: 0.65rem; border-radius: 50%; }
-    .avatar.accent-bg { background: linear-gradient(135deg, #6366f1, #3b82f6); font-size: 0.55rem; }
+    .avatar.accent-bg { background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%); font-size: 0.55rem; }
 
     /* ════ RIGHT SIDEBAR ════ */
     .sidebar-col {
@@ -720,20 +720,20 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
       font-family: inherit;
       outline: none;
       &::placeholder { color: var(--text-muted); }
-      &:focus { border-color: rgba(99,102,241,0.5); }
+      &:focus { border-color: rgba(255,115,53,0.5); }
     }
 
     .invite-btn {
       width: 28px; height: 28px; flex-shrink: 0;
-      background: rgba(99,102,241,0.2);
+      background: rgba(255,115,53,0.2);
       border: none;
       border-radius: 6px;
-      color: #818cf8;
+      color: #ff7335;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       transition: background 0.15s;
       mat-icon { font-size: 14px; width: 14px; height: 14px; }
-      &:hover { background: rgba(99,102,241,0.4); }
+      &:hover { background: rgba(255,115,53,0.4); }
     }
 
     .invite-feedback {
@@ -793,18 +793,18 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
       outline: none;
       cursor: pointer;
       color-scheme: var(--color-scheme, light);
-      &:focus { border-color: rgba(99,102,241,0.5); }
+      &:focus { border-color: rgba(255,115,53,0.5); }
     }
 
     .quick-confirm {
-      background: rgba(99,102,241,0.25);
+      background: rgba(255,115,53,0.25);
       border: none;
       border-radius: 6px;
       width: 28px;
-      color: #818cf8;
+      color: #ff7335;
       font-size: 1rem;
       cursor: pointer;
-      &:hover { background: rgba(99,102,241,0.4); }
+      &:hover { background: rgba(255,115,53,0.4); }
     }
 
     /* ── Footer ── */
@@ -827,11 +827,11 @@ interface Member { name: string; initials: string; color: string; avatarUrl?: st
       height: 40px;
       padding: 0 22px !important;
       border-radius: 9px !important;
-      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%) !important;
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%) !important;
       color: #fff !important;
       font-weight: 600 !important;
       font-size: 0.875rem !important;
-      box-shadow: 0 4px 14px rgba(99,102,241,0.35) !important;
+      box-shadow: 0 4px 14px rgba(255,115,53,0.35) !important;
       mat-icon { font-size: 16px; width: 16px; height: 16px; margin-right: 4px; }
     }
 
@@ -881,7 +881,7 @@ export class TaskFormComponent implements OnInit {
   members = signal<Member[]>([]);
 
   private readonly AVATAR_COLORS = [
-    '#6366f1', '#0ea5e9', '#a855f7', '#f59e0b',
+    '#ff7335', '#0ea5e9', '#ffb088', '#f59e0b',
     '#10b981', '#ef4444', '#ec4899', '#14b8a6',
   ];
 

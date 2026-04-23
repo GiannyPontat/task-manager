@@ -16,6 +16,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     ReactiveFormsModule,
     MatSnackBarModule,
   ],
+  host: { 'data-theme': 'light' },
   animations: [
     trigger('panelEnter', [
       transition(':enter', [
@@ -48,11 +49,17 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
           </a>
 
           <div class="left-body">
-            <h1 class="left-h1">Vos projets,<br>sous contrôle.</h1>
+            <h1 class="left-h1">Vos projets,<br><span class="left-h1-accent">sous contrôle.</span></h1>
             <p class="left-sub">
               Un kanban full-stack conçu pour montrer ce qu'Angular 17
               et Spring Boot peuvent faire ensemble.
             </p>
+
+            <div class="stack-pills">
+              <span class="s-pill">Angular 17</span>
+              <span class="s-pill">Spring Boot</span>
+              <span class="s-pill">PostgreSQL</span>
+            </div>
 
             <ul class="feature-list">
               <li class="feature-item">
@@ -90,14 +97,6 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
             </ul>
           </div>
 
-          <div class="left-footer">
-            <div class="stack-pills">
-              <span class="s-pill">Angular 17</span>
-              <span class="s-pill">Spring Boot</span>
-              <span class="s-pill">PostgreSQL</span>
-            </div>
-          </div>
-
         </div>
       </aside>
 
@@ -109,7 +108,10 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
           <div class="f-item form-header">
             <div class="form-eyebrow">
-              <span class="status-dot"></span>
+              <span class="status-ping">
+                <span class="status-ping-anim"></span>
+                <span class="status-ping-core"></span>
+              </span>
               Serveur actif
             </div>
             <h2 class="form-title">Bon retour.</h2>
@@ -252,66 +254,43 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     /* ── Page layout ── */
     .page {
       display: grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: minmax(420px, 1fr) 3fr;
       min-height: 100dvh;
-      background: var(--bg-app);
-      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-      color: var(--text-main);
-      --accent: #18181B;
-      --border: rgba(0,0,0,0.1);
-      --border-focus: rgba(24,24,27,0.25);
-      --glass: rgba(0,0,0,0.04);
-      --muted: rgba(15,23,42,0.45);
-      --error: #f87171;
+      background: #FDFCFC;
+      font-family: 'Inter', 'Outfit', system-ui, -apple-system, sans-serif;
+      color: #2F3035;
     }
 
-    :host-context([data-theme="dark"]) {
-      --accent: #4048E7;
-      --border-focus: rgba(64,72,231,0.5);
-      --border: rgba(255,255,255,0.08);
-      --glass: rgba(255,255,255,0.04);
-      --muted: rgba(226,232,240,0.45);
-      --footer-copy-color: rgba(226,232,240,0.25);
-      --field-bg: rgba(255,255,255,0.05);
-      --toggle-hover-bg: rgba(255,255,255,0.08);
-      --placeholder-color: rgba(226,232,240,0.25);
-      --error-banner-text: #fca5a5;
-    }
-
-    /* ── Left panel ── */
+    /* ─────────────────────────────────────────────────────────────
+       LEFT PANEL — Argumentaire (dark gradient)
+       ───────────────────────────────────────────────────────────── */
     .left-panel {
-      background: linear-gradient(160deg, rgba(24,24,27,0.02) 0%, rgba(9,15,26,0.98) 60%);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
       position: relative;
       overflow: hidden;
-      /* Le panel a toujours un fond sombre — forcer les tokens texte en version claire */
-      --muted: rgba(226,232,240,0.55);
-      --glass: rgba(255,255,255,0.06);
-      --border: rgba(255,255,255,0.1);
+      background: linear-gradient(155deg, #0F172A 0%, #1A2236 55%, #1E293B 100%);
+      display: flex;
+      flex-direction: column;
     }
+    /* Decorative orange glow blob */
     .left-panel::before {
       content: '';
       position: absolute;
-      top: -160px;
-      left: -120px;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(ellipse, rgba(255,255,255,0.04) 0%, transparent 70%);
+      top: -180px; left: -140px;
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(248,121,65,0.18) 0%, transparent 65%);
       border-radius: 50%;
       pointer-events: none;
+      filter: blur(20px);
     }
     .left-panel::after {
       content: '';
       position: absolute;
-      bottom: -100px;
-      right: -80px;
-      width: 360px;
-      height: 360px;
-      background: radial-gradient(ellipse, rgba(255,255,255,0.02) 0%, transparent 70%);
+      bottom: -160px; right: -120px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
+      filter: blur(20px);
     }
 
     .left-inner {
@@ -320,70 +299,116 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: flex;
       flex-direction: column;
       height: 100%;
-      padding: 36px 40px;
+      padding: 44px 56px;
     }
 
+    /* Brand */
     .brand { text-decoration: none; display: inline-block; margin-bottom: auto; }
     .brand-logo {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: -0.02em;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #F87941 0%, #F9B095 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
-    .left-body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 48px 0 32px; }
+    .left-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 56px 0 40px;
+      max-width: 460px;
+    }
 
     .left-h1 {
-      font-size: clamp(1.9rem, 2.5vw, 2.4rem);
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
       font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.04em;
-      color: #f1f5f9;
-      margin: 0 0 16px;
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+      color: #F8FAFC;
+      margin: 0 0 22px;
     }
-    .left-sub {
-      font-size: 13.5px;
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 300px;
-      margin: 0 0 36px;
+    .left-h1-accent {
+      background: linear-gradient(135deg, #F87941 0%, #F9B095 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
     }
 
-    .feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 13px; }
+    .left-sub {
+      font-size: 15px;
+      line-height: 1.65;
+      color: #CBD5E1;
+      max-width: 380px;
+      margin: 0 0 28px;
+      font-weight: 400;
+    }
+
+    /* Stack pills (glassmorphism, just under sub) */
+    .stack-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .s-pill {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: #E2E8F0;
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.14);
+      padding: 6px 14px;
+      border-radius: 999px;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .s-pill:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(248,121,65,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Feature list (orange accent checks) */
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
     .feature-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 13px;
-      color: rgba(226,232,240,0.65);
+      font-size: 13.5px;
+      color: rgba(226,232,240,0.78);
+      font-weight: 400;
     }
     .feature-check {
       width: 22px; height: 22px;
       border-radius: 7px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: rgba(226,232,240,0.7);
+      background: rgba(248,121,65,0.12);
+      border: 1px solid rgba(248,121,65,0.35);
+      color: #F87941;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(248,121,65,0.15);
     }
 
-    .left-footer { padding-top: 32px; border-top: 1px solid var(--border); }
-    .stack-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-    .s-pill {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: var(--muted);
-      background: var(--glass);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 999px;
-    }
-
-    /* ── Right panel ── */
+    /* ─────────────────────────────────────────────────────────────
+       RIGHT PANEL — Form (white SaaS premium)
+       ───────────────────────────────────────────────────────────── */
     .right-panel {
+      background: #FDFCFC;
       display: flex;
       flex-direction: column;
       align-items: stretch;
@@ -396,101 +421,86 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 48px 24px;
+      padding: 56px 32px;
     }
 
     .form-wrap {
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
+      background: #FFFFFF;
+      border-radius: 2.5rem;
+      padding: 48px 44px;
+      box-shadow: 0 30px 80px -20px rgba(15, 23, 42, 0.12),
+                  0 12px 40px -12px rgba(15, 23, 42, 0.06),
+                  0 0 0 1px rgba(15, 23, 42, 0.03);
       display: flex;
       flex-direction: column;
       gap: 28px;
     }
 
-    /* ── Footer ── */
-    .rp-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 40px;
-      border-top: 1px solid var(--border);
-    }
-    .rp-footer-copy {
-      font-size: 11.5px;
-      color: var(--footer-copy-color, rgba(15,23,42,0.25));
-    }
-    .rp-footer-links {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .rp-footer-a {
-      font-size: 11.5px;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-    .rp-footer-a:hover { color: var(--text-main); }
-    .rp-footer-dot {
-      width: 3px; height: 3px;
-      border-radius: 50%;
-      background: var(--border);
-    }
-
-    /* ── Form separator ── */
-    .form-sep {
-      height: 1px;
-      background: var(--border);
-    }
-
     .form-header { text-align: center; }
 
+    /* Server status — animate-ping pattern */
     .form-eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 9px;
       font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
+      color: #64748B;
+      margin-bottom: 18px;
     }
-    .status-dot {
-      width: 7px; height: 7px;
+    .status-ping {
+      position: relative;
+      display: inline-flex;
+      width: 9px; height: 9px;
+    }
+    .status-ping-anim {
+      position: absolute;
+      inset: 0;
       border-radius: 50%;
-      background: #4ade80;
-      animation: pulse-green 2.5s ease-in-out infinite;
+      background: #22C55E;
+      opacity: 0.75;
+      animation: pingAnim 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
-    @keyframes pulse-green {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
-      50%       { box-shadow: 0 0 0 4px rgba(74,222,128,0); }
+    .status-ping-core {
+      position: relative;
+      display: inline-flex;
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: #16A34A;
+    }
+    @keyframes pingAnim {
+      0%   { transform: scale(1);    opacity: 0.75; }
+      75%, 100% { transform: scale(2.4); opacity: 0; }
     }
 
     .form-title {
-      font-size: 1.9rem;
+      font-size: 2.1rem;
       font-weight: 800;
-      letter-spacing: -0.04em;
-      color: var(--text-main);
-      margin: 0 0 8px;
+      letter-spacing: -0.045em;
+      color: #0F172A;
+      margin: 0 0 10px;
+      line-height: 1.1;
     }
     .form-sub {
-      font-size: 13.5px;
-      color: var(--muted);
-      line-height: 1.5;
+      font-size: 14px;
+      color: #64748B;
+      line-height: 1.55;
       margin: 0;
     }
 
     /* ── Form body ── */
-    .form-body { display: flex; flex-direction: column; gap: 18px; }
-
-    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-body { display: flex; flex-direction: column; gap: 20px; }
+    .field-group { display: flex; flex-direction: column; gap: 8px; }
 
     .field-label {
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 600;
-      color: var(--muted);
-      letter-spacing: 0.01em;
+      color: #334155;
+      letter-spacing: 0.005em;
     }
     .field-label-row {
       display: flex;
@@ -498,67 +508,68 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       justify-content: space-between;
     }
     .forgot-link {
-      font-size: 12px;
-      color: var(--accent);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #F87941;
       text-decoration: none;
-      opacity: 0.8;
-      transition: opacity 0.15s;
+      transition: color 0.15s;
     }
-    .forgot-link:hover { opacity: 1; }
+    .forgot-link:hover { color: #EA580C; }
 
     .field-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
-      background: var(--field-bg, rgba(0,0,0,0.03));
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 0 14px;
-      height: 46px;
-      transition: border-color 0.2s, background 0.2s,
-                  box-shadow 0.2s;
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 0 16px;
+      height: 50px;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
     }
     .field-wrap.field-focus {
-      border-color: var(--border-focus);
-      background: var(--field-focus-bg);
-      box-shadow: 0 0 0 3px var(--field-focus-ring);
+      border-color: #F87941;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 4px rgba(248,121,65,0.12);
     }
     .field-wrap.field-error {
-      border-color: rgba(248,113,113,0.5);
+      border-color: #FCA5A5;
       background: rgba(248,113,113,0.04);
     }
 
-    .field-icon { color: var(--muted); flex-shrink: 0; }
+    .field-icon { color: #94A3B8; flex-shrink: 0; }
 
     .field-input {
       flex: 1;
       background: transparent;
       border: none;
       outline: none;
-      font-family: 'Outfit', system-ui, sans-serif;
-      font-size: 14px;
-      color: var(--text-main);
-      caret-color: var(--accent);
+      font-family: inherit;
+      font-size: 14.5px;
+      color: #0F172A;
+      caret-color: #F87941;
+      font-weight: 500;
     }
-    .field-input::placeholder { color: var(--placeholder-color, rgba(15,23,42,0.25)); }
+    .field-input::placeholder { color: #94A3B8; font-weight: 400; }
 
     .toggle-btn {
       background: none;
       border: none;
-      padding: 4px;
+      padding: 6px;
       cursor: pointer;
-      color: var(--muted);
+      color: #94A3B8;
       display: flex;
       align-items: center;
-      border-radius: 5px;
+      border-radius: 6px;
       transition: color 0.15s, background 0.15s;
     }
-    .toggle-btn:hover { color: var(--text-main); background: var(--toggle-hover-bg, rgba(0,0,0,0.06)); }
+    .toggle-btn:hover { color: #0F172A; background: rgba(15,23,42,0.05); }
 
     .field-err-msg {
-      font-size: 11.5px;
-      color: var(--error);
+      font-size: 12px;
+      color: #DC2626;
       padding-left: 4px;
+      font-weight: 500;
     }
 
     /* ── Banners ── */
@@ -566,18 +577,18 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: flex;
       align-items: center;
       gap: 10px;
-      background: var(--field-focus-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
+      background: rgba(248,121,65,0.06);
+      border: 1px solid rgba(248,121,65,0.18);
+      border-radius: 12px;
+      padding: 11px 14px;
       font-size: 12.5px;
-      color: var(--muted);
+      color: #B45309;
       animation: fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .warmup-spinner {
       width: 14px; height: 14px;
-      border: 2px solid var(--field-focus-ring);
-      border-top-color: var(--accent);
+      border: 2px solid rgba(248,121,65,0.2);
+      border-top-color: #F87941;
       border-radius: 50%;
       animation: spin 0.75s linear infinite;
       flex-shrink: 0;
@@ -588,11 +599,12 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       align-items: center;
       gap: 8px;
       background: rgba(248,113,113,0.07);
-      border: 1px solid rgba(248,113,113,0.2);
-      border-radius: 10px;
-      padding: 10px 14px;
+      border: 1px solid rgba(248,113,113,0.22);
+      border-radius: 12px;
+      padding: 11px 14px;
       font-size: 12.5px;
-      color: var(--error-banner-text, #dc2626);
+      color: #DC2626;
+      font-weight: 500;
       animation: fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -601,53 +613,51 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Submit button ── */
+    /* ── Submit button (black, hover scale) ── */
     .submit-btn {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       width: 100%;
-      height: 48px;
-      margin-top: 4px;
-      background: var(--accent);
-      color: var(--btn-text);
+      height: 52px;
+      margin-top: 6px;
+      background: #0F172A;
+      color: #FFFFFF;
       border: none;
-      border-radius: 12px;
-      font-family: 'Outfit', system-ui, sans-serif;
-      font-size: 14px;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 14.5px;
       font-weight: 600;
+      letter-spacing: 0.005em;
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px var(--accent-shadow);
-    }
-    .submit-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.08);
-      transform: translateX(-100%);
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background 0.2s ease-out, transform 0.2s ease-out, box-shadow 0.2s ease-out;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.18);
     }
     .submit-btn:hover:not(:disabled) {
-      opacity: 0.93;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 28px var(--accent-shadow-hover);
+      background: #1E293B;
+      transform: scale(1.02);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.28);
     }
-    .submit-btn:hover:not(:disabled)::before { transform: translateX(0); }
-    .submit-btn:active:not(:disabled) { transform: scale(0.98); }
-    .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .submit-btn:active:not(:disabled) { transform: scale(0.99); }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .btn-spinner {
       width: 16px; height: 16px;
       border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: var(--btn-text);
+      border-top-color: #FFFFFF;
       border-radius: 50%;
       animation: spin 0.75s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Form separator ── */
+    .form-sep {
+      height: 1px;
+      background: #E2E8F0;
+    }
 
     /* ── Register row ── */
     .register-row {
@@ -656,22 +666,49 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       justify-content: center;
       gap: 6px;
     }
-    .register-hint { font-size: 13px; color: var(--muted); }
+    .register-hint { font-size: 13.5px; color: #64748B; }
     .register-link {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--accent);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0F172A;
       text-decoration: none;
-      transition: opacity 0.15s;
+      transition: color 0.15s;
     }
-    .register-link:hover { opacity: 0.8; }
+    .register-link:hover { color: #F87941; }
+
+    /* ── Footer (très discret) ── */
+    .rp-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 44px;
+    }
+    .rp-footer-copy {
+      font-size: 11.5px;
+      color: #94A3B8;
+      font-weight: 500;
+    }
+    .rp-footer-links { display: flex; align-items: center; gap: 10px; }
+    .rp-footer-a {
+      font-size: 11.5px;
+      color: #94A3B8;
+      text-decoration: none;
+      transition: color 0.15s;
+      font-weight: 500;
+    }
+    .rp-footer-a:hover { color: #475569; }
+    .rp-footer-dot {
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: #CBD5E1;
+    }
 
     /* ── Responsive ── */
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
       .page { grid-template-columns: 1fr; }
       .left-panel { display: none; }
-      .rp-center { padding: 80px 20px 40px; align-items: flex-start; }
-      .form-wrap { max-width: 100%; }
+      .rp-center { padding: 60px 20px 40px; align-items: flex-start; }
+      .form-wrap { max-width: 100%; padding: 36px 28px; border-radius: 2rem; }
       .rp-footer { padding: 14px 20px; }
     }
   `],

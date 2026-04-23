@@ -131,7 +131,7 @@ interface CalendarView { key: string; label: string; }
 
     .page-icon {
       font-size: 28px; width: 28px; height: 28px;
-      color: #6366f1;
+      color: #ff7335;
     }
 
     .page-title {
@@ -240,9 +240,9 @@ interface CalendarView { key: string; label: string; }
     }
 
     .view-btn.active {
-      background: rgba(99, 102, 241, 0.2);
-      color: #818cf8;
-      border: 1px solid rgba(99, 102, 241, 0.35);
+      background: rgba(255,115,53, 0.2);
+      color: #ff7335;
+      border: 1px solid rgba(255,115,53, 0.35);
     }
 
     /* ── Loading ── */
@@ -293,9 +293,9 @@ interface CalendarView { key: string; label: string; }
       --fc-border-color: var(--border);
       --fc-page-bg-color: transparent;
       --fc-neutral-bg-color: var(--bg-panel);
-      --fc-today-bg-color: rgba(99, 102, 241, 0.1);
-      --fc-highlight-color: rgba(99, 102, 241, 0.15);
-      --fc-event-bg-color: #6366f1;
+      --fc-today-bg-color: rgba(255,115,53, 0.1);
+      --fc-highlight-color: rgba(255,115,53, 0.15);
+      --fc-event-bg-color: #ff7335;
       --fc-event-border-color: transparent;
       --fc-event-text-color: #fff;
       --fc-non-business-color: var(--bg-panel);
@@ -342,7 +342,7 @@ interface CalendarView { key: string; label: string; }
       }
 
       .fc-day-today {
-        background: rgba(99, 102, 241, 0.08) !important;
+        background: rgba(255,115,53, 0.08) !important;
       }
 
       /* Outside days */

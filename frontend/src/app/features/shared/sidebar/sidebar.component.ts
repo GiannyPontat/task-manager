@@ -32,8 +32,14 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
         <!-- ── Sidebar Header (workspace + user) ── -->
         <div class="sidebar-header">
           <div class="workspace-label">
-            <mat-icon class="workspace-icon">task_alt</mat-icon>
-            <span class="workspace-name">TaskBoard</span>
+            <span class="workspace-logo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M9 12l2 2 4-4"/>
+                <rect x="3" y="3" width="18" height="18" rx="4"/>
+              </svg>
+            </span>
+            <span class="workspace-name">Flowly</span>
+            <span class="workspace-badge">PRO</span>
           </div>
           <div class="profile-row">
             <div class="user-avatar">
@@ -42,6 +48,7 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
               } @else {
                 {{ userInitials() }}
               }
+              <span class="avatar-status"></span>
             </div>
             <div class="profile-info">
               <span class="profile-name">{{ authService.currentUser()?.username }}</span>
@@ -63,6 +70,7 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
                 [routerLink]="item.route"
                 routerLinkActive="active"
               >
+                <span class="nav-indicator"></span>
                 <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
                 <span class="nav-label">{{ item.label }}</span>
               </a>
@@ -94,6 +102,7 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
                 [class.active]="projectService.selected()?.id === project.id"
                 (click)="projectService.selectProject(project)"
               >
+                <span class="nav-indicator"></span>
                 <mat-icon class="nav-icon">folder</mat-icon>
                 <span class="nav-label project-name-label">
                   <span class="project-name-text">{{ project.name }}</span>
@@ -186,7 +195,7 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
                       [style.box-shadow]="'0 0 8px ' + f.color + '99'"></span>
                 <span class="filter-label">{{ f.label }}</span>
                 @if (priorityCount(f.label) > 0) {
-                  <span class="priority-count">({{ priorityCount(f.label) }})</span>
+                  <span class="priority-count">{{ priorityCount(f.label) }}</span>
                 }
               </button>
             }
@@ -224,76 +233,114 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       display: block;
       height: 100%;
       font-family: 'Inter', -apple-system, system-ui, sans-serif;
+
+      /* Palette Login (accent) */
+      --orange:        #F87941;
+      --orange-hover:  #EA580C;
+      --salmon:        #F9B095;
+      --orange-bg:     rgba(248,121,65,0.08);
+      --orange-bg-2:   rgba(248,121,65,0.14);
+      --orange-ring:   rgba(248,121,65,0.22);
+      --orange-glow:   rgba(248,121,65,0.32);
+      --gradient:      linear-gradient(135deg, #F87941 0%, #F9B095 100%);
     }
 
     .sidebar-wrap {
-      width: 240px;
+      width: 248px;
       height: 100vh;
       padding: 12px 10px;
       overflow: hidden;
     }
 
-    /* ── Glass panel ── */
+    /* ── Glass panel (SaaS premium) ── */
     .glass-panel {
       height: 100%;
       background: var(--bg-panel);
-      backdrop-filter: blur(18px) saturate(180%);
-      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
       border: 1px solid var(--border-panel);
-      border-right: 1px solid var(--border);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
+      border-radius: 22px;
+      box-shadow: 0 12px 36px -12px rgba(15,23,42,0.10),
+                  0 4px 12px -4px rgba(15,23,42,0.06),
+                  inset 0 1px 0 rgba(255,255,255,0.5);
       display: flex;
       flex-direction: column;
-      padding: 20px 12px;
+      padding: 18px 12px;
       position: relative;
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-width: none;
+    }
+    :host-context([data-theme="dark"]) .glass-panel {
+      box-shadow: 0 12px 36px -12px rgba(0,0,0,0.5),
+                  inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
     .glass-panel::-webkit-scrollbar { display: none; }
 
     /* ── Sidebar Header ── */
     .sidebar-header {
-      padding: 4px 6px 10px;
+      padding: 4px 8px 14px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 14px;
     }
 
     .workspace-label {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .workspace-icon {
-      font-size: 13px;
-      width: 13px;
-      height: 13px;
-      background: linear-gradient(135deg, #6366f1, #3b82f6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .workspace-logo {
+      width: 24px; height: 24px;
+      border-radius: 7px;
+      background: var(--gradient);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px var(--orange-glow);
+      flex-shrink: 0;
     }
 
     .workspace-name {
-      font-size: 0.62rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      background: linear-gradient(135deg, #6366f1, #3b82f6);
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: var(--gradient);
       -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
       background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+
+    .workspace-badge {
+      font-size: 0.55rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--orange-bg-2);
+      color: var(--orange);
+      border: 1px solid var(--orange-ring);
+      margin-left: auto;
     }
 
     /* ── Profile ── */
     .profile-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 11px;
+      padding: 9px 9px;
+      background: var(--bg-panel-hover);
+      border: 1px solid var(--border-panel);
+      border-radius: 12px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .profile-row:hover {
+      border-color: var(--orange-ring);
+      box-shadow: 0 0 0 3px var(--orange-bg);
     }
 
     .avatar-img {
@@ -304,27 +351,41 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     }
 
     .user-avatar {
+      position: relative;
       width: 34px; height: 34px; min-width: 34px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: linear-gradient(135deg, #6366f1, #3b82f6);
+      border-radius: 11px;
+      overflow: visible;
+      background: var(--gradient);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
+      font-size: 0.78rem;
+      font-weight: 800;
       color: #fff;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.02em;
       flex-shrink: 0;
+      box-shadow: 0 4px 12px var(--orange-glow);
+    }
+    .user-avatar .avatar-img {
+      border-radius: 11px;
+    }
+    .avatar-status {
+      position: absolute;
+      bottom: -2px; right: -2px;
+      width: 11px; height: 11px;
+      border-radius: 50%;
+      background: #22C55E;
+      border: 2px solid var(--bg-panel);
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.3);
     }
 
-    .profile-info { display: flex; flex-direction: column; overflow: hidden; }
-    .profile-name { font-size: 0.8rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .profile-sub  { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-info { display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+    .profile-name { font-size: 0.82rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.01em; }
+    .profile-sub  { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
 
     /* ── Divider ── */
     .divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin: 8px 0;
+      margin: 6px 0;
       flex-shrink: 0;
     }
 
@@ -332,42 +393,66 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     .section { padding: 4px 0; }
 
     .section-label {
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-weight: 700;
+      letter-spacing: 0.12em;
+      font-weight: 800;
       color: var(--text-muted);
-      margin: 4px 0 8px 8px;
+      margin: 6px 0 8px 10px;
     }
 
     /* ── Nav ── */
-    .nav-list { display: flex; flex-direction: column; gap: 3px; }
+    .nav-list { display: flex; flex-direction: column; gap: 2px; }
 
     .nav-item {
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 10px;
+      gap: 11px;
+      padding: 9px 12px;
       border-radius: 10px;
       text-decoration: none;
       color: var(--text-secondary);
-      font-size: 0.82rem;
+      font-size: 0.83rem;
       font-weight: 500;
       border: 1px solid transparent;
-      transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.1s;
+      transition: background 0.2s, color 0.2s, transform 0.18s;
       cursor: pointer;
-      &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
+      overflow: hidden;
+      &:hover {
+        background: var(--bg-panel-hover);
+        color: var(--text-main);
+        transform: translateX(2px);
+      }
+      &:hover .nav-icon { color: var(--orange); }
       &:active { transform: scale(0.98); }
     }
 
-    .nav-item.active {
-      background: rgba(99,102,241,0.1);
-      border-color: rgba(99,102,241,0.2);
-      color: var(--primary);
+    /* Indicateur de gauche (barre orange) */
+    .nav-indicator {
+      position: absolute;
+      left: 0; top: 50%;
+      width: 3px; height: 0;
+      background: var(--gradient);
+      border-radius: 0 3px 3px 0;
+      transform: translateY(-50%);
+      transition: height 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 8px var(--orange-glow);
     }
 
-    .nav-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
-    .nav-label { white-space: nowrap; }
+    .nav-item.active {
+      background: var(--orange-bg);
+      font-weight: 600;
+    }
+    .nav-item.active .nav-indicator { height: 60%; }
+    .nav-item.active .nav-icon { color: var(--orange); }
+
+    .nav-icon {
+      font-size: 18px; width: 18px; height: 18px;
+      flex-shrink: 0;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .nav-label { white-space: nowrap; letter-spacing: -0.01em; }
 
     /* ── Défilement du nom de projet ── */
     .project-name-label {
@@ -410,23 +495,25 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       margin-bottom: 6px;
     }
 
-    .section-header-row .section-label { margin: 4px 0 0 8px; }
+    .section-header-row .section-label { margin: 4px 0 0 10px; }
 
     .invite-btn {
-      width: 32px; height: 32px;
+      width: 28px; height: 28px;
       background: var(--bg-panel);
       border: 1px solid var(--border);
       border-radius: 8px;
       color: var(--text-muted);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
       flex-shrink: 0;
-      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
       &:hover {
-        background: rgba(99,102,241,0.15);
-        border-color: var(--primary);
-        color: var(--primary);
+        background: var(--orange-bg);
+        border-color: var(--orange);
+        color: var(--orange);
+        transform: scale(1.08) rotate(90deg);
+        box-shadow: 0 0 0 3px var(--orange-bg);
       }
       &:active { transform: scale(0.92); }
     }
@@ -434,18 +521,21 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     .member-list {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 2px;
     }
 
     .member-row {
       display: flex;
       align-items: center;
-      gap: 9px;
-      padding: 5px 8px;
+      gap: 10px;
+      padding: 6px 10px;
       border-radius: 9px;
-      transition: background 0.15s;
+      transition: background 0.2s, transform 0.18s;
       cursor: default;
-      &:hover { background: var(--bg-panel-hover); }
+      &:hover {
+        background: var(--bg-panel-hover);
+        transform: translateX(2px);
+      }
     }
 
     .member-avatar {
@@ -453,12 +543,15 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       border-radius: 50%;
       overflow: hidden;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.65rem;
-      font-weight: 700;
+      font-size: 0.66rem;
+      font-weight: 800;
       color: #fff;
       text-transform: uppercase;
       flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(15,23,42,0.12);
+      transition: transform 0.2s;
     }
+    .member-row:hover .member-avatar { transform: scale(1.08); }
 
     .member-info {
       display: flex;
@@ -477,15 +570,15 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     }
 
     .member-role-badge {
-      font-size: 0.58rem;
-      font-weight: 700;
+      font-size: 0.55rem;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #818cf8;
-      background: rgba(99,102,241,0.15);
-      border: 1px solid rgba(99,102,241,0.25);
+      letter-spacing: 0.08em;
+      color: var(--orange);
+      background: var(--orange-bg);
+      border: 1px solid var(--orange-ring);
       border-radius: 4px;
-      padding: 1px 5px;
+      padding: 2px 6px;
       flex-shrink: 0;
     }
 
@@ -493,28 +586,32 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     .project-item {
       position: relative;
       cursor: pointer;
-      .delete-project-btn { display: none; }
-      &:hover .delete-project-btn { display: flex; }
     }
 
     .project-action-btn {
       margin-left: auto;
-      width: 30px; height: 30px;
+      width: 26px; height: 26px;
       background: none;
       border: none;
-      border-radius: 7px;
-      color: #64748b;
+      border-radius: 6px;
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
       padding: 0;
-      transition: color 0.15s, background 0.15s, transform 0.1s;
-      mat-icon { font-size: 15px; width: 15px; height: 15px; }
-      &:hover { color: #818cf8; background: rgba(99,102,241,0.15); }
+      opacity: 0;
+      transition: color 0.2s, background 0.2s, transform 0.2s, opacity 0.2s;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      &:hover {
+        color: var(--orange);
+        background: var(--orange-bg);
+        transform: rotate(45deg);
+      }
       &:active { transform: scale(0.90); }
     }
+    .project-item:hover .project-action-btn { opacity: 1; }
 
     /* ── Inline project create form ── */
     .inline-form {
@@ -522,6 +619,10 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       flex-direction: column;
       gap: 6px;
       padding: 6px 8px;
+      background: var(--bg-panel-hover);
+      border: 1px dashed var(--orange-ring);
+      border-radius: 10px;
+      margin-top: 4px;
     }
 
     .inline-input {
@@ -529,86 +630,102 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       background: var(--input-bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 6px 10px;
+      padding: 7px 10px;
       color: var(--text-main);
       font-size: 0.82rem;
       font-family: inherit;
       outline: none;
       box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
       &::placeholder { color: var(--text-muted); }
-      &:focus { border-color: var(--primary); }
+      &:focus {
+        border-color: var(--orange);
+        box-shadow: 0 0 0 3px var(--orange-bg);
+      }
     }
 
     .inline-actions { display: flex; gap: 4px; justify-content: flex-end; }
 
     .action-btn {
-      width: 32px; height: 32px;
+      width: 30px; height: 30px;
       border: none;
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
+      transition: background 0.15s, transform 0.15s;
       mat-icon { font-size: 15px; width: 15px; height: 15px; }
       &:active { transform: scale(0.92); }
     }
 
     .action-btn.check {
-      background: rgba(99,102,241,0.3);
-      color: #a5b4fc;
-      &:hover { background: rgba(99,102,241,0.5); }
+      background: var(--orange-bg-2);
+      color: var(--orange);
+      &:hover { background: var(--orange); color: #fff; transform: scale(1.06); }
     }
 
     .action-btn.close-btn {
-      background: rgba(255,255,255,0.06);
-      color: #64748b;
-      &:hover { background: rgba(255,77,77,0.15); color: #ff4d4d; }
+      background: var(--bg-panel-hover);
+      color: var(--text-muted);
+      &:hover { background: rgba(239,68,68,0.12); color: #ef4444; transform: scale(1.06); }
     }
 
     /* ── Filters ── */
-    .filter-list { display: flex; flex-direction: column; gap: 3px; }
+    .filter-list { display: flex; flex-direction: column; gap: 2px; }
 
     .filter-item {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 9px 10px;
+      padding: 9px 12px;
       border-radius: 10px;
       background: transparent;
       border: 1px solid transparent;
       color: var(--text-secondary);
-      font-size: 0.82rem;
+      font-size: 0.83rem;
       font-weight: 500;
       cursor: pointer;
       text-align: left;
       width: 100%;
-      transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.1s;
-      &:hover { background: var(--bg-panel-hover); color: var(--text-main); }
+      transition: background 0.2s, color 0.2s, transform 0.18s;
+      font-family: inherit;
+      &:hover { background: var(--bg-panel-hover); color: var(--text-main); transform: translateX(2px); }
       &:active { transform: scale(0.98); }
     }
 
     .filter-item.active {
-      background: rgba(99,102,241,0.1);
-      border-color: rgba(99,102,241,0.2);
-      color: var(--primary);
+      background: var(--orange-bg);
+      color: var(--orange);
+      font-weight: 600;
     }
 
     .priority-dot {
       width: 8px; height: 8px; min-width: 8px;
       border-radius: 50%;
       flex-shrink: 0;
+      transition: transform 0.2s;
     }
+    .filter-item:hover .priority-dot { transform: scale(1.4); }
 
-    .filter-label { white-space: nowrap; flex: 1; }
+    .filter-label { white-space: nowrap; flex: 1; letter-spacing: -0.01em; }
 
     .priority-count {
-      font-size: 0.68rem;
-      font-weight: 600;
+      font-size: 0.65rem;
+      font-weight: 700;
       color: var(--text-muted);
+      background: var(--bg-panel-hover);
+      border-radius: 5px;
+      padding: 2px 7px;
       flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .filter-item.active .priority-count {
+      background: var(--orange-bg-2);
+      color: var(--orange);
     }
 
     /* ── Spacer ── */
-    .spacer { flex: 1; }
+    .spacer { flex: 1; min-height: 8px; }
 
     /* ── Logout ── */
     .logout-section {
@@ -622,9 +739,9 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
     .theme-toggle-btn {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 11px;
       width: 100%;
-      padding: 9px 10px;
+      padding: 9px 12px;
       border-radius: 10px;
       background: transparent;
       border: 1px solid transparent;
@@ -634,21 +751,27 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       cursor: pointer;
       text-align: left;
       font-family: inherit;
-      transition: background 0.18s, color 0.18s;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.18s;
       &:hover {
-        background: rgba(99,102,241,0.08);
-        border-color: rgba(99,102,241,0.15);
-        color: var(--primary);
+        background: var(--orange-bg);
+        border-color: var(--orange-ring);
+        color: var(--orange);
+        transform: translateX(2px);
       }
-      mat-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
+      &:hover mat-icon { transform: rotate(20deg); }
+      mat-icon {
+        font-size: 18px; width: 18px; height: 18px;
+        flex-shrink: 0;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
     }
 
     .logout-btn {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 11px;
       width: 100%;
-      padding: 9px 10px;
+      padding: 9px 12px;
       border-radius: 10px;
       background: transparent;
       border: 1px solid transparent;
@@ -657,16 +780,20 @@ import { ProjectSettingsComponent } from '../../projects/project-settings/projec
       font-weight: 500;
       cursor: pointer;
       text-align: left;
-      transition: background 0.18s, color 0.18s, border-color 0.18s;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.18s;
       &:hover {
-        background: rgba(255, 77, 77, 0.08);
-        border-color: rgba(255, 77, 77, 0.18);
+        background: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.22);
         color: #ef4444;
+        transform: translateX(2px);
       }
+      &:hover mat-icon { transform: translateX(2px); }
+      mat-icon { transition: transform 0.2s; }
     }
 
     .logout-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
-    .logout-label { white-space: nowrap; }
+    .logout-label { white-space: nowrap; letter-spacing: -0.01em; }
   `],
 })
 export class SidebarComponent implements OnInit {
@@ -712,9 +839,9 @@ export class SidebarComponent implements OnInit {
   });
 
   private readonly AVATAR_COLORS = [
-    '#e53935', '#d81b60', '#8e24aa', '#5e35b1',
-    '#1e88e5', '#039be5', '#00897b', '#43a047',
-    '#f4511e', '#fb8c00', '#00acc1', '#6d4c41',
+    '#F87941', '#EA580C', '#F59E0B', '#FB923C',
+    '#3B82F6', '#0EA5E9', '#22C55E', '#10B981',
+    '#A855F7', '#EC4899', '#6366F1', '#06B6D4',
   ];
 
   memberColor(username: string): string {
@@ -749,9 +876,9 @@ export class SidebarComponent implements OnInit {
   ];
 
   readonly filters = [
-    { label: 'Urgent', color: '#ff4d4d' },
-    { label: 'Moyen',  color: '#ffbd2e' },
-    { label: 'Bas',    color: '#2ecc71' },
+    { label: 'Urgent', color: '#EF4444' },
+    { label: 'Moyen',  color: '#F59E0B' },
+    { label: 'Bas',    color: '#22C55E' },
   ];
 
   ngOnInit(): void {

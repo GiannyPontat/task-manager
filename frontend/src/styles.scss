@@ -20,14 +20,16 @@ $theme: mat.define-light-theme((
 }
 
 // ─── CSS Design Tokens ────────────────────────────────────────────────────────
-:root {
+:root,
+[data-theme="light"] {
   // Light (default) — fond doux, reposant pour les yeux
   --color-scheme:   light;
   --bg-app:         #E8EDF5;
   --bg-card:        #F0F4FA;
+  --btn-text:        #F1F5F9;
   --text-main:      #1E293B;
   --text-muted:     #64748B;
-  --primary:        #6366F1;
+  --primary:        #ff7335;
   --border:         #CBD5E1;
   --shadow:         0 2px 8px rgb(15 23 42 / 0.08);
 
@@ -48,27 +50,27 @@ $theme: mat.define-light-theme((
 
 [data-theme="dark"] {
   --color-scheme:   dark;
-  --bg-app:         #0B0E14;
-  --bg-card:        #161B22;
+  --bg-app:         #121212;
+  --bg-card:        #1C1C1C;
   --text-main:      #F8FAFC;
-  --text-muted:     #94A3B8;
-  --primary:        #818CF8;
-  --border:         #30363D;
+  --text-muted:     #A1A1AA;
+  --primary:        #ff7335;
+  --border:         #2A2A2A;
   --shadow:         0 4px 6px -1px rgb(0 0 0 / 0.5);
 
   // Extended tokens (composants)
-  --bg-panel:       rgba(255,255,255,0.05);
-  --bg-panel-hover: rgba(255,255,255,0.09);
-  --border-panel:   rgba(255,255,255,0.12);
-  --text-primary:   #f8fafc;
-  --text-secondary: #cbd5e1;
-  --navbar-bg:      #1e293b;
-  --card-bg:        rgba(255,255,255,0.04);
-  --card-border:    rgba(255,255,255,0.08);
-  --input-bg:       rgba(255,255,255,0.04);
-  --divider:        rgba(255,255,255,0.1);
-  --bg-deep:        #0B0E14;
-  --bg-main:        #0B0E14;
+  --bg-panel:       #1C1C1C;
+  --bg-panel-hover: #242424;
+  --border-panel:   #2A2A2A;
+  --text-primary:   #F8FAFC;
+  --text-secondary: #D4D4D8;
+  --navbar-bg:      #1A1A1A;
+  --card-bg:        #1C1C1C;
+  --card-border:    #2A2A2A;
+  --input-bg:       #1F1F1F;
+  --divider:        #2A2A2A;
+  --bg-deep:        #0E0E0E;
+  --bg-main:        #121212;
 }
 
 // ─── Transition globale ───────────────────────────────────────────────────────

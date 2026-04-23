@@ -74,7 +74,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 
     .header-icon {
       width: 32px; height: 32px; flex-shrink: 0;
-      background: linear-gradient(135deg, #6366f1, #3b82f6);
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%);
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       mat-icon { font-size: 16px; width: 16px; height: 16px; color: #fff; }
@@ -109,11 +109,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     }
     :host ::ng-deep .email-field .mat-mdc-form-field-label,
     :host ::ng-deep .email-field .mdc-floating-label { color: var(--text-muted) !important; }
-    :host ::ng-deep .email-field input { color: var(--text-main) !important; caret-color: #6366f1; }
+    :host ::ng-deep .email-field input { color: var(--text-main) !important; caret-color: #ff7335; }
     :host ::ng-deep .email-field.mat-focused .mdc-notched-outline__leading,
     :host ::ng-deep .email-field.mat-focused .mdc-notched-outline__notch,
     :host ::ng-deep .email-field.mat-focused .mdc-notched-outline__trailing {
-      border-color: rgba(99,102,241,0.7) !important;
+      border-color: rgba(255,115,53,0.7) !important;
     }
 
     .dlg-footer {
@@ -130,11 +130,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
       height: 38px;
       padding: 0 18px !important;
       border-radius: 9px !important;
-      background: linear-gradient(135deg, #6366f1, #3b82f6) !important;
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%) !important;
       color: #fff !important;
       font-weight: 600 !important;
       font-size: 0.82rem !important;
-      box-shadow: 0 4px 12px rgba(99,102,241,0.3) !important;
+      box-shadow: 0 4px 12px rgba(255,115,53,0.3) !important;
       mat-icon { font-size: 15px; width: 15px; height: 15px; margin-right: 4px; }
     }
   `],

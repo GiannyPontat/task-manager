@@ -7,6 +7,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
   selector: 'app-landing',
   standalone: true,
   imports: [CommonModule, RouterModule],
+  host: { 'data-theme': 'light' },
   animations: [
     trigger('heroEnter', [
       transition(':enter', [
@@ -32,6 +33,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     <div class="bg-mesh" aria-hidden="true">
       <div class="blob b1"></div>
       <div class="blob b2"></div>
+      <div class="blob b3"></div>
     </div>
 
     <!-- ── NAVBAR ── -->
@@ -39,10 +41,15 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       <div class="nav-wrap">
         <a class="logo" routerLink="/">Flowly</a>
         <div class="nav-links">
-          <a href="#features" class="nav-a">Fonctionnalités</a>
-          <a href="#stack" class="nav-a">Stack Tech</a>
+          <a href="#features" (click)="scrollToSection($event, 'features')" class="nav-a">Fonctionnalités</a>
+          <a href="#stack" (click)="scrollToSection($event, 'stack')" class="nav-a">Stack Tech</a>
         </div>
-        <a routerLink="/login" class="btn-login">Connexion</a>
+        <a routerLink="/login" class="btn-login">
+          <span>Connexion</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
       </div>
     </nav>
 
@@ -51,12 +58,15 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
       <div class="hero-left">
         <div class="h-item hero-eyebrow">
-          <span class="eyebrow-pulse"></span>
-          Portfolio · Développeur Java Junior
+          <span class="status-ping">
+            <span class="status-ping-anim"></span>
+            <span class="status-ping-core"></span>
+          </span>
+          Portfolio · Développeur Java Full Stack
         </div>
         <h1 class="h-item hero-h1">
           Le kanban qui<br>
-          <em class="hero-em">parle code.</em>
+          <span class="hero-em">parle code.</span>
         </h1>
         <p class="h-item hero-p">
           Construit avec <strong>Angular 17</strong> et <strong>Spring Boot</strong>.
@@ -74,7 +84,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/>
             </svg>
-            GitHub
+            <span>GitHub</span>
           </a>
         </div>
         <div class="h-item hero-pills">
@@ -109,7 +119,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
             <div class="mock-col">
               <div class="mock-col-hd">
                 <span>En cours</span>
-                <span class="mc-badge mc-blue">2</span>
+                <span class="mc-badge mc-orange">2</span>
               </div>
               <div class="mock-task mock-active">Tests unitaires frontend</div>
               <div class="mock-task mock-active">Tests unitaires backend</div>
@@ -135,14 +145,14 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     <section class="section" id="features">
       <div class="section-meta" data-reveal>
         <span class="eyebrow-label">Fonctionnalités</span>
-        <h2 class="section-h">Ce que Flowly sait faire.</h2>
+        <h2 class="section-h">Ce que Flowly <span class="section-h-accent">sait faire.</span></h2>
       </div>
 
       <div class="bento">
 
         <!-- Card 1: Collaboration (wide 2fr) -->
         <div class="bcard bcard-wide" data-reveal style="--i:0">
-          <div class="bcard-icon icon-blue">
+          <div class="bcard-icon icon-orange">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
@@ -203,7 +213,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
         <div class="bcard bcard-full" data-reveal style="--i:2">
           <div class="bcard-full-inner">
             <div class="bcard-full-left">
-              <div class="bcard-icon icon-blue">
+              <div class="bcard-icon icon-orange">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                   <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
                 </svg>
@@ -220,8 +230,8 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
               <svg class="mini-chart-svg" viewBox="0 0 210 64" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="bGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.75"/>
-                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.15"/>
+                    <stop offset="0%" stop-color="#ff7335" stop-opacity="0.85"/>
+                    <stop offset="100%" stop-color="#ffb088" stop-opacity="0.2"/>
                   </linearGradient>
                 </defs>
                 <rect x="0"   y="28" width="22" height="36" rx="3" fill="url(#bGrad)"/>
@@ -280,7 +290,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     <section class="section" id="stack">
       <div class="section-meta" data-reveal>
         <span class="eyebrow-label">Stack Technique</span>
-        <h2 class="section-h">Technologies maîtrisées.</h2>
+        <h2 class="section-h">Technologies <span class="section-h-accent">maîtrisées.</span></h2>
       </div>
       <div class="stack-grid" data-reveal style="--i:1">
         <div class="stack-item" *ngFor="let t of stack">
@@ -318,48 +328,47 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     </footer>
   `,
   styles: [`
-    /* ── Host & tokens ── */
+    /* ── Host & tokens — palette Light App (Flowly) ── */
     :host {
       min-height: 100dvh;
-      background: var(--bg-app);
-      color: var(--text-main);
-      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      background: #E8EDF5;
+      color: #1E293B;
+      font-family: 'Inter', 'Outfit', system-ui, -apple-system, sans-serif;
       position: relative;
       overflow-x: hidden;
-      --accent: #18181B;
-      --accent-dim: rgba(24,24,27,0.06);
-      --accent-border: rgba(24,24,27,0.12);
-      --glass: rgba(0,0,0,0.04);
-      --glass-hover: rgba(0,0,0,0.07);
-      --border: rgba(0,0,0,0.08);
-      --border-strong: rgba(0,0,0,0.12);
-      --muted: rgba(15,23,42,0.5);
-      --radius: 20px;
+
+      /* Palette app light theme */
+      --ink:           #1E293B;
+      --ink-soft:      #1E293B;
+      --ink-mid:       #334155;
+      --ink-low:       #475569;
+      --ink-muted:     #64748B;
+      --ink-faint:     #94A3B8;
+      --ink-hairline:  #CBD5E1;
+      --bg-base:       #E8EDF5;
+      --bg-card:       #F0F4FA;
+      --bg-soft:       #F8FAFC;
+      --border:        #CBD5E1;
+      --border-strong: #94A3B8;
+
+      /* Accent orange app (--primary) */
+      --orange:        #ff7335;
+      --orange-hover:  #e55a16;
+      --salmon:        #ffb088;
+      --orange-bg:     rgba(255,115,53,0.08);
+      --orange-bg-2:   rgba(255,115,53,0.14);
+      --orange-ring:   rgba(255,115,53,0.18);
+      --orange-glow:   rgba(255,115,53,0.35);
+
+      /* Shadows */
+      --sh-card:       0 2px 8px rgba(15,23,42,0.08), 0 0 0 1px rgba(15,23,42,0.04);
+      --sh-card-hover: 0 30px 60px -20px rgba(15,23,42,0.22),
+                       0 12px 30px -12px rgba(255,115,53,0.20),
+                       0 0 0 1px rgba(255,115,53,0.25);
+      --radius:        20px;
     }
 
-    :host-context([data-theme="dark"]) {
-      --accent: #4048E7;
-      --accent-dim: rgba(64,72,231,0.12);
-      --accent-border: rgba(64,72,231,0.25);
-      --glass: rgba(255,255,255,0.04);
-      --glass-hover: rgba(255,255,255,0.07);
-      --border: rgba(255,255,255,0.08);
-      --border-strong: rgba(255,255,255,0.12);
-      --muted:      rgba(226,232,240,0.45);
-      --text-sub:   rgba(226,232,240,0.6);
-      --text-soft:  rgba(226,232,240,0.75);
-      --text-dim:   rgba(226,232,240,0.3);
-      --text-faint: rgba(226,232,240,0.2);
-    }
-
-    :host {
-      --text-sub:   rgba(15,23,42,0.6);
-      --text-soft:  rgba(15,23,42,0.75);
-      --text-dim:   rgba(15,23,42,0.3);
-      --text-faint: rgba(15,23,42,0.18);
-    }
-
-    /* ── Background blobs ── */
+    /* ── Background blobs (orange + indigo subtils) ── */
     .bg-mesh {
       position: fixed;
       inset: 0;
@@ -367,31 +376,24 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       z-index: 0;
       overflow: hidden;
     }
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-    }
+    .blob { position: absolute; border-radius: 50%; }
     .b1 {
-      width: 640px; height: 640px;
-      top: -180px; left: -120px;
-      background: radial-gradient(ellipse, rgba(24,24,27,0.05) 0%, transparent 70%);
-      opacity: 1;
+      width: 720px; height: 720px;
+      top: -220px; left: -180px;
+      background: radial-gradient(circle, rgba(255,115,53,0.14) 0%, transparent 65%);
       filter: blur(60px);
     }
     .b2 {
-      width: 560px; height: 560px;
-      bottom: -120px; right: -80px;
-      background: radial-gradient(ellipse, rgba(24,24,27,0.03) 0%, transparent 70%);
-      opacity: 1;
-      filter: blur(55px);
+      width: 620px; height: 620px;
+      bottom: -160px; right: -120px;
+      background: radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%);
+      filter: blur(60px);
     }
-    :host-context([data-theme="dark"]) .b1 {
-      background: radial-gradient(ellipse, rgba(64,72,231,0.22) 0%, transparent 70%);
-      opacity: 1;
-    }
-    :host-context([data-theme="dark"]) .b2 {
-      background: radial-gradient(ellipse, rgba(94,93,130,0.14) 0%, transparent 70%);
-      opacity: 1;
+    .b3 {
+      width: 480px; height: 480px;
+      top: 40%; left: 55%;
+      background: radial-gradient(circle, rgba(249,176,149,0.07) 0%, transparent 70%);
+      filter: blur(80px);
     }
 
     /* ── Navbar ── */
@@ -399,7 +401,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       position: sticky;
       top: 0;
       z-index: 100;
-      background: color-mix(in srgb, var(--bg-app) 80%, transparent);
+      background: rgba(253,252,252,0.78);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-bottom: 1px solid var(--border);
@@ -408,46 +410,74 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       max-width: 1120px;
       margin: 0 auto;
       padding: 0 28px;
-      height: 56px;
+      height: 64px;
       display: flex;
       align-items: center;
       gap: 28px;
     }
     .logo {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--accent);
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
       text-decoration: none;
-      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--orange) 0%, var(--salmon) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      transition: filter 0.2s, transform 0.2s;
     }
+    .logo:hover { filter: brightness(1.1); transform: scale(1.04); }
     .nav-links {
       display: flex;
-      gap: 2px;
+      gap: 4px;
       margin-left: auto;
     }
     .nav-a {
-      color: var(--muted);
+      position: relative;
+      color: var(--ink-mid);
       text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 6px 12px;
-      border-radius: 8px;
-      transition: color 0.15s, background 0.15s;
-    }
-    .nav-a:hover { color: var(--text-main); background: var(--glass); }
-    .btn-login {
-      text-decoration: none;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 600;
-      color: var(--btn-text);
-      background: var(--accent);
-      padding: 7px 16px;
-      border-radius: 9px;
-      transition: opacity 0.15s, transform 0.15s;
-      box-shadow: 0 2px 14px var(--accent-shadow);
+      padding: 8px 14px;
+      border-radius: 10px;
+      transition: color 0.2s, background 0.2s;
     }
-    .btn-login:hover  { opacity: 0.88; transform: translateY(-1px); }
+    .nav-a::after {
+      content: '';
+      position: absolute;
+      left: 14px; right: 14px; bottom: 4px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange), var(--salmon));
+      border-radius: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-a:hover { color: var(--ink); background: var(--orange-bg); }
+    .nav-a:hover::after { transform: scaleX(1); }
+
+    .btn-login {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #FFFFFF;
+      background: var(--ink);
+      padding: 9px 18px;
+      border-radius: 11px;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(15,23,42,0.18);
+    }
+    .btn-login:hover {
+      background: var(--ink-soft);
+      transform: scale(1.04);
+      box-shadow: 0 8px 24px rgba(15,23,42,0.28);
+    }
     .btn-login:active { transform: scale(0.97); }
+    .btn-login svg { transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+    .btn-login:hover svg { transform: translateX(3px); }
 
     /* ── Hero — Split grid ── */
     .hero {
@@ -455,10 +485,10 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       z-index: 1;
       max-width: 1120px;
       margin: 0 auto;
-      padding: 88px 28px 72px;
+      padding: 96px 28px 80px;
       display: grid;
       grid-template-columns: 1.15fr 0.85fr;
-      gap: 48px;
+      gap: 56px;
       align-items: center;
     }
 
@@ -467,89 +497,113 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     .hero-eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 20px;
+      color: var(--ink-muted);
+      margin-bottom: 22px;
+      padding: 6px 14px 6px 12px;
+      background: rgba(255,115,53,0.06);
+      border: 1px solid rgba(255,115,53,0.18);
+      border-radius: 999px;
+      width: fit-content;
     }
-    .eyebrow-pulse {
-      display: inline-block;
-      width: 7px; height: 7px;
+    .status-ping {
+      position: relative;
+      display: inline-flex;
+      width: 8px; height: 8px;
+    }
+    .status-ping-anim {
+      position: absolute; inset: 0;
       border-radius: 50%;
-      background: var(--accent);
-      animation: eyePulse 2.4s ease-in-out infinite;
+      background: var(--orange);
+      opacity: 0.75;
+      animation: pingAnim 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
-    @keyframes eyePulse {
-      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(24,24,27,0.3); }
-      50%       { opacity: 0.7; transform: scale(0.9); box-shadow: 0 0 0 4px rgba(24,24,27,0); }
+    .status-ping-core {
+      position: relative;
+      display: inline-flex;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--orange-hover);
+    }
+    @keyframes pingAnim {
+      0%        { transform: scale(1);   opacity: 0.75; }
+      75%, 100% { transform: scale(2.4); opacity: 0; }
     }
 
     .hero-h1 {
       font-size: clamp(2.6rem, 5vw, 4rem);
       font-weight: 800;
-      line-height: 1.08;
-      letter-spacing: -0.04em;
-      color: var(--text-main);
-      margin: 0 0 20px;
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+      color: var(--ink);
+      margin: 0 0 22px;
     }
     .hero-em {
-      font-style: italic;
-      color: var(--accent);
+      background: linear-gradient(135deg, var(--orange) 0%, var(--salmon) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-style: normal;
       font-weight: 800;
+      display: inline-block;
     }
 
     .hero-p {
-      font-size: 15px;
+      font-size: 15.5px;
       line-height: 1.72;
-      color: var(--text-sub);
-      max-width: 440px;
-      margin: 0 0 32px;
+      color: var(--ink-low);
+      max-width: 460px;
+      margin: 0 0 36px;
     }
-    .hero-p strong { color: var(--text-main); font-weight: 600; }
+    .hero-p strong { color: var(--ink); font-weight: 600; }
 
     .hero-actions {
       display: flex;
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
     }
 
-    /* Primary CTA */
+    /* Primary CTA (Login style — black + scale) */
     .btn-primary {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       text-decoration: none;
-      font-size: 14px;
+      font-size: 14.5px;
       font-weight: 600;
-      color: var(--btn-text);
-      background: var(--accent);
-      padding: 11px 22px;
-      border-radius: 11px;
+      color: #FFFFFF;
+      background: var(--ink);
+      padding: 13px 24px;
+      border-radius: 13px;
       position: relative;
       overflow: hidden;
-      transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px var(--accent-shadow);
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 6px 20px rgba(15,23,42,0.22);
     }
     .btn-primary::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(255,255,255,0.08);
-      transform: translateX(-100%);
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      background: linear-gradient(135deg, var(--orange) 0%, var(--salmon) 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
     }
-    .btn-primary:hover { opacity: 0.93; transform: translateY(-2px); box-shadow: 0 6px 28px var(--accent-shadow-hover); }
-    .btn-primary:hover::before { transform: translateX(0); }
-    .btn-primary:active { transform: scale(0.97) translateY(0); }
-    .btn-arr {
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    .btn-primary > * { position: relative; z-index: 1; }
+    .btn-primary:hover {
+      background: var(--ink-soft);
+      transform: scale(1.04);
+      box-shadow: 0 14px 36px rgba(255,115,53,0.32);
     }
-    .btn-primary:hover .btn-arr { transform: translateX(3px); }
+    .btn-primary:hover::before { opacity: 1; }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-arr { transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+    .btn-primary:hover .btn-arr { transform: translateX(4px); }
 
     /* Ghost CTA */
     .btn-ghost {
@@ -557,75 +611,89 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       align-items: center;
       gap: 8px;
       text-decoration: none;
-      font-size: 14px;
+      font-size: 14.5px;
       font-weight: 600;
-      color: var(--text-soft);
-      background: var(--glass);
-      border: 1px solid var(--border);
-      padding: 11px 20px;
-      border-radius: 11px;
-      backdrop-filter: blur(8px);
-      transition: background 0.15s, color 0.15s, transform 0.15s;
+      color: var(--ink-soft);
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      padding: 12px 22px;
+      border-radius: 13px;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
-    .btn-ghost:hover { background: var(--glass-hover); color: var(--text-main); transform: translateY(-2px); }
+    .btn-ghost:hover {
+      background: #FFFFFF;
+      border-color: var(--orange);
+      color: var(--orange);
+      transform: scale(1.04);
+      box-shadow: 0 0 0 4px var(--orange-ring);
+    }
     .btn-ghost:active { transform: scale(0.97); }
 
     /* Pills */
     .hero-pills {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 7px;
     }
     .pill {
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 600;
       letter-spacing: 0.04em;
-      color: var(--muted);
-      background: var(--glass);
+      color: var(--ink-mid);
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 999px;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+      cursor: default;
+    }
+    .pill:hover {
+      background: var(--orange-bg);
+      border-color: var(--orange);
+      color: var(--orange-hover);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(255,115,53,0.18);
     }
 
     /* ── Mock kanban window ── */
-    .hero-right {
-      animation: floatY 7s ease-in-out infinite;
-    }
+    .hero-right { animation: floatY 7s ease-in-out infinite; }
     @keyframes floatY {
       0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-14px); }
+      50%      { transform: translateY(-14px); }
     }
 
     .mock-window {
-      background: color-mix(in srgb, var(--bg-app) 90%, transparent);
-      backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border: 1px solid var(--border-strong);
-      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.55),
-                  inset 0 1px 0 rgba(255,255,255,0.07);
+      box-shadow: 0 30px 70px -20px rgba(15,23,42,0.18),
+                  0 12px 36px -12px rgba(15,23,42,0.10),
+                  inset 0 1px 0 rgba(255,255,255,0.7);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+    }
+    .mock-window:hover {
+      transform: translateY(-6px) scale(1.015);
+      box-shadow: 0 40px 90px -20px rgba(15,23,42,0.24),
+                  0 16px 50px -12px rgba(255,115,53,0.18);
     }
     .mock-bar {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 14px;
+      padding: 11px 14px;
       border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,0.025);
+      background: var(--bg-soft);
     }
-    .mock-dots { display: flex; gap: 5px; }
-    .md {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-    }
-    .md-r { background: #ff5f56; }
-    .md-y { background: #ffbd2e; }
-    .md-g { background: #27c93f; }
+    .mock-dots { display: flex; gap: 6px; }
+    .md { width: 11px; height: 11px; border-radius: 50%; }
+    .md-r { background: #FF5F56; }
+    .md-y { background: #FFBD2E; }
+    .md-g { background: #27C93F; }
     .mock-bar-title {
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 500;
-      color: var(--muted);
+      color: var(--ink-muted);
       margin-left: 4px;
       font-family: 'JetBrains Mono', monospace;
     }
@@ -635,60 +703,66 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       gap: 0;
     }
     .mock-col {
-      padding: 12px 10px;
+      padding: 14px 12px;
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 7px;
     }
     .mock-col:last-child { border-right: none; }
     .mock-col-hd {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
     .mock-col-hd > span:first-child {
       font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      font-weight: 700;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--ink-muted);
     }
     .mc-badge {
       font-size: 10px;
-      font-weight: 600;
-      color: var(--text-dim);
-      background: var(--glass-hover);
-      border-radius: 4px;
-      padding: 1px 5px;
+      font-weight: 700;
+      color: var(--ink-low);
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 1px 6px;
       font-family: 'JetBrains Mono', monospace;
     }
-    .mc-blue  { color: rgba(59,130,246,0.8); background: rgba(59,130,246,0.1); }
-    .mc-green { color: rgba(34,197,94,0.8);  background: rgba(34,197,94,0.08); }
+    .mc-orange { color: var(--orange-hover); background: var(--orange-bg-2); border-color: rgba(255,115,53,0.3); }
+    .mc-green  { color: #15803D; background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); }
 
     .mock-task {
-      font-size: 11px;
-      color: var(--muted);
-      background: var(--glass);
+      font-size: 11.5px;
+      color: var(--ink-mid);
+      background: var(--bg-soft);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 8px;
+      border-radius: 7px;
+      padding: 7px 9px;
       line-height: 1.4;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, transform 0.2s, background 0.2s;
+    }
+    .mock-task:hover {
+      border-color: var(--orange);
+      background: #FFFFFF;
+      transform: translateX(2px);
     }
     .mock-active {
-      color: var(--text-soft);
-      background: rgba(59,130,246,0.07);
-      border-color: rgba(59,130,246,0.3);
+      color: var(--ink-soft);
+      background: var(--orange-bg);
+      border-color: rgba(255,115,53,0.35);
       animation: activePulse 2.5s ease-in-out infinite;
     }
     @keyframes activePulse {
-      0%, 100% { border-color: rgba(59,130,246,0.3); }
-      50%       { border-color: rgba(59,130,246,0.65); }
+      0%, 100% { border-color: rgba(255,115,53,0.35); box-shadow: 0 0 0 0 rgba(255,115,53,0.2); }
+      50%      { border-color: rgba(255,115,53,0.7);  box-shadow: 0 0 0 4px rgba(255,115,53,0); }
     }
     .mock-done {
-      color: var(--text-dim);
+      color: var(--ink-faint);
       background: transparent;
       border-color: transparent;
       text-decoration: line-through;
@@ -700,28 +774,38 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       z-index: 1;
       max-width: 1120px;
       margin: 0 auto;
-      padding: 72px 28px;
+      padding: 80px 28px;
     }
     .section-meta {
-      margin-bottom: 40px;
+      margin-bottom: 44px;
       text-align: center;
     }
     .eyebrow-label {
-      display: block;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 10px;
+      color: var(--orange);
+      background: var(--orange-bg);
+      border: 1px solid rgba(255,115,53,0.2);
+      border-radius: 999px;
+      padding: 5px 14px;
+      margin-bottom: 16px;
     }
     .section-h {
-      font-size: clamp(1.65rem, 3vw, 2.2rem);
-      font-weight: 700;
+      font-size: clamp(1.85rem, 3.2vw, 2.4rem);
+      font-weight: 800;
       line-height: 1.2;
-      letter-spacing: -0.03em;
-      color: var(--text-main);
+      letter-spacing: -0.035em;
+      color: var(--ink);
       margin: 0;
+    }
+    .section-h-accent {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--salmon) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     /* ── Bento grid ── */
@@ -729,7 +813,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       display: grid;
       grid-template-columns: 2fr 1fr;
       grid-template-rows: auto auto;
-      gap: 14px;
+      gap: 16px;
     }
     .bcard-wide   { grid-column: 1; grid-row: 1; }
     .bcard-narrow { grid-column: 2; grid-row: 1; }
@@ -737,159 +821,198 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
     /* Base card */
     .bcard {
-      background: var(--glass);
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      position: relative;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px;
-      transition: background 0.2s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                  box-shadow 0.25s;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+      padding: 30px;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.3s;
+      box-shadow: var(--sh-card);
+      overflow: hidden;
+    }
+    .bcard::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 0%),
+                  rgba(255,115,53,0.07), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+    .bcard::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--orange) 0%, var(--salmon) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+              mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
     }
     .bcard:hover {
-      background: var(--glass-hover);
-      transform: translateY(-3px);
-      box-shadow: 0 16px 44px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07);
+      transform: translateY(-10px) scale(1.025);
+      box-shadow: var(--sh-card-hover);
+      border-color: transparent;
+    }
+    .bcard:hover::before { opacity: 1; }
+    .bcard:hover::after  { opacity: 1; }
+    .bcard:hover .bcard-icon {
+      transform: scale(1.12) rotate(-6deg);
+      box-shadow: 0 12px 28px var(--orange-glow);
+    }
+    .bcard:hover .bcard-h {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--salmon) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     .bcard-icon {
-      width: 40px; height: 40px;
-      border-radius: 11px;
+      width: 44px; height: 44px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
     }
-    .icon-blue {
-      background: var(--accent-dim);
-      color: #60a5fa;
-      border: 1px solid var(--accent-border);
+    .icon-orange {
+      background: var(--orange-bg-2);
+      color: var(--orange);
+      border: 1px solid rgba(255,115,53,0.3);
     }
     .icon-emerald {
-      background: rgba(16,185,129,0.1);
-      color: #34d399;
-      border: 1px solid rgba(16,185,129,0.2);
+      background: rgba(34,197,94,0.10);
+      color: #16A34A;
+      border: 1px solid rgba(34,197,94,0.25);
     }
 
     .bcard-h {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
-      color: var(--text-main);
-      margin: 0 0 8px;
+      color: var(--ink);
+      margin: 0 0 10px;
       letter-spacing: -0.02em;
+      transition: color 0.3s;
     }
     .bcard-p {
-      font-size: 13px;
+      font-size: 13.5px;
       line-height: 1.65;
-      color: var(--muted);
-      margin: 0 0 18px;
+      color: var(--ink-muted);
+      margin: 0 0 20px;
     }
-    .bcard-p strong { color: var(--text-soft); }
+    .bcard-p strong { color: var(--ink-soft); font-weight: 600; }
     .bcard-tag {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.07em;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-dim);
+      color: var(--ink-faint);
       margin-top: auto;
     }
 
     /* ── Mock invite UI ── */
     .mock-invite {
-      background: color-mix(in srgb, var(--bg-app) 60%, transparent);
+      background: var(--bg-soft);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 16px;
+      border-radius: 13px;
+      padding: 13px;
+      margin-bottom: 18px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 9px;
     }
-    .mi-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .mi-row { display: flex; align-items: center; gap: 11px; }
     .mi-av {
-      width: 28px; height: 28px;
-      border-radius: 8px;
-      font-size: 11px;
+      width: 30px; height: 30px;
+      border-radius: 9px;
+      font-size: 11.5px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
-    .mi-a { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.25); }
-    .mi-b { background: rgba(236,72,153,0.15); color: #f9a8d4; border: 1px solid rgba(236,72,153,0.2); }
+    .mi-a { background: rgba(255,115,53,0.15); color: var(--orange-hover); border: 1px solid rgba(255,115,53,0.25); }
+    .mi-b { background: rgba(99,102,241,0.12); color: #4F46E5; border: 1px solid rgba(99,102,241,0.22); }
     .mi-info { flex: 1; min-width: 0; }
-    .mi-name  { display: block; font-size: 11px; font-weight: 600; color: var(--text-soft); line-height: 1.3; }
-    .mi-email { display: block; font-size: 10px; color: var(--muted); }
+    .mi-name  { display: block; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); line-height: 1.3; }
+    .mi-email { display: block; font-size: 10.5px; color: var(--ink-muted); }
     .mi-badge {
       font-size: 10px;
-      font-weight: 600;
-      padding: 2px 7px;
+      font-weight: 700;
+      padding: 2px 8px;
       border-radius: 5px;
-      background: var(--glass-hover);
-      color: var(--muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--ink-muted);
       white-space: nowrap;
     }
-    .mi-admin { background: rgba(59,130,246,0.1); color: #60a5fa; }
+    .mi-admin { background: var(--orange-bg-2); color: var(--orange-hover); border-color: rgba(255,115,53,0.3); }
     .mi-input-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--glass);
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 7px 10px;
+      border-radius: 9px;
+      padding: 8px 11px;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .mi-placeholder { font-size: 11px; color: var(--text-faint); }
+    .mi-input-row:hover { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-ring); }
+    .mi-placeholder { font-size: 11.5px; color: var(--ink-faint); }
     .mi-send-btn {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent);
-      opacity: 0.8;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--orange);
     }
 
     /* ── Security list ── */
     .sec-list {
       display: flex;
       flex-direction: column;
-      gap: 9px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 18px;
     }
     .sec-item {
       display: flex;
       align-items: center;
-      gap: 9px;
-      font-size: 12px;
-      color: var(--muted);
+      gap: 10px;
+      font-size: 12.5px;
+      color: var(--ink-low);
+      transition: transform 0.2s, color 0.2s;
     }
+    .sec-item:hover { transform: translateX(3px); color: var(--ink); }
     .sec-dot {
-      width: 5px; height: 5px;
+      width: 6px; height: 6px;
       border-radius: 50%;
-      background: #34d399;
+      background: #16A34A;
       flex-shrink: 0;
-      box-shadow: 0 0 6px rgba(52,211,153,0.5);
+      box-shadow: 0 0 8px rgba(22,163,74,0.55);
     }
 
     /* ── Dashboard card full ── */
     .bcard-full-inner {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 32px;
+      gap: 36px;
       align-items: center;
     }
     .bcard-full-left { display: flex; flex-direction: column; }
-    .bcard-full-right {}
     .mini-chart-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--ink-muted);
       margin-bottom: 12px;
     }
     .mini-chart-svg {
@@ -897,64 +1020,94 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       height: 64px;
       display: block;
     }
+    .mini-chart-svg rect {
+      transition: filter 0.3s;
+    }
+    .bcard-full:hover .mini-chart-svg rect { filter: drop-shadow(0 4px 12px rgba(255,115,53,0.4)); }
     .mini-chart-days {
       display: flex;
       justify-content: space-between;
-      margin-top: 8px;
+      margin-top: 10px;
     }
     .mini-chart-days span {
       font-size: 10px;
-      color: var(--text-faint);
+      color: var(--ink-faint);
       font-family: 'JetBrains Mono', monospace;
     }
 
     /* ── Technical Challenge ── */
     .challenge {
-      background: var(--glass);
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
-      border: 1px solid rgba(59,130,246,0.15);
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 36px;
-      box-shadow: 0 0 60px rgba(59,130,246,0.04), inset 0 1px 0 rgba(255,255,255,0.04);
+      padding: 40px;
+      box-shadow: var(--sh-card);
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.3s;
+      overflow: hidden;
     }
+    .challenge::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--orange) 0%, var(--salmon) 50%, var(--orange) 100%);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .challenge:hover {
+      transform: translateY(-8px) scale(1.015);
+      box-shadow: 0 36px 80px -20px rgba(15,23,42,0.18),
+                  0 16px 40px -12px rgba(255,115,53,0.16),
+                  0 0 0 1px rgba(255,115,53,0.25);
+      border-color: transparent;
+    }
+    .challenge:hover::before { transform: scaleX(1); }
     .challenge-hd {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
+      gap: 11px;
+      margin-bottom: 16px;
     }
     .challenge-ico {
-      width: 32px; height: 32px;
-      border-radius: 9px;
-      background: rgba(251,191,36,0.1);
-      border: 1px solid rgba(251,191,36,0.2);
-      color: #fbbf24;
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: var(--orange-bg-2);
+      border: 1px solid rgba(255,115,53,0.3);
+      color: var(--orange);
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .challenge:hover .challenge-ico {
+      transform: scale(1.12) rotate(-8deg);
+      box-shadow: 0 8px 20px var(--orange-glow);
     }
     .challenge-eyebrow {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #fbbf24;
+      color: var(--orange);
     }
     .challenge-h {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: var(--text-main);
-      margin: 0 0 12px;
+      color: var(--ink);
+      margin: 0 0 14px;
       letter-spacing: -0.02em;
     }
     .challenge-txt {
       font-size: 13.5px;
       line-height: 1.7;
-      color: var(--muted);
-      margin: 0 0 20px;
+      color: var(--ink-low);
+      margin: 0 0 22px;
     }
-    .challenge-txt strong { color: var(--text-soft); }
+    .challenge-txt strong { color: var(--ink); font-weight: 600; }
 
     .diff-row {
       display: flex;
@@ -970,58 +1123,83 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       min-width: 200px;
     }
     .diff-lbl {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
-    .lbl-red   { color: #f87171; }
-    .lbl-green { color: #4ade80; }
+    .lbl-red   { color: #DC2626; }
+    .lbl-green { color: #16A34A; }
     .diff-code {
       display: block;
       font-family: 'JetBrains Mono', monospace;
       font-size: 11.5px;
-      padding: 9px 13px;
+      padding: 10px 14px;
       border-radius: 9px;
       line-height: 1.5;
     }
-    .code-red   { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.14); color: #dc2626; }
-    .code-green { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.14); color: #16a34a; }
-    :host-context([data-theme="dark"]) .code-red   { color: #fca5a5; }
-    :host-context([data-theme="dark"]) .code-green { color: #86efac; }
-    .diff-arr { color: var(--text-faint); flex-shrink: 0; }
+    .code-red   { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); color: #B91C1C; }
+    .code-green { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.18); color: #15803D; }
+    .diff-arr   { color: var(--ink-faint); flex-shrink: 0; transition: transform 0.4s, color 0.3s; }
+    .challenge:hover .diff-arr { transform: translateX(6px); color: var(--orange); }
 
     /* ── Stack grid ── */
     .stack-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
     }
     .stack-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      background: var(--glass);
+      gap: 13px;
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      transition: background 0.15s, transform 0.2s;
+      border-radius: 13px;
+      padding: 16px 18px;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.25s;
+      cursor: default;
     }
-    .stack-item:hover { background: var(--glass-hover); transform: translateY(-2px); }
+    .stack-item:hover {
+      border-color: var(--orange);
+      transform: translateY(-5px) scale(1.04);
+      box-shadow: 0 18px 40px -10px rgba(255,115,53,0.22),
+                  0 0 0 1px var(--orange-ring);
+    }
+    .stack-item:hover .stack-dot {
+      transform: scale(1.8);
+      box-shadow: 0 0 14px currentColor, 0 0 24px currentColor;
+    }
+    .stack-item:hover .stack-name {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--salmon) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
     .stack-dot {
-      width: 7px; height: 7px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .stack-name { font-size: 13px; font-weight: 600; color: var(--text-main); }
-    .stack-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .stack-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink);
+      transition: color 0.3s;
+    }
+    .stack-sub  { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
 
     /* ── Footer ── */
     .footer {
       position: relative;
       z-index: 1;
       border-top: 1px solid var(--border);
-      padding: 24px 28px;
+      padding: 28px;
+      margin-top: 40px;
     }
     .footer-wrap {
       max-width: 1120px;
@@ -1032,33 +1210,37 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       flex-wrap: wrap;
     }
     .footer-logo {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent);
+      font-size: 14px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--orange) 0%, var(--salmon) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     .footer-links {
       display: flex;
-      gap: 16px;
+      gap: 18px;
       margin-left: auto;
     }
     .footer-a {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       text-decoration: none;
-      font-size: 12px;
-      color: var(--muted);
-      transition: color 0.15s;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink-muted);
+      transition: color 0.2s, transform 0.2s;
     }
-    .footer-a:hover { color: var(--text-muted); }
-    .footer-copy { font-size: 11px; color: var(--text-faint); }
+    .footer-a:hover { color: var(--orange); transform: translateY(-1px); }
+    .footer-copy { font-size: 11.5px; color: var(--ink-faint); }
 
     /* ── Scroll reveal ── */
     [data-reveal] {
       opacity: 0;
-      transform: translateY(22px);
-      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(24px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
       transition-delay: calc(var(--i, 0) * 110ms);
     }
     [data-reveal].in-view {
@@ -1068,7 +1250,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; padding: 64px 20px 48px; }
+      .hero { grid-template-columns: 1fr; padding: 64px 20px 48px; gap: 40px; }
       .bento { grid-template-columns: 1fr; }
       .bcard-wide, .bcard-narrow, .bcard-full { grid-column: 1; grid-row: auto; }
       .bcard-full-inner { grid-template-columns: 1fr; }
@@ -1081,7 +1263,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
       .mock-col:not(:first-child) { display: none; }
       .diff-row { flex-direction: column; }
       .diff-arr { transform: rotate(90deg); align-self: center; }
-      .section { padding: 52px 20px; }
+      .section { padding: 56px 20px; }
       .footer-links { margin-left: 0; }
       .footer-wrap { flex-direction: column; align-items: flex-start; gap: 12px; }
     }
@@ -1092,14 +1274,14 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
   private observer?: IntersectionObserver;
 
   readonly stack = [
-    { name: 'Angular 17',      desc: 'Frontend SPA',           color: '#f43f5e' },
-    { name: 'Spring Boot',     desc: 'API REST backend',       color: '#22c55e' },
-    { name: 'PostgreSQL',      desc: 'Base de données',        color: '#3b82f6' },
-    { name: 'JWT Auth',        desc: 'Sécurité / tokens',      color: '#f59e0b' },
-    { name: 'Docker',          desc: 'Conteneurisation',       color: '#0ea5e9' },
-    { name: 'Resend API',      desc: 'Emails transactionnels', color: '#a855f7' },
-    { name: 'Spring Security', desc: 'Guards & autorisation',  color: '#10b981' },
-    { name: 'RxJS',            desc: 'Programmation réactive', color: '#ec4899' },
+    { name: 'Angular 17',      desc: 'Frontend SPA',           color: '#ff7335' },
+    { name: 'Spring Boot',     desc: 'API REST backend',       color: '#22C55E' },
+    { name: 'PostgreSQL',      desc: 'Base de données',        color: '#3B82F6' },
+    { name: 'JWT Auth',        desc: 'Sécurité / tokens',      color: '#F59E0B' },
+    { name: 'Docker',          desc: 'Conteneurisation',       color: '#0EA5E9' },
+    { name: 'Resend API',      desc: 'Emails transactionnels', color: '#A855F7' },
+    { name: 'Spring Security', desc: 'Guards & autorisation',  color: '#10B981' },
+    { name: 'RxJS',            desc: 'Programmation réactive', color: '#EC4899' },
   ];
 
   ngAfterViewInit() {
@@ -1114,9 +1296,52 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
     );
     this.el.nativeElement.querySelectorAll('[data-reveal]')
       .forEach((el: Element) => this.observer!.observe(el));
+
+    // Spotlight effect on bcard hover (mouse-tracking radial)
+    this.el.nativeElement.querySelectorAll('.bcard').forEach((card: HTMLElement) => {
+      card.addEventListener('mousemove', (e: MouseEvent) => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+        card.style.setProperty('--my', `${e.clientY - r.top}px`);
+      });
+    });
   }
 
   ngOnDestroy() {
     this.observer?.disconnect();
+  }
+
+  scrollToSection(event: Event, id: string): void {
+    event.preventDefault();
+    const target = this.el.nativeElement.querySelector(`#${id}`) as HTMLElement | null;
+    if (!target) return;
+
+    const scroller = this.findScrollContainer(target);
+    const navHeight = 64;
+    const offset = 12;
+
+    if (scroller && scroller !== document.documentElement && scroller !== document.body) {
+      const top = target.getBoundingClientRect().top
+                - scroller.getBoundingClientRect().top
+                + scroller.scrollTop
+                - navHeight - offset;
+      scroller.scrollTo({ top, behavior: 'smooth' });
+    } else {
+      const top = target.getBoundingClientRect().top + window.scrollY - navHeight - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  }
+
+  private findScrollContainer(el: HTMLElement): HTMLElement | null {
+    let node: HTMLElement | null = el.parentElement;
+    while (node && node !== document.body) {
+      const style = getComputedStyle(node);
+      const oy = style.overflowY;
+      if ((oy === 'auto' || oy === 'scroll') && node.scrollHeight > node.clientHeight) {
+        return node;
+      }
+      node = node.parentElement;
+    }
+    return document.scrollingElement as HTMLElement | null;
   }
 }

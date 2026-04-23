@@ -199,7 +199,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
       --field-focus-ring: rgba(64,72,231,0.14);
       --border: rgba(255,255,255,0.08);
       --border-focus: rgba(64,72,231,0.5);
-      --muted: rgba(226,232,240,0.45);
+      --text-muted: rgba(226,232,240,0.45);
       --error: #f87171;
     }
 
@@ -230,10 +230,10 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
     .card-brand { display: flex; align-items: center; gap: 12px; }
     .brand-logo { font-size: 1.05rem; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; text-decoration: none; }
     .brand-sep { width: 1px; height: 16px; background: var(--border); }
-    .brand-tag { font-size: 12px; color: var(--muted); }
+    .brand-tag { font-size: 12px; color: var(--text-muted); }
 
     .card-title { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.04em; color: #f1f5f9; margin: 0 0 8px; }
-    .card-sub { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.6; }
+    .card-sub { font-size: 13.5px; color: var(--text-muted); margin: 0; line-height: 1.6; }
 
     /* States */
     .success-state, .error-state { display: flex; flex-direction: column; gap: 12px; }
@@ -277,7 +277,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
     }
     .field-wrap.field-error { border-color: rgba(248,113,113,0.5); background: rgba(248,113,113,0.04); }
 
-    .field-icon { color: var(--muted); flex-shrink: 0; }
+    .field-icon { color: var(--text-muted); flex-shrink: 0; }
     .field-input {
       flex: 1; background: transparent; border: none; outline: none;
       font-family: 'Outfit', system-ui, sans-serif; font-size: 14px;
@@ -288,7 +288,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
 
     .toggle-btn {
       background: none; border: none; padding: 4px; cursor: pointer;
-      color: var(--muted); display: flex; align-items: center;
+      color: var(--text-muted); display: flex; align-items: center;
       border-radius: 5px; transition: color 0.15s, background 0.15s;
     }
     .toggle-btn:hover { color: #e2e8f0; background: rgba(255,255,255,0.06); }

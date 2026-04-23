@@ -294,10 +294,10 @@ import { InvitationService } from '../../../core/services/invitation.service';
 
     .project-avatar {
       width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
-      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%);
       display: flex; align-items: center; justify-content: center;
       font-size: 1.1rem; font-weight: 800; color: #fff;
-      box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+      box-shadow: 0 4px 12px rgba(255,115,53,0.4);
     }
 
     .header-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -316,7 +316,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
       background: var(--bg-panel); border: 1px solid var(--border-panel);
       color: var(--text-muted);
     }
-    .role-badge.is-admin { color: #a78bfa; background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.3); }
+    .role-badge.is-admin { color: #ffb088; background: rgba(255,115,53,0.12); border-color: rgba(255,115,53,0.3); }
 
     .header-progress-row { display: flex; align-items: center; gap: 8px; }
 
@@ -327,7 +327,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
     }
     .mini-progress-fill {
       height: 100%; border-radius: 99px;
-      background: linear-gradient(90deg, #6366f1, #a855f7);
+      background: linear-gradient(90deg, #ff7335 0%, #ffb088 100%);
       transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
       animation: fillIn 1s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
@@ -391,7 +391,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
     }
     .progress-fill {
       height: 100%; border-radius: 99px;
-      background: linear-gradient(90deg, #6366f1, #a855f7);
+      background: linear-gradient(90deg, #ff7335 0%, #ffb088 100%);
       animation: fillIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
       transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -402,7 +402,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
     .legend-dot {
       display: inline-block; width: 7px; height: 7px; border-radius: 50%;
     }
-    .legend-dot.done { background: #a855f7; box-shadow: 0 0 6px rgba(168,85,247,0.6); }
+    .legend-dot.done { background: #ffb088; box-shadow: 0 0 6px rgba(255,176,136,0.6); }
     .legend-dot.in-progress { background: #0ea5e9; box-shadow: 0 0 6px rgba(14,165,233,0.6); }
     .legend-dot.todo { background: var(--border); }
 
@@ -464,8 +464,8 @@ import { InvitationService } from '../../../core/services/invitation.service';
     .invite-row {
       display: flex; align-items: center; gap: 10px;
       margin-bottom: 16px; padding: 12px;
-      background: rgba(99,102,241,0.06);
-      border: 1px solid rgba(99,102,241,0.2);
+      background: rgba(255,115,53,0.06);
+      border: 1px solid rgba(255,115,53,0.2);
       border-radius: 12px;
     }
     .invite-field { flex: 1; margin-bottom: -1.25em; }
@@ -497,7 +497,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
     .user-cell { display: flex; align-items: center; gap: 10px; }
     .member-avatar {
       width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, #6366f1, #a855f7);
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%);
       display: flex; align-items: center; justify-content: center;
       font-size: 0.72rem; font-weight: 700; color: #fff;
     }
@@ -518,7 +518,7 @@ import { InvitationService } from '../../../core/services/invitation.service';
       font-size: 0.68rem; font-weight: 600; padding: 2px 8px;
       border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;
     }
-    .role-ADMIN   { color: #a78bfa; background: rgba(167,139,250,0.12); }
+    .role-ADMIN   { color: #ffb088; background: rgba(255,115,53,0.12); }
     .role-EDITOR  { color: #059669; background: rgba(5,150,105,0.1); }
     .role-VIEWER  { color: var(--text-muted); background: var(--bg-panel); }
     .remove-btn { color: var(--text-muted) !important; &:hover { color: #ff4d4d !important; } }
@@ -539,9 +539,9 @@ import { InvitationService } from '../../../core/services/invitation.service';
     .form-footer { display: flex; justify-content: flex-end; margin-top: 4px; }
     .btn-primary {
       height: 38px; padding: 0 20px !important; border-radius: 10px !important;
-      background: linear-gradient(135deg, #6366f1, #3b82f6) !important;
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%) !important;
       color: #fff !important; font-weight: 600 !important;
-      box-shadow: 0 4px 14px rgba(99,102,241,0.3) !important;
+      box-shadow: 0 4px 14px rgba(255,115,53,0.3) !important;
     }
 
     /* ── Divider ── */

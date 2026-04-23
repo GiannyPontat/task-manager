@@ -107,7 +107,7 @@ import { NotificationService } from '../../../core/services/notification.service
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand-mark {
       width: 30px; height: 30px;
-      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%);
       border-radius: 8px; display: flex; align-items: center; justify-content: center;
       font-size: 15px; font-weight: 800; color: #fff; flex-shrink: 0;
     }
@@ -117,7 +117,7 @@ import { NotificationService } from '../../../core/services/notification.service
 
     .nav-link { color: var(--text-muted) !important; font-size: 0.875rem !important; font-weight: 500 !important; border-radius: 8px !important; margin-right: 4px; transition: color 0.15s, background 0.15s; letter-spacing: 0; }
     .nav-link:hover { color: var(--text-main) !important; background: var(--bg-panel) !important; }
-    :host ::ng-deep .nav-active.nav-link { color: var(--primary) !important; background: rgba(99,102,241,0.1) !important; }
+    :host ::ng-deep .nav-active.nav-link { color: var(--primary) !important; background: rgba(255,115,53,0.1) !important; }
 
     /* Bell */
     .notif-btn {
@@ -200,7 +200,7 @@ import { NotificationService } from '../../../core/services/notification.service
     .user-area { display: flex; align-items: center; gap: 9px; margin-right: 6px; }
     .avatar {
       width: 32px; height: 32px;
-      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%);
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
       font-size: 0.78rem; font-weight: 700; color: #fff; text-transform: uppercase; flex-shrink: 0;
     }
@@ -211,10 +211,10 @@ import { NotificationService } from '../../../core/services/notification.service
 
     .auth-link { color: var(--text-muted) !important; font-size: 0.875rem; }
     .cta-btn {
-      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%) !important;
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%) !important;
       color: #fff !important; border-radius: 8px !important; font-size: 0.875rem !important;
       font-weight: 600 !important; margin-left: 10px; padding: 0 18px !important;
-      box-shadow: 0 2px 8px rgba(99,102,241,0.4) !important;
+      box-shadow: 0 2px 8px rgba(255,115,53,0.4) !important;
     }
   `],
 })

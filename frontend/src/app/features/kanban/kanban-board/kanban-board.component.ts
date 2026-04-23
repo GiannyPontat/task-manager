@@ -418,9 +418,9 @@ const PRIORITY_COLORS: Record<Priority, string> = {
     }
 
     .task-count {
-      background: rgba(99,102,241,0.2);
+      background: rgba(241,166,99,0.2);
       color: var(--primary);
-      border: 1px solid rgba(99,102,241,0.3);
+      border: 1px solid rgba(241,166,99,0.3);
       border-radius: 20px;
       padding: 2px 9px;
       font-size: 0.7rem;

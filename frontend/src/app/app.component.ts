@@ -97,7 +97,7 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password
       height: 500px;
       top: -120px;
       left: -80px;
-      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      background: linear-gradient(135deg, #ff7335 0%, #ffb088 100%);
       filter: blur(130px);
       transition: opacity 0.3s ease;
     }
