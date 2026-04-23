@@ -160,8 +160,7 @@ npx cypress open
 
 ## Captures d'écran
 
-> *(à ajouter)*
+> *![img.png](img.png)*
 
 ## Auteur
-
 Développé par [GiannyPontat](https://github.com/GiannyPontat).
